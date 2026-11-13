@@ -4,13 +4,13 @@
 **Platformă:** aplicație **iOS nativă (SwiftUI)**, backend Python. Fără Android: echipa are două MacBook-uri și două iPhone-uri, iar demo-ul se face pe iPhone.
 **Repo:** [github.com/VladimirTM/PolyGraph](https://github.com/VladimirTM/PolyGraph) (local: `~/Git/PolyGraph`)
 
-**Pitch într-o frază:** pozezi cutiile de medicamente și rețetele bunicii; PolyGraph construiește graful ei terapeutic, găsește deterministic interacțiunile, dublurile și medicamentele nepotrivite vârstei, îi face un program zilnic simplu, o ascultă când spune cum se simte și ține familia, farmacistul și medicul de familie în aceeași buclă.
+**Pitch într-o frază:** pozezi cutiile de medicamente și rețetele bunicii; PolyGraph construiește graful ei terapeutic, găsește deterministic interacțiunile, dublurile și medicamentele nepotrivite vârstei, îi face un program zilnic simplu, o ascultă când spune cum se simte și ține familia și medicul de familie în aceeași buclă.
 
 ---
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e închis** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9) și completarea cu OCR-ul real din A2): toate cele patru capturi din `demo/ocr/` trec prin `ocr_match` fără Gemini. `make demo-b3` verifică fluxul cap-coadă pe date sintetice. **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e în `main`** ([PR #13](https://github.com/VladimirTM/PolyGraph/pull/13)): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_pharmacist`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. **A2 e gata** ([PR #15](https://github.com/VladimirTM/PolyGraph/pull/15)): cutie (DataMatrix + poză) și rețetă (camera de documente), OCR pe telefon, `/scan`, sheet-ul de confirmare cu câmpurile „verificați” și avertizări de expirare / duplicat, camera falsă `PG_FAKE_SCAN`; `make check-ios` verde, încercat pe iPhone cu cutiile de test din `demo/datamatrix/`; rămân cutiile fizice în sală (T-A2-03). **B5 e în `main`** ([PR #16](https://github.com/VladimirTM/PolyGraph/pull/16)) cu rutele reale `/checkins` și `/feed`. `make check` trece cu 247 de teste cu `kb.sqlite` construit. **A3 e gata** (modul aparținător: listă pe medici cu „Anulează”, alerte cu zoom, ACB, graf radial local, detaliu + editare). **B6 e gata pe `feature/b6-share`:** `POST /share` (token 72 h), pagina farmacistului (`/share/{token}`), „Am verificat” cu notă (apare pe alertă și în Noutăți), fișa de tipărit (2 pagini A4 cu toate alertele grave) și graful pentru WKWebView (`/share/{token}/graph?embed=1`, tap pe muchie → `messageHandlers.alert`); `make check` are 260 de teste; rămâne verificarea manuală pe iPhone (T-B6-04). **Urmează:** Dev A pornește A4. Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e închis** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9) și completarea cu OCR-ul real din A2): toate cele patru capturi din `demo/ocr/` trec prin `ocr_match` fără Gemini. `make demo-b3` verifică fluxul cap-coadă pe date sintetice. **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e în `main`** ([PR #13](https://github.com/VladimirTM/PolyGraph/pull/13)): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_pharmacist`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. **A2 e gata** ([PR #15](https://github.com/VladimirTM/PolyGraph/pull/15)): cutie (DataMatrix + poză) și rețetă (camera de documente), OCR pe telefon, `/scan`, sheet-ul de confirmare cu câmpurile „verificați” și avertizări de expirare / duplicat, camera falsă `PG_FAKE_SCAN`; `make check-ios` verde, încercat pe iPhone cu cutiile de test din `demo/datamatrix/`; rămân cutiile fizice în sală (T-A2-03). **B5 e în `main`** ([PR #16](https://github.com/VladimirTM/PolyGraph/pull/16)) cu rutele reale `/checkins` și `/feed`. `make check` trece cu 247 de teste cu `kb.sqlite` construit. **A3 e gata** (modul aparținător: listă pe medici cu „Anulează”, alerte cu zoom, ACB, graf radial local, detaliu + editare). **B6 e în `main`** ([PR #21](https://github.com/VladimirTM/PolyGraph/pull/21)) și apoi **reorientat spre medicul de familie** (`feature/b6-doctor-portal`): portalul `/portal` cu login prin cod, lista pacienților, fișa cu decizie + notă pe alertă (apare pe alertă și în Noutăți), reconcilierea de tipărit (2 pagini A4) și QR-ul care adaugă pacientul în lista medicului; farmacistul a ieșit din contracte și din textele motorului; `make check` are 266 de teste; rămâne T-B6-04 (manual pe iPhone). **Urmează:** Dev A pornește A4. Actualizați coloana „Status” la fiecare sync point.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
@@ -28,14 +28,14 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | B2 motorul de interacțiuni + graful | Dev B | W4–W12 | V 22:00–S 13:00 | ✅ | golden test = `expected_alerts.json` |
 | **S1** | amândoi | W8 | S 02:00 | ⬜ | |
 | Q1 review (noaptea) | agent | somn | S 02:00–09:00 | ⬜ | `docs/reviews/Q1.md`, triere 10 min |
-| A3 medicamente, alerte, graf | Dev A | W8–W12 (+ integrare W12–W14) | S 09:00–16:00 | ✅ | modul aparținător; `make check-ios` verde, graful pe iPhone fără internet în 427 ms; „Arată farmacistului” rămâne pentru A6 |
+| A3 medicamente, alerte, graf | Dev A | W8–W12 (+ integrare W12–W14) | S 09:00–16:00 | ✅ | modul aparținător; `make check-ios` verde, graful pe iPhone fără internet în 427 ms; „Arată medicului” (QR) rămâne pentru A6 |
 | B3 extracția (OCR → catalog, GS1, cache) | Dev B | W12–W14 | S 14:00–16:00 | ✅ | `/scan` real |
 | **S2** + Q2 | amândoi | W14 | S 16:00 | ⬜ | fluxul real cap-coadă |
 | A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | ⬜ | Acum, Ziua de azi, „Am luat”, TTS, notificări |
 | B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | ✅ | `/schedule`, `/checkins` reale; B4 gata (`/schedule`, `/doses`), B5 gata (`/checkins`, `/feed`); X1 (can_i_take → what-if) și Whisper rămân condiționale |
 | **S3** (MVP complet) | amândoi | W19 | S 21:30 | ⬜ | |
 | A5 check-in vocal + Noutăți | Dev A | W19–W23 | S 21:30–D 02:00 | ⬜ | |
-| B6 pagina farmacistului + tipărire | Dev B | W19–W23 | S 21:30–D 02:00 | 🟡 | `/share` real: pagina, „Am verificat” → alertă + Noutăți, `/print` în 2 pagini A4, `/graph?embed=1`; rămâne T-B6-04 (manual pe iPhone) |
+| B6 portalul medicului de familie + tipărire | Dev B | W19–W23 | S 21:30–D 02:00 | 🟡 | portalul real (`/portal`): login cu cod, lista pacienților, fișa cu decizie + notă → alertă + Noutăți, tipărire în 2 pagini A4, QR care adaugă pacientul; `/graph?embed=1`; rămâne T-B6-04 (manual pe iPhone) |
 | Q3 review (noaptea) | agent | somn | D 02:00–08:00 | ⬜ | triere 15 min |
 | A6 QR, modul demo · B7 demo hardening | A · B | W23–W24.5 | D 08:00–09:30 | ⬜ | + fix-urile blocker din Q3 |
 | **S4** feature freeze + Q4 | amândoi | W24.5 | D 09:30 | ⬜ | după S4 nu se mai scrie cod nou |
@@ -71,7 +71,7 @@ Un sync point nu e trecut cât timp raportul Q aferent are un blocker cu decizia
 | **W14** | **S 16:00** | **S2** | **S2** · pornește **Q2** pe Mac-ul lui Dev B (rulează în paralel ~45 min); triere la ~W15 |
 | W14–W19 | S 16:00–21:30 | A4 modul senior: Acum, Ziua de azi, „Am luat”, TTS, notificări | B4 solverul de program; B5 simptome + corelare |
 | **W19** | **S 21:30** | **S3 (MVP complet)** | **S3** |
-| W19–W23 | S 21:30–02:00 | A5 check-in vocal (pe telefon) + Noutăți | B6 pagina farmacistului + versiunea de tipărit |
+| W19–W23 | S 21:30–02:00 | A5 check-in vocal (pe telefon) + Noutăți | B6 portalul medicului de familie + versiunea de tipărit |
 | – | D 02:00–08:00 | 😴 · **Q3 rulează pe Mac-ul lui Dev A** | 😴 |
 | W23–W24.5 | D 08:00–09:30 | triere Q3 (15 min); A6 QR, modul demo; fix-urile blocker din Q3 | B7 demo hardening; fix-urile blocker din Q3 pe backend |
 | **W24.5** | **D 09:30** | **S4 feature freeze** | **S4 feature freeze** |
@@ -90,7 +90,7 @@ Planul are cinci părți:
 
 > **Regula de aur a produsului:** în fluxul normal nu rulează niciun LLM: textul îl citește OCR-ul de pe telefon, vocea o transcrie telefonul, iar potrivirea în catalog, simptomele, interacțiunile și programul sunt deterministe. Un LLM (Gemini, tier gratuit) intervine doar ca rezervă, când potrivirea eșuează, și rezultatul lui trece prin aceleași verificări. **Dacă există o interacțiune, cât de gravă e și ce se recomandă vin exclusiv din baze de date și reguli deterministe**, cu sursa afișată lângă fiecare alertă. Asta e argumentul tehnic principal la juriu: „fără halucinații în decizia medicală”.
 
-> **Regula de aur a siguranței:** aplicația nu spune niciodată „opriți medicamentul X” și nu schimbă doze. Spune „discutați cu medicul / arătați farmacistului”, iar alertele grave merg la aparținător și la farmacist, nu doar la pacient.
+> **Regula de aur a siguranței:** aplicația nu spune niciodată „opriți medicamentul X” și nu schimbă doze. Spune „discutați cu medicul de familie”, iar alertele grave merg la aparținător și la medicul de familie (portalul), nu doar la pacient.
 
 ---
 
@@ -142,7 +142,7 @@ Regulă: un bug găsit în demo primește întâi un test (sau o intrare în `ex
   |---|---|---|
   | Claude Code | Claude Pro, câte unul fiecare | agentul principal: Dev A pe aplicația iOS, Dev B pe motor, potrivire și backend |
   | Codex CLI | ChatGPT Plus | rezerva lui Dev A când Claude atinge limita de 5 h; task-uri iOS mici și bine delimitate |
-  | Gemini CLI | Google AI Pro | rezerva lui Dev B (scripturi de date, teste Python, CSS-ul paginii farmacistului) și **agentul de review** din etapa Q (alt furnizor = verificare cu adevărat independentă, iar limitele Claude rămân pentru cod) |
+  | Gemini CLI | Google AI Pro | rezerva lui Dev B (scripturi de date, teste Python, CSS-ul portalului) și **agentul de review** din etapa Q (alt furnizor = verificare cu adevărat independentă, iar limitele Claude rămân pentru cod) |
   | Gemini API, tier gratuit | cheie din Google AI Studio | în aplicație, doar ca rezervă la scanare și la simptome |
 
   Regulile: (1) conturile ChatGPT Plus și Google AI Pro le ține pe Mac-ul lui fiecare cel care le deține, dar oricine le poate folosi când îi expiră fereastra Claude; (2) când un agent atinge limita, task-ul continuă pe celălalt agent cu același prompt din plan și cu `git diff` ca punct de pornire, nu se așteaptă resetarea; (3) task-urile mari (A3, A4, B2) se încep cu Claude la începutul unei ferestre noi de 5 h; (4) nimeni nu pune o cheie de API în variabilele de mediu ale Claude Code (`ANTHROPIC_API_KEY`), ca să nu se factureze pe API.
@@ -159,7 +159,7 @@ Regulă: un bug găsit în demo primește întâi un test (sau o intrare în `ex
 |---|---|---|
 | **Pacientul** | vârstnic cu 5–10 medicamente de la medici diferiți | „Modul senior”: doar programul de azi, poza cutiei la fiecare doză, buton mare „Am luat”, asistent vocal |
 | **Aparținătorul** | fiica / fiul, adesea în alt oraș | tot: lista, graful, alertele detaliate, aderența, check-in-urile vocale; primește alertele grave |
-| **Farmacistul** | farmacia de cartier | fișa de medicație prin link / QR temporar, poate marca alerte „verificat” și lăsa o notă |
+| **Medicul de familie** | cabinetul | portal web cu lista pacienților care i-au partajat tratamentul (prin QR); pe fiecare alertă decide „Menține / Modific la consultație / Trimit la specialist” + notă, care ajung la familie; „Reconcilierea medicației” de tipărit |
 | **Medicul de familie** | coordonatorul îngrijirii | aceeași fișă web + „Reconcilierea medicației” de tipărit (sau salvat ca PDF) pentru consultație |
 
 ### 1.2 Feature-uri MVP (intră sigur în demo)
@@ -175,21 +175,21 @@ Regulă: un bug găsit în demo primește întâi un test (sau o intrare în `ex
 | F7 | **Modul senior** | Ecranul „Acum”: ce pastilă, cu poza cutiei, câte bucăți, instrucțiunea („pe stomacul gol”); „Am luat” / „Am sărit”; citire cu voce (TTS, română) | A |
 | F8 | **Check-in vocal zilnic** | „Cum vă simțiți azi?” → transcriere pe telefon (recunoașterea vocală iOS, română), cu textul afișat în timp ce vorbește → simptome dintr-un vocabular fix → corelare deterministă cu efectele adverse și interacțiunile existente → escaladare la aparținător dacă e cazul | A (UI audio), B (pipeline) |
 | F9 | **Aparținătorul** | Feed: alerte noi, doze ratate, check-in-uri cu simptome legate de medicamente; în demo rulează pe al doilea telefon | A |
-| F10 | **Fișa pentru farmacist / medic** | QR / link cu token care expiră; pagină web cu lista, graful, alertele, aderența; farmacistul marchează „verificat” + notă; „Reconcilierea medicației” de tipărit | B (pagina), A (QR) |
+| F10 | **Portalul medicului de familie** | login cu cod; lista pacienților (cei cu alerte nerevizuite și semnalele familiei sus); fișa cu medicamentele, graful, alertele, aderența, check-in-urile; decizie + notă pe alertă → alertă + Noutăți; QR cu token de 72 h care adaugă pacientul în listă; „Reconcilierea medicației” de tipărit | B (portalul), A (QR) |
 
 ### 1.3 Bonus (doar dacă sync point-ul S3 e atins la timp; la 30 h, realist doar X2, ca scenariu din modul demo)
 
 | # | Feature | De ce e bun în pitch |
 |---|---|---|
 | X1 | **„Pot să iau…?”** prin voce („Pot să iau un Algocalmin?”) → același motor rulat ca „what-if” pe regimul curent → răspuns vocal | arată că motorul e reutilizabil; foarte natural pentru vârstnici |
-| X2 | **Scenariul „medic nou”**: rețetă nouă scanată → alerta critică apare live pe telefonul aparținătorului și în pagina farmacistului | momentul „wow” din demo (se pregătește oricum ca script, X2 e doar varianta live, fără refresh) |
+| X2 | **Scenariul „medic nou”**: rețetă nouă scanată → alerta critică apare live pe telefonul aparținătorului și în portalul medicului de familie | momentul „wow” din demo (se pregătește oricum ca script, X2 e doar varianta live, fără refresh) |
 | X3 | Expirări și stoc („mai aveți pastile pentru 3 zile”) din numărul de comprimate de pe cutie | utilitate zilnică |
 | X4 | Explicația în limbaj simplu, reformulată de LLM **strict din câmpurile alertei** (cu sursa) | accesibilitate |
 
 ### 1.4 Ce NU face (scris explicit în pitch și în aplicație)
 
 - Nu pune diagnostice, nu schimbă și nu oprește medicamente, nu recomandă doze.
-- Nu înlocuiește farmacistul sau medicul; îi aduce la aceeași informație.
+- Nu înlocuiește medicul de familie; îi aduce informația pe care altfel n-o vede (OTC-uri, rețete de la 5 specialiști).
 - Nu e dispozitiv medical certificat (prototip; poziționarea de reglementare e în secțiunea 9).
 
 ---
@@ -216,7 +216,7 @@ Regulă: un bug găsit în demo primește întâi un test (sau o intrare în `ex
 │ schedule/  solver cu constrângeri (backtracking)                                │
 │ voice/     text transcris pe telefon → potrivire pe sinonime (vocabular fix)    │
 │            → corelare; Gemini doar ca rezervă                                  │
-│ share/     pagină Jinja + Cytoscape.js + note farmacist; versiune de tipărit    │
+│ share/     portalul medicului (Jinja + Cytoscape.js), decizii, tipărire        │
 │ store      SQLite (app.sqlite: pacienți, medicamente, doze, check-in-uri)        │
 │ kb         SQLite read-only (kb.sqlite: produse RO, substanțe, interacțiuni, reguli) │
 └─────────────────────────────────────────────────────────────────────────────────┘
@@ -258,7 +258,7 @@ Regulă: un bug găsit în demo primește întâi un test (sau o intrare în `ex
 
 **Unde stă skill-ul.** `.claude/skills/apple-design/SKILL.md`, copiat neschimbat din [emilkowalski/skills](https://github.com/emilkowalski/skills/blob/main/skills/apple-design/SKILL.md) (commit `4061b67`, licență MIT, cu fișierul `LICENSE` lângă el). `AGENTS.md` și `CLAUDE.md` cer ca **orice etapă care atinge UI-ul** să citească întâi skill-ul și apoi `docs/DESIGN.md` (secțiunea aceasta).
 
-**Skill-ul e scris pentru web; SwiftUI are nativ aproape tot ce descrie.** Pagina farmacistului (B6) aplică skill-ul direct, în CSS. În aplicație, regula e: **folosește componenta de sistem care face deja ce cere skill-ul și scrie cod propriu doar unde nu există**. Tabelul de mai jos e traducerea; ce e în coloana a doua nu se reimplementează de mână.
+**Skill-ul e scris pentru web; SwiftUI are nativ aproape tot ce descrie.** Portalul medicului de familie (B6) aplică skill-ul direct, în CSS. În aplicație, regula e: **folosește componenta de sistem care face deja ce cere skill-ul și scrie cod propriu doar unde nu există**. Tabelul de mai jos e traducerea; ce e în coloana a doua nu se reimplementează de mână.
 
 | Skill | Ce folosim în SwiftUI (iOS 18+) |
 |---|---|
@@ -277,7 +277,7 @@ Regulă: un bug găsit în demo primește întâi un test (sau o intrare în `ex
 
 | Principiu (skill §16) | Ce înseamnă concret aici |
 |---|---|
-| **Purpose** | Pacientul are **un singur ecran principal** („Acum”). Graful, sursele și severitățile există doar în modul aparținător și în pagina farmacistului. |
+| **Purpose** | Pacientul are **un singur ecran principal** („Acum”). Graful, sursele și severitățile există doar în modul aparținător și în portalul medicului de familie. |
 | **Agency** | Fără dialoguri de confirmare pentru acțiuni reversibile: „Am luat” se poate anula 5 s. Confirmarea apare doar la ștergerea unui medicament. |
 | **Responsibility** | Nicio formulare de tip „opriți”; microfonul și camera se cer la primul gest care are nevoie de ele, cu motivul spus în cuvinte; fiecare alertă își arată sursa; vocea se transcrie pe telefon. |
 | **Familiarity** | Tipare iOS standard: titluri mari, sheet-uri, swipe-to-delete cu undo, înapoi din stânga, tab bar. Nimic inventat acolo unde iOS are deja un tipar. |
@@ -292,7 +292,7 @@ Regulă: un bug găsit în demo primește întâi un test (sau o intrare în `ex
 - **Feedback instant, commit protejat.** Butonul se micșorează imediat la atingere (§1); acțiunea pornește la ridicarea degetului, iar a doua apăsare pe aceeași doză în următoarea secundă e ignorată (și backend-ul e idempotent pe doză).
 - **Microfonul: atingere ca să pornească, atingere sau liniște ca să se oprească**, nu „țineți apăsat”. Oprire automată după 2 s de liniște sau 60 s.
 - **Suprafețe opace în modul senior.** Materialele translucide rămân doar în chrome-ul de sistem al modului aparținător.
-- **Fără roșu de alarmă pentru pacient.** Alertele grave se văd la Ana și la farmacist; Maria vede un card liniștit cu „Am anunțat-o pe Ana”.
+- **Fără roșu de alarmă pentru pacient.** Alertele grave se văd la Ana și la medicul de familie; Maria vede un card liniștit cu „Am anunțat-o pe Ana”.
 
 #### 2.4.3 Tokenii (`app/PolyGraph/Design/`)
 
@@ -347,7 +347,7 @@ Doar **tokenii + 3 interacțiuni lucrate**: butonul cu răspuns instant și guar
 | | **Dev A: aplicația mobilă** | **Dev B: date, motor, backend** |
 |---|---|---|
 | Deține | `app/` (proiectul Xcode) | `backend/`, `kb/`, `demo/` |
-| Construiește | proiectul iOS, tokenii de design (2.4, `docs/DESIGN.md`), clientul API, scanarea (DataMatrix + poză + rețetă), confirmarea, medicamentele și alertele, graful în WKWebView, modul senior (Acum, program, TTS, notificări), check-in-ul vocal pe telefon, Noutăți, QR, modul demo | ingestia datelor, potrivirea în nomenclator, motorul de interacțiuni, verificările pentru vârstnici, graful, solverul de program, pipeline-ul de extracție, înțelegerea simptomelor + corelarea, pagina farmacistului (și versiunea de tipărit), cache-ul pentru demo |
+| Construiește | proiectul iOS, tokenii de design (2.4, `docs/DESIGN.md`), clientul API, scanarea (DataMatrix + poză + rețetă), confirmarea, medicamentele și alertele, graful în WKWebView, modul senior (Acum, program, TTS, notificări), check-in-ul vocal pe telefon, Noutăți, QR, modul demo | ingestia datelor, potrivirea în nomenclator, motorul de interacțiuni, verificările pentru vârstnici, graful, solverul de program, pipeline-ul de extracție, înțelegerea simptomelor + corelarea, portalul medicului de familie (și versiunea de tipărit), cache-ul pentru demo |
 | Împreună | P0 (contractele), D1 (integrare, repetiții), D2 (pitch) | idem |
 
 Granița dintre cei doi e formată din trei lucruri, toate în `contracts/`:
@@ -441,9 +441,9 @@ Reguli:
   "title": "Risc crescut de sângerare",
   "patient_text": "Două dintre pastile, luate împreună, pot crește riscul de sângerare. Am anunțat-o pe Ana.",
   "detail": "Acenocumarol + ibuprofen: AINS cresc riscul de hemoragie la pacienții anticoagulați.",
-  "recommendation": "Discutați cu medicul cardiolog sau cu farmacistul înainte de următoarea doză de ibuprofen. Nu opriți anticoagulantul fără acordul medicului.",
+  "recommendation": "Discutați cu medicul cardiolog înainte de următoarea doză de ibuprofen. Nu opriți anticoagulantul fără acordul medicului.",
   "action": "contact_doctor",
-  "route_to": ["caregiver", "pharmacist"],
+  "route_to": ["caregiver", "doctor"],
   "source": { "db": "ddinter", "ref": "<id DDInter substanța A> – <id DDInter substanța B>", "url": null },
   "basis": "direct",
   "analogy": null,
@@ -454,13 +454,13 @@ Reguli:
 
 Reguli:
 - `kind` ∈ `ddi`, `food`, `duplicate`, `elderly_pim`, `anticholinergic`, `timing`, `expired`, `symptom`.
-- `severity` ∈ `critical`, `major`, `moderate`, `minor`, `info`. Sursele, în ordinea priorității: (1) `kb/curated_ddi.csv` (verificat de mână pe site-ul DDInter / în RCP; aici se marchează și perechile „contraindicat” → `critical`, ex. simvastatină + claritromicină); (2) nivelul DDInter: `Major` → `major`, `Moderate` → `moderate`, `Minor` → `minor`; (3) **regula de clasă** pentru `Unknown`: dacă o substanță din aceeași clasă ATC nivel 4 are nivel pentru aceeași pereche (ex. acenocumarol `B01AA07` → warfarină `B01AA03`), alerta preia nivelul, cu `basis = "class_analogy"`, `analogy = { "via": "warfarină", "atc4": "B01AA" }` și textul „evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist”; (4) altfel, perechea `Unknown` nu produce alertă (doar o muchie gri în graf).
-- `basis` ∈ `direct`, `curated`, `class_analogy`; se afișează în detaliul alertei și în pagina farmacistului.
-- Afișarea pentru aparținător: `critical` și `major` sus, una câte una; `moderate` **grupate și restrânse** într-un singur card („6 interacțiuni moderate, de discutat cu farmacistul la următoarea vizită”); `minor` ascunse (vizibile doar în pagina farmacistului). **Alertele `food` nu intră printre cardurile grave, indiferent de severitate:** se grupează într-un singur card „Mâncare și băutură” (ex. grepfrutul cu simvastatina, care în DDInter e `Major`), sub cardurile grave.
-- `action` ∈ `contact_doctor`, `ask_pharmacist`, `separate_times`, `avoid_food`, `monitor`, `replace_box`.
-- `route_to` ⊆ `patient`, `caregiver`, `pharmacist`. Regula: `critical` și `major` (în afară de `food`) → `caregiver` + `pharmacist`; pacientul vede doar `patient_text`, fără termeni tehnici.
+- `severity` ∈ `critical`, `major`, `moderate`, `minor`, `info`. Sursele, în ordinea priorității: (1) `kb/curated_ddi.csv` (verificat de mână pe site-ul DDInter / în RCP; aici se marchează și perechile „contraindicat” → `critical`, ex. simvastatină + claritromicină); (2) nivelul DDInter: `Major` → `major`, `Moderate` → `moderate`, `Minor` → `minor`; (3) **regula de clasă** pentru `Unknown`: dacă o substanță din aceeași clasă ATC nivel 4 are nivel pentru aceeași pereche (ex. acenocumarol `B01AA07` → warfarină `B01AA03`), alerta preia nivelul, cu `basis = "class_analogy"`, `analogy = { "via": "warfarină", "atc4": "B01AA" }` și textul „evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de medicul de familie”; (4) altfel, perechea `Unknown` nu produce alertă (doar o muchie gri în graf).
+- `basis` ∈ `direct`, `curated`, `class_analogy`; se afișează în detaliul alertei și în portalul medicului.
+- Afișarea pentru aparținător: `critical` și `major` sus, una câte una; `moderate` **grupate și restrânse** într-un singur card („6 interacțiuni moderate, de discutat cu medicul de familie la următoarea vizită”); `minor` ascunse (vizibile doar în portalul medicului de familie). **Alertele `food` nu intră printre cardurile grave, indiferent de severitate:** se grupează într-un singur card „Mâncare și băutură” (ex. grepfrutul cu simvastatina, care în DDInter e `Major`), sub cardurile grave.
+- `action` ∈ `contact_doctor`, `ask_doctor`, `separate_times`, `avoid_food`, `monitor`, `replace_box`.
+- `route_to` ⊆ `patient`, `caregiver`, `doctor`. Regula: `critical` și `major` (în afară de `food`) → `caregiver` + `doctor`; pacientul vede doar `patient_text`, fără termeni tehnici.
 - `id` e determinist (tip + id-urile sortate), ca re-analiza să nu dubleze alertele.
-- `status` ∈ `open`, `acknowledged`, `verified_by_pharmacist`; `resolution` = `{ "by": "pharmacist", "note": "...", "at": "..." }`.
+- `status` ∈ `open`, `acknowledged`, `reviewed_by_doctor`; `resolution` = `{ "by": "doctor", "decision": "keep" | "change_at_visit" | "refer_specialist", "note": "...", "at": "..." }`.
 
 ### 5.4 `Schedule`
 
@@ -485,7 +485,7 @@ Reguli:
 
 Reguli:
 - Maximum 5 momente pe zi; solverul minimizează numărul de momente, apoi distanța față de ancore.
-- `unsatisfied` listează constrângerile imposibile (cu medicamentele implicate); fiecare intrare generează o alertă `timing` cu `action: ask_pharmacist`.
+- `unsatisfied` listează constrângerile imposibile (cu medicamentele implicate); fiecare intrare generează o alertă `timing` cu `action: ask_doctor`.
 
 ### 5.5 `CheckIn`
 
@@ -552,9 +552,9 @@ Autentificare: un `patient_token` simplu în header (`X-Patient-Token`), creat l
 | POST | `/v1/patients/{id}/checkins` | JSON `{ text }` (transcrierea de pe telefon) sau, doar în varianta de rezervă, multipart `audio` (m4a) → `CheckIn` | A |
 | GET | `/v1/patients/{id}/feed?since=` | evenimente pentru aparținător: alerte noi, doze ratate, check-in-uri escaladate | A (polling la 10 s) |
 | POST | `/v1/patients/{id}/share` | → `{ share_token, url, expires_at }` (implicit 72 h) | A |
-| GET | `/share/{token}` | pagina HTML pentru farmacist / medic | browser |
-| POST | `/share/{token}/alerts/{alert_id}/verify` | `{ note }` → `status: verified_by_pharmacist` | pagina |
-| GET | `/share/{token}/print` | „Reconcilierea medicației”, gândită pentru tipărire / „Salvează ca PDF” din browser | pagina |
+| GET | `/share/{token}` | linkul din QR: cu sesiunea portalului îl adaugă pe pacient în lista medicului (303 → fișa); altfel autentificarea | browser |
+| GET | `/portal`, `/portal/patients/{id}` (+ `/print`, `/graph`) | portalul medicului de familie (HTML, sesiune prin cookie după `POST /portal/login`) | browser |
+| POST | `/portal/patients/{id}/alerts/{alert_id}/review` | `{ decision, note }` → `status: reviewed_by_doctor` + eveniment `doctor_reviewed` | portalul |
 | GET | `/v1/kb/search?q=` | autocomplete pentru adăugarea manuală | A |
 | GET | `/share/{token}/graph?embed=1` | doar graful, pe tot ecranul, pentru WKWebView-ul din app (B6, A3) | A |
 | POST | `/demo/reset` | doar cu `DEMO_MODE=1`: recreează pacientul demo din fixture (B7, A6, Q0) | A, Q |
@@ -757,7 +757,7 @@ Nu face: lista și alertele (A3), modul senior.
 - [x] Cardul ACB
 - [x] Graful în `WKWebView` (pagina lui B6; până atunci un HTML local cu Cytoscape)
 - [x] Detaliul unui medicament
-- [ ] „Arată farmacistului” în toolbar-ul listei (rămâne pentru A6, odată cu ShareSheet-ul)
+- [ ] „Arată medicului” (QR) în toolbar-ul listei (rămâne pentru A6, odată cu ShareSheet-ul)
 
 ~~~text
 [WORKFLOW] Branch: feature/a3-meds-alerts-graph.
@@ -766,9 +766,9 @@ Citește .claude/skills/apple-design/SKILL.md (§3, §7, §12, §16) și docs/DE
 
 Obiectiv: modul Aparținător arată lista, alertele și graful pacientului.
 
-1. MedsView: List(.insetGrouped) cu secțiuni pe prescriber.specialty („Cardiologie”, „Fără rețetă”); rând: AsyncImage cu poza cutiei (48 pt, rază 8), brand + concentrație, posologia în cuvinte („½ seara”), un punct de severitate + eticheta celei mai grave alerte. .swipeActions → Șterge: dispare imediat, apare un banner „Anulează” 5 s (agency, fără dialog), apoi DELETE. Toolbar: „+” → ScanView (fullScreenCover), „Arată farmacistului” → ShareSheet (A6). .refreshable.
-2. AlertsView: ScrollView; sus, cardurile critical și major, câte unul pe alertă (fără alertele food); dedesubt, un singur card restrâns pentru toate alertele moderate („6 interacțiuni moderate, de discutat cu farmacistul la următoarea vizită”, DisclosureGroup); apoi un card restrâns „Mâncare și băutură” cu toate alertele food, indiferent de severitate; minor nu apar în aplicație (doar în pagina farmacistului). Card: punct + eticheta severității în cuvinte („Grav”), titlul, medicamentele ca chip-uri, o linie de recomandare; alertele cu basis = class_analogy au eticheta mică „prin analogie”. Fiecare card e .matchedTransitionSource(id: alert.id, in: ns) într-un NavigationLink.
-3. AlertDetailView cu .navigationTransition(.zoom(sourceID: alert.id, in: ns)): „Ce înseamnă” (detail), „Ce puteți face” (recommendation), medicamentele (link la detaliu), sursa în .footnote („Sursa: DDInter 2.0”), statusul și nota farmacistului, buton „Am înțeles”. Închiderea interactivă (swipe în jos) și întoarcerea în card le face sistemul.
+1. MedsView: List(.insetGrouped) cu secțiuni pe prescriber.specialty („Cardiologie”, „Fără rețetă”); rând: AsyncImage cu poza cutiei (48 pt, rază 8), brand + concentrație, posologia în cuvinte („½ seara”), un punct de severitate + eticheta celei mai grave alerte. .swipeActions → Șterge: dispare imediat, apare un banner „Anulează” 5 s (agency, fără dialog), apoi DELETE. Toolbar: „+” → ScanView (fullScreenCover), „Arată medicului” → ShareSheet (A6). .refreshable.
+2. AlertsView: ScrollView; sus, cardurile critical și major, câte unul pe alertă (fără alertele food); dedesubt, un singur card restrâns pentru toate alertele moderate („6 interacțiuni moderate, de discutat cu medicul de familie la următoarea vizită”, DisclosureGroup); apoi un card restrâns „Mâncare și băutură” cu toate alertele food, indiferent de severitate; minor nu apar în aplicație (doar în portalul medicului de familie). Card: punct + eticheta severității în cuvinte („Grav”), titlul, medicamentele ca chip-uri, o linie de recomandare; alertele cu basis = class_analogy au eticheta mică „prin analogie”. Fiecare card e .matchedTransitionSource(id: alert.id, in: ns) într-un NavigationLink.
+3. AlertDetailView cu .navigationTransition(.zoom(sourceID: alert.id, in: ns)): „Ce înseamnă” (detail), „Ce puteți face” (recommendation), medicamentele (link la detaliu), sursa în .footnote („Sursa: DDInter 2.0”), statusul și decizia medicului de familie (cu nota), buton „Am înțeles”. Închiderea interactivă (swipe în jos) și întoarcerea în card le face sistemul.
 4. AcbCard deasupra alertelor dacă acb_total ≥ 1: scorul mare, o propoziție (≥ 3: „risc crescut de confuzie și căderi”), medicamentele care contribuie.
 5. GraphView: UIViewRepresentable cu WKWebView care încarcă {baseURL}/share/{token}/graph?embed=1 (token creat o dată și ținut în AppStore). Până la B6: Graph/graph.html din bundle, cu cytoscape.min.js local, primind JSON-ul prin evaluateJavaScript. Tap pe muchie → WKScriptMessageHandler → deschide AlertDetailView. Fundal transparent, ca să se vadă fundalul aplicației.
 6. MedDetailView (push): poza mare, substanțe, momentele din program, alertele lui, „Editează” (refolosește ConfirmSheet din A2).
@@ -859,8 +859,8 @@ Obiectiv: Maria spune cum se simte; Ana află în câteva secunde, pe alt telefo
 2. VoiceCheckInView (fundal opac): la deschidere, TTS „Cum vă simțiți azi? Apăsați butonul și spuneți-mi.”; buton circular de 160 pt (PressableButtonStyle); sub el, transcrierea parțială apare pe măsură ce Maria vorbește (feedback continuu, §1) și eticheta de stare („Vă ascult…”, „Am înțeles, mă gândesc…”).
 3. Inelul: un cerc a cărui scară urmează nivelul netezit, actualizat cu withAnimation(.pgQuick) la fiecare valoare nouă (springul pornește de la valoarea curentă, deci nu sare). Cu Reduce Motion: inel static + textul de stare.
 4. La oprire: POST /checkins cu { text: transcrierea finală } → reply_text mare (22 pt) + citit cu TTS; transcrierea mică, sub el. Dacă recunoașterea vocală nu e disponibilă sau e refuzată: TextField mare + „Trimite”. (Doar dacă testul de la pregătire a arătat că recunoașterea pe telefon e slabă în română: se trimite și înregistrarea audio, iar backend-ul folosește Whisper, vezi B5.)
-5. intent = can_i_take (bonus X1, doar dacă S3 a fost atins la timp): card verde liniștit („Puteți lua”) sau nisip („Întrebați întâi farmacistul”), textul = reply_text.
-6. FeedView (tab-ul Noutăți): polling GET /feed?since= la 10 s cât timp scenePhase == .active; elementele noi se inserează sus cu .pgStandard numai dacă lista e la început (ScrollPosition / onScrollGeometryChange); altfel apare o pastilă cu .regularMaterial „3 noutăți ↑” care derulează la început. Carduri pe tip: alertă nouă, doză ratată, check-in (transcriere, chip-uri cu simptome, „posibil legat de: Sintrom + Nurofen”), verificare de la farmacist (nota). Tap → AlertDetailView sau detaliul check-in-ului.
+5. intent = can_i_take (bonus X1, doar dacă S3 a fost atins la timp): card verde liniștit („Puteți lua”) sau nisip („Întrebați întâi medicul”), textul = reply_text.
+6. FeedView (tab-ul Noutăți): polling GET /feed?since= la 10 s cât timp scenePhase == .active; elementele noi se inserează sus cu .pgStandard numai dacă lista e la început (ScrollPosition / onScrollGeometryChange); altfel apare o pastilă cu .regularMaterial „3 noutăți ↑” care derulează la început. Carduri pe tip: alertă nouă, doză ratată, check-in (transcriere, chip-uri cu simptome, „posibil legat de: Sintrom + Nurofen”), decizia medicului de familie (cu nota). Tap → AlertDetailView sau detaliul check-in-ului.
 7. Eveniment nou cu severity critical / major sau escalate: notificare locală imediată (UNTimeIntervalNotificationTrigger 1 s) și, dacă aplicația e deschisă, .sensoryFeedback(.warning) pe același trigger cu inserarea cardului.
 
 Criterii de acceptare: două iPhone-uri pe aceeași rețea; check-in-ul demo rostit pe telefonul 1 apare ca notificare pe telefonul 2 în < 15 s; textul apare pe ecran în timp ce Maria vorbește; înregistrarea se oprește singură când tace.
@@ -897,7 +897,7 @@ Criterii de acceptare: scenariul din secțiunea 7 rulează de 3 ori la rând, cu
 
 **Teste**
 - [ ] T-A6-01 Test static în `make check-ios`: nicio apariție de `.spring(`, `Color(red:` sau `Animation.easeInOut(` în `app/PolyGraph/` în afara `Design/`.
-- [ ] T-A6-02 Manual: QR-ul scanat cu camera celuilalt iPhone deschide pagina farmacistului.
+- [ ] T-A6-02 Manual: QR-ul scanat de medic (autentificat în portal) îl adaugă pe pacient în lista lui.
 
 ---
 
@@ -1102,7 +1102,7 @@ Criterii de acceptare: tests/test_voice_demo.py: checkin_demo → simptomele și
 
 ---
 
-### B6 · Pagina farmacistului / medicului și versiunea de tipărit
+### B6 · Portalul medicului de familie și versiunea de tipărit
 
 **Responsabil:** Dev B · **Depinde de:** B2, B4 · **Durată:** 3 h · **Branch:** `feature/b6-share`
 
@@ -1111,7 +1111,7 @@ Criterii de acceptare: tests/test_voice_demo.py: checkin_demo → simptomele și
 
 Citește .claude/skills/apple-design/SKILL.md: pagina e web, deci skill-ul se aplică direct (§1, §7, §12, §14, §15, §16), fără traducerea SwiftUI din docs/DESIGN.md; din DESIGN.md iei doar culorile, severitățile și textele.
 
-Obiectiv: o pagină pe care farmacistul o deschide din QR și înțelege situația în 30 de secunde.
+Obiectiv: o pagină pe care medicul de familie o deschide și înțelege situația în 30 de secunde.
 
 1. POST /share → token aleator (secrets.token_urlsafe(16)), expires_at = acum + 72 h, în share_tokens. Token expirat → pagină „Linkul a expirat”.
 2. GET /share/{token} (Jinja2 + un singur CSS + cytoscape.min.js servit local): antet (nume, vârstă, „Fișă generată de PolyGraph, nu înlocuiește evaluarea profesională”), rezumatul („9 medicamente de la 5 medici · 2 alerte grave · ACB 3 · aderență 86% în ultimele 7 zile”), tabelul medicamentelor (brand, DCI, ATC, posologie, prescriptor, de când), alertele cu sursa și formularul „Am verificat” + notă (POST /share/{token}/alerts/{id}/verify), graful, check-in-urile din ultimele 7 zile, programul zilei.
@@ -1123,16 +1123,21 @@ Obiectiv: o pagină pe care farmacistul o deschide din QR și înțelege situaț
    - @media (prefers-reduced-motion: reduce) fără tranziții de poziție; (prefers-reduced-transparency: reduce) antet opac; (prefers-contrast: more) fundaluri solide și margini vizibile; dark mode cu prefers-color-scheme;
    - un singur fișier CSS, fără framework; doar transform și opacity în tranziții.
 3. GET /share/{token}/graph?embed=1: doar graful, pe tot ecranul, pentru WKWebView-ul din app (A3), cu fundal transparent, aceleași culori și același font (-apple-system) ca aplicația; tap pe o muchie → window.webkit.messageHandlers.alert.postMessage(alert_id).
-4. GET /share/{token}/print: aceeași pagină, cu un stylesheet @media print (fără graf interactiv, fără butoane, A4, 1–2 pagini): „Reconcilierea medicației” pentru medicul de familie: medicamente (pe prescriptori), probleme găsite (cu sursa), întrebări propuse pentru consultație (din template-uri per kind), spațiu pentru semnătură. Farmacistul sau medicul o salvează ca PDF din browser; fără WeasyPrint (economisim instalarea și depanarea lui).
-5. Verificarea de către farmacist apare în feed (A5) și pe alertă (A3).
+4. GET /share/{token}/print: aceeași pagină, cu un stylesheet @media print (fără graf interactiv, fără butoane, A4, 1–2 pagini): „Reconcilierea medicației” pentru medicul de familie: medicamente (pe prescriptori), probleme găsite (cu sursa), întrebări propuse pentru consultație (din template-uri per kind), spațiu pentru semnătură. Medicul o salvează ca PDF din browser; fără WeasyPrint (economisim instalarea și depanarea lui).
+5. Decizia medicului apare în feed (A5) și pe alertă (A3).
 
 Criterii de acceptare: pagina se încarcă pe un telefon în < 2 s pe rețeaua locală; versiunea de tipărit a pacientului demo încape în ≤ 2 pagini A4 (Print Preview în Safari) și are toate alertele major / critical; o verificare făcută în pagină apare în app la următorul polling.
 ~~~
 
+**Schimbare după PR #21 (13.11.2026): farmacistul iese din produs, rămâne medicul de familie.** Pagina din QR devine un portal: medicul se autentifică cu un cod (`/portal/login`, sesiune prin cookie 12 h; demo: `dr. Elena Popa`, cod `medic-demo` sau `PG_DOCTOR_CODE`), vede lista pacienților care i-au partajat tratamentul (cei cu alerte grave nerevizuite și cu semnale de la familie sus; în demo, Maria + încă doi pacienți) și deschide fișa fiecăruia (`/portal/patients/{id}`, plus `/print` și `/graph`). Pe fiecare alertă alege „Menține” / „Modific la consultație” / „Trimit la specialist”, cu notă opțională → `status: reviewed_by_doctor`, `resolution.decision` și evenimentul `doctor_reviewed` în Noutăți. Linkul din QR (`/share/{token}`, 72 h) îl adaugă pe pacient în lista medicului autentificat. Contractele: `pharmacist` → `doctor` în `route_to`, `ask_pharmacist` → `ask_doctor`, `verified_by_pharmacist` → `reviewed_by_doctor`, `pharmacist_verified` → `doctor_reviewed`; rutele `/share/{token}/verify` și `/share/{token}/print` dispar. Textele motorului trimit la medicul de familie.
+
 **Teste**
 - [x] T-B6-01 Token expirat / inexistent → 404 cu pagina prietenoasă, fără date.
 - [x] T-B6-02 HTML-ul de la `/print` conține fiecare alertă `major` / `critical`.
-- [x] T-B6-03 Escape HTML pe nota farmacistului (XSS simplu: `<script>` rămâne text).
+- [x] T-B6-03 Escape HTML pe nota medicului (XSS simplu: `<script>` rămâne text).
+- [x] T-B6-05 Portalul: fără sesiune → autentificare, fără date; un medic vede doar pacienții din lista lui (404 pentru ceilalți); `next` doar spre căi locale.
+- [x] T-B6-06 Linkul din QR adaugă pacientul în lista medicului autentificat; fără sesiune, autentificarea revine la link.
+- [x] T-B6-07 Decizia + nota ajung pe alertă (`reviewed_by_doctor`) și în Noutăți (`doctor_reviewed`), validate după contracte.
 - [ ] T-B6-04 Manual: pagina pe un iPhone cu Reduce Motion, Reduce Transparency și Increase Contrast pornite; pe desktop la zoom 200%.
 
 ---
@@ -1167,7 +1172,7 @@ Criterii de acceptare: cu Wi-Fi-ul laptopului oprit (telefoanele pe hotspot-ul l
 |---|---|---|---|---|
 | **Q1** | după S1 (W8), **peste noapte** | Mac-ul lui Dev A, cât dormiți | onboarding, navigarea, medicamentele și alertele pe mock, sheet-ul de confirmare cu scanarea simulată | 10 min de triere dimineața |
 | **Q2** | după S2 (W14) | Mac-ul lui Dev B, în paralel cu lucrul | fluxul real: scanare → confirmare → alerte → graf; erorile de rețea; + verificarea fix-urilor din Q1 | 10 min de triere |
-| **Q3** | după S3 + A5 / B6 (W23), **peste noapte** | Mac-ul lui Dev A | tot MVP-ul: modul senior, programul, „Am luat”, check-in-ul, Noutăți, pagina farmacistului; toate variantele de accesibilitate | 15 min de triere dimineața; fix-urile blocker / major în W23–W24.5 |
+| **Q3** | după S3 + A5 / B6 (W23), **peste noapte** | Mac-ul lui Dev A | tot MVP-ul: modul senior, programul, „Am luat”, check-in-ul, Noutăți, portalul medicului; toate variantele de accesibilitate | 15 min de triere dimineața; fix-urile blocker / major în W23–W24.5 |
 | **Q4** | la S4 (W24.5), primele 45 min din D1 | Mac-ul lui Dev B | scenariul demo din secțiunea 7, cap-coadă, de 2 ori; regresia tuturor constatărilor închise | se repară doar blocker-ele |
 
 Fiecare Q verifică din nou și constatările rămase deschise din Q-urile anterioare.
@@ -1223,11 +1228,11 @@ Context de citit întâi: docs/PLAN.md (secțiunile 1, 2.4, 5, 7 și etapele liv
 2. Pentru fiecare flux și fiecare variantă (Light, Dark, AX, Motion, Contrast), deschide capturile și JSON-urile și verifică, în ordinea asta:
    a. Funcțional: fiecare feature livrat (secțiunea 1.2) face ce spun criteriile de acceptare ale etapei lui; alertele afișate pentru pacientul demo = expected_alerts.json (aceleași, aceeași ordine, aceleași severități); programul = expected_schedule.json; check-in-ul demo produce simptomele și corelările din fixture; erorile din logul aplicației și al backend-ului.
    b. Siguranța conținutului: niciun text vizibil care spune „opriți”, „nu mai luați” sau o doză nouă; nicio alertă fără sursă în modul aparținător; niciun roșu și niciun jargon (ATC, DDI, „farmacocinetic”, coduri) în modul senior.
-   c. Consistență: aceeași acțiune are același nume peste tot („Am luat”, nu și „Luat” / „Confirmă”); același termen pentru același lucru (medicament / pastilă / cutie, folosite consecvent); diacritice corecte; formatul orei (24 h, „ora 13”); etichetele severității identice în card, detaliu, feed și pagina farmacistului; aceleași componente arată și se comportă la fel pe ecrane diferite.
+   c. Consistență: aceeași acțiune are același nume peste tot („Am luat”, nu și „Luat” / „Confirmă”); același termen pentru același lucru (medicament / pastilă / cutie, folosite consecvent); diacritice corecte; formatul orei (24 h, „ora 13”); etichetele severității identice în card, detaliu, feed și portalul medicului; aceleași componente arată și se comportă la fel pe ecrane diferite.
    d. Designul (DESIGN.md și skill-ul): răspuns instant la apăsare; componente de sistem folosite acolo unde DESIGN.md o cere; consistență spațială (detaliul iese din card și se întoarce în el); fără animații cu overshoot în afara gesturilor cu impuls; suprafețe opace în modul senior; din cadrele extrase: „Am luat” fără salturi între cadre și fără mișcare cu PG_REDUCE_MOTION.
    e. Accesibilitate: erorile din performAccessibilityAudit; în varianta AX, text tăiat sau elemente suprapuse; ținte de atingere în modul senior < 72 pt (din frame-urile din JSON); butoane fără label; contrast vizibil insuficient în Dark și Contrast.
    f. UX pentru vârstnici (2.4.2): o singură acțiune principală pe ecran; nicio acțiune disponibilă doar prin gest; ce urmează e clar fără explicații; stările de status, finalizare, avertizare și eroare (2.4.6) există și sunt în cuvinte simple.
-   g. Stări limită: backend oprit, cutie ilizibilă, listă goală, alertă verificată de farmacist, medicament expirat, moment fără doze.
+   g. Stări limită: backend oprit, cutie ilizibilă, listă goală, alertă revizuită de medic, medicament expirat, moment fără doze.
 3. Re-verifică fiecare constatare deschisă din rapoartele anterioare: închisă / încă deschisă / regresie.
 4. Scrie docs/reviews/QN.md:
    - rezumat în 5 rânduri: ce merge, câte constatări pe severitate, cele 3 cele mai importante;
@@ -1261,7 +1266,7 @@ Reguli: fără constatări vagi („ar putea fi mai frumos”); fiecare constata
 - [ ] `make demo-check` verde pe `main`
 - [ ] Q4: raportul `docs/reviews/Q4.md` fără blocker deschis; regresia constatărilor din Q1–Q3 verde
 - [ ] Scenariul din secțiunea 7 rulat cronometrat de 3 ori, cu resetare între rulări; fiecare problemă → fix doar dacă e < 20 min, altfel se scoate din scenariu
-- [ ] Înregistrare ecran (ambele telefoane + pagina farmacistului) a unei rulări curate: **video de rezervă** dacă ceva pică pe scenă
+- [ ] Înregistrare ecran (ambele telefoane + portalul medicului) a unei rulări curate: **video de rezervă** dacă ceva pică pe scenă
 - [ ] Telefoanele: luminozitate maximă, Nu deranja (cu excepția notificărilor app-ului), baterie > 80%, aplicația instalată din Xcode în configurația Release
 - [ ] Cutiile demo fizice și rețeta tipărită într-o pungă, în ordinea scenariului
 
@@ -1289,7 +1294,7 @@ Telefonul 1 = Maria (modul senior). Telefonul 2 = Ana (aparținător). Laptopul 
 | 1:40 | Maria apasă microfonul: „Dimineața, când mă ridic din pat, mi se învârte capul și am observat niște vânătăi pe mână” | – |
 | 1:55 | Pe telefonul Anei: notificare „Maria a raportat: amețeală, vânătăi; posibil legat de Sintrom + Nurofen” | „Vânătăile au fost legate de interacțiunea deja găsită; Ana află în câteva secunde, din alt oraș.” |
 | 2:10 | **Medic nou:** Ana scanează rețeta ORL (Fromilid, claritromicină) → alertă **critică** simvastatină + claritromicină și una gravă Sintrom + claritromicină, pe ambele telefoane | „Al șaselea medic a prescris un antibiotic. PolyGraph a prins două conflicte înainte de prima pastilă.” |
-| 2:30 | QR → laptopul (farmacia): fișa, farmacistul bifează „verificat” + notă → apare la Ana | „Familia, farmacistul și medicul de familie văd aceeași fișă. Asta e comunitatea conectată din The Bloom.” |
+| 2:30 | laptopul (cabinetul): portalul medicului de familie, Maria sus în listă; medicul alege „Modific la consultație” + notă la Sintrom + Nurofen → apare la Ana | „Familia și medicul de familie văd aceeași fișă; medicul vede și ce nu i-a prescris nimeni (Nurofen-ul). Asta e comunitatea conectată din The Bloom.” |
 | 2:50 | „Reconcilierea medicației” (versiunea de tipărit) | „Și asta o duce Maria la medicul de familie.” |
 
 Plan B pentru fiecare pas: scanarea pică → butonul „Adaugă rețeta ORL” din modul demo; recunoașterea vocală pică → check-in prin text; rețeaua pică → hotspot-ul laptopului + cache; totul pică → video-ul de rezervă.
@@ -1300,7 +1305,7 @@ Plan B pentru fiecare pas: scanarea pică → butonul „Adaugă rețeta ORL” 
 
 1. **Problema, cu cifre:** în Europa, ~1 din 10 internări ale vârstnicilor e legată de reacții adverse la medicamente (studiul ADAPT, Irlanda: 10,0%; o meta-analiză pe pacienți vârstnici: 8,7%); Comisia Europeană a estimat ~5% din toate internările și ~197.000 de decese pe an în UE din reacții adverse. Polimedicația crește riscul de internare de ~3 ori într-un studiu finlandez (OR 3,3).
 2. **De ce acum / de ce noi:** nimeni nu vede lista completă; medicii nu comunică; vârstnicul e singurul „integrator”. API-ul public de interacțiuni al NLM a fost oprit în 2024, deci soluțiile simple nu mai merg.
-3. **Soluția:** poză → graf → alerte deterministe → program simplu → voce → familia și farmacistul în buclă.
+3. **Soluția:** poză → graf → alerte deterministe → program simplu → voce → familia și medicul de familie în buclă.
 4. **Demo** (secțiunea 7).
 5. **Cum e construit:** diagrama din 2.1 cu regula „LLM doar la margini”; DDInter 2.0 + nomenclatorul RO + Beers / STOPP / ACB; solverul; designul pentru vârstnici (un singur ecran, butoane mari, fără gesturi, Reduce Motion / Dynamic Type respectate).
 6. **Impact și model:** familia (abonament mic), farmaciile (serviciu de revizuire a medicației, diferențiator pentru lanțuri), medicii de familie (fișa de reconciliere, timp câștigat). Pași următori: date licențiate comercial, pilot cu o farmacie din Timișoara, integrare cu rețeta electronică.
@@ -1327,7 +1332,7 @@ Plan B pentru fiecare pas: scanarea pică → butonul „Adaugă rețeta ORL” 
 | Vocea TTS ro-RO lipsește sau sună rău pe iPhone | A4, verificat devreme; fallback: doar text mare | A |
 | DataMatrix greu de citit pe cutii lucioase / curbate | A2, pe cutiile demo, în lumina sălii; fallback poză | A |
 | Alert fatigue (prea multe alerte moderate / minore) | B2: minor ascuns, routing pe roluri, dedup per pereche; alertele de mâncare grupate într-un singur card | B |
-| Golurile din DDInter: acenocumarol (Sintrom) fără niciun nivel, fără texte în fișierele descărcabile | `curated_ddi.csv` pentru perechile demo; regula de clasă ATC pentru `Unknown`, marcată „prin analogie, de confirmat de farmacist”; la pitch, prezentat ca limitare tratată transparent | B |
+| Golurile din DDInter: acenocumarol (Sintrom) fără niciun nivel, fără texte în fișierele descărcabile | `curated_ddi.csv` pentru perechile demo; regula de clasă ATC pentru `Unknown`, marcată „prin analogie, de confirmat de medicul de familie”; la pitch, prezentat ca limitare tratată transparent | B |
 | Formulări care pot fi citite ca sfat medical | T-B2-03 (fără „opriți”, fără doze); disclaimer pe pagină și pe versiunea de tipărit | B |
 | Designul (animații, materiale) mănâncă timp | 2.4.7: tokenii + 3 interacțiuni lucrate; restul componente de sistem | A |
 | Skill-ul `apple-design` e pentru web; agenții pot reimplementa în Swift ce oferă deja sistemul sau pot ignora abaterile pentru vârstnici | `docs/DESIGN.md` (tabelul skill → SwiftUI) e citit în fiecare prompt A; 2.4.2 are prioritate; T-A6-01 prinde valorile scrise de mână | A |
@@ -1353,7 +1358,7 @@ Date și conturi:
 - [x] Descărcat DDInter 2.0 în `kb/raw/ddinter/` (12.11.2026): 8 CSV-uri, coloanele și problemele notate în `kb/raw/ddinter/README.md`; nivelurile perechilor demo în `demo_pairs_report.csv`.
 - [x] Descărcat catalogul românesc (Catalogul Public național al prețurilor maximale, Ministerul Sănătății, 04.08.2026) în `kb/raw/ro/`; coloanele și acoperirea în `kb/raw/ro/README.md`; OTC-urile demo în `kb/ro_products_extra.csv` (de completat după cutiile reale).
 - [x] Completat `kb/curated_ddi.csv` (11 perechi) și `kb/curated_dfi.csv` (11 alimente) de pe site-ul DDInter (12.11.2026). Pe site, acenocumarolul e tot `Unknown` și fără texte, deci perechile lui sunt marcate `class_analogy` (prin warfarină).
-- [x] Verificat în RCP (anm.ro, 12.11.2026): Sintrom 4.5 numește explicit IPP/omeprazol, simvastatină, hormoni tiroidieni, clasa AINS și alimentele cu vitamina K; **claritromicina și clasa macrolide nu sunt numite** (doar eritromicina), deci rândul acenocumarol+claritromicină rămâne analogie de clasă, de confirmat de farmacist. Simvastatină 4.3: claritromicina contraindicată (confirmat și în RCP-ul claritromicinei); max 20 mg/zi cu amlodipină (4.5). Euthyrox 4.5: IPP, calciu și soia confirmate, levotiroxina potențează cumarinicele; **cafeaua nu apare**, rândul levotiroxină+cafea a fost scos din `curated_dfi.csv`.
+- [x] Verificat în RCP (anm.ro, 12.11.2026): Sintrom 4.5 numește explicit IPP/omeprazol, simvastatină, hormoni tiroidieni, clasa AINS și alimentele cu vitamina K; **claritromicina și clasa macrolide nu sunt numite** (doar eritromicina), deci rândul acenocumarol+claritromicină rămâne analogie de clasă, de confirmat de medicul de familie. Simvastatină 4.3: claritromicina contraindicată (confirmat și în RCP-ul claritromicinei); max 20 mg/zi cu amlodipină (4.5). Euthyrox 4.5: IPP, calciu și soia confirmate, levotiroxina potențează cumarinicele; **cafeaua nu apare**, rândul levotiroxină+cafea a fost scos din `curated_dfi.csv`.
 - [x] `kb/rules/elderly.yaml`: 13 reguli din AGS Beers 2023 (AINS cronic, AINS + anticoagulant, benzodiazepine, somnifere Z, antihistaminice de generația 1, triciclice, IPP > 8 săptămâni, sulfoniluree, digoxină > 0,125 mg, antipsihotice, metoclopramid, opioid + sedativ, ≥ 3 medicamente active pe SNC), pe coduri ATC verificate în catalogul românesc. ID-urile STOPP v3 sunt de completat doar dacă e timp.
 - [x] `kb/rules/acb.yaml`: scala ACB 2012 (~75 de substanțe, scoruri 1–3, prag 3). Licența e Regenstrief: OK pentru prototip, permisiune pentru produs.
 - [x] `kb/rules/timing.yaml`: 15 reguli de orar (Euthyrox, simvastatină și omeprazol verificate în RCP-urile de pe anm.ro; restul marcate `verified: false`). Pe demo: Euthyrox pe stomacul gol dimineața, la ≥ 4 h de calciu; omeprazol înainte de micul dejun; simvastatină seara; amitriptilină la culcare.

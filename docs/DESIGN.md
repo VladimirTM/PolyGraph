@@ -5,7 +5,7 @@
 
 **Unde stă skill-ul.** `.claude/skills/apple-design/SKILL.md`, copiat neschimbat din [emilkowalski/skills](https://github.com/emilkowalski/skills/blob/main/skills/apple-design/SKILL.md) (commit `4061b67`, licență MIT, cu fișierul `LICENSE` lângă el). `AGENTS.md` și `CLAUDE.md` cer ca **orice etapă care atinge UI-ul** să citească întâi skill-ul și apoi `docs/DESIGN.md` (secțiunea aceasta).
 
-**Skill-ul e scris pentru web; SwiftUI are nativ aproape tot ce descrie.** Pagina farmacistului (B6) aplică skill-ul direct, în CSS. În aplicație, regula e: **folosește componenta de sistem care face deja ce cere skill-ul și scrie cod propriu doar unde nu există**. Tabelul de mai jos e traducerea; ce e în coloana a doua nu se reimplementează de mână.
+**Skill-ul e scris pentru web; SwiftUI are nativ aproape tot ce descrie.** Portalul medicului de familie (B6) aplică skill-ul direct, în CSS. În aplicație, regula e: **folosește componenta de sistem care face deja ce cere skill-ul și scrie cod propriu doar unde nu există**. Tabelul de mai jos e traducerea; ce e în coloana a doua nu se reimplementează de mână.
 
 | Skill | Ce folosim în SwiftUI (iOS 18+) |
 |---|---|
@@ -24,7 +24,7 @@
 
 | Principiu (skill §16) | Ce înseamnă concret aici |
 |---|---|
-| **Purpose** | Pacientul are **un singur ecran principal** („Acum”). Graful, sursele și severitățile există doar în modul aparținător și în pagina farmacistului. |
+| **Purpose** | Pacientul are **un singur ecran principal** („Acum”). Graful, sursele și severitățile există doar în modul aparținător și în portalul medicului de familie. |
 | **Agency** | Fără dialoguri de confirmare pentru acțiuni reversibile: „Am luat” se poate anula 5 s. Confirmarea apare doar la ștergerea unui medicament. |
 | **Responsibility** | Nicio formulare de tip „opriți”; microfonul și camera se cer la primul gest care are nevoie de ele, cu motivul spus în cuvinte; fiecare alertă își arată sursa; vocea se transcrie pe telefon. |
 | **Familiarity** | Tipare iOS standard: titluri mari, sheet-uri, swipe-to-delete cu undo, înapoi din stânga, tab bar. Nimic inventat acolo unde iOS are deja un tipar. |
@@ -39,7 +39,7 @@
 - **Feedback instant, commit protejat.** Butonul se micșorează imediat la atingere (§1); acțiunea pornește la ridicarea degetului, iar a doua apăsare pe aceeași doză în următoarea secundă e ignorată (și backend-ul e idempotent pe doză).
 - **Microfonul: atingere ca să pornească, atingere sau liniște ca să se oprească**, nu „țineți apăsat”. Oprire automată după 2 s de liniște sau 60 s.
 - **Suprafețe opace în modul senior.** Materialele translucide rămân doar în chrome-ul de sistem al modului aparținător.
-- **Fără roșu de alarmă pentru pacient.** Alertele grave se văd la Ana și la farmacist; Maria vede un card liniștit cu „Am anunțat-o pe Ana”.
+- **Fără roșu de alarmă pentru pacient.** Alertele grave se văd la Ana și la medicul de familie; Maria vede un card liniștit cu „Am anunțat-o pe Ana”.
 
 ## 2.4.3 Tokenii (`app/PolyGraph/Design/`)
 
@@ -102,7 +102,7 @@ Doar **tokenii + 3 interacțiuni lucrate**: butonul cu răspuns instant și guar
   | Scanare (A2) | `scan.closeButton`, `scan.modePicker`, `scan.guidance`, `scan.shutter`, `scan.manualButton`, `scan.error`, `scan.retryButton`, `scan.unavailable`, `scan.unavailable.manualButton`; camera falsă (Debug): `scan.fakeCamera`, `scan.fake.usePage` |
   | Confirmare (A2) | `confirm.cancelButton`, `confirm.strengthWarning` (A3), `confirm.discardButton`, `confirm.saveButton`, `confirm.skipButton`, `confirm.error`, `confirm.expiredWarning`, `confirm.duplicateWarning`, `confirm.warnings`, `confirm.reviewBadge`, `confirm.brandField`, `confirm.strengthField`, `confirm.substance.<i>`, `confirm.substance.missing`, `confirm.searchCatalog`, `confirm.dose.morning` / `noon` / `evening` / `bedtime`, `confirm.asNeededToggle`, `confirm.foodPicker`, `confirm.prescriberField`, `confirm.specialtyField`, `confirm.expiryPicker`, `confirm.addExpiryButton`, `confirm.exportOCRButton` (Debug); căutarea în catalog: `kbsearch.list`, `kbsearch.result.<i>` |
   | Alerte (A3) | `alerts.list`, `alerts.loading`, `alerts.error`, `alerts.retryButton`, `alerts.empty`, `alerts.acbCard`, `alerts.card.<alert_id>` (și rândurile din cardurile restrânse), `alerts.moderateGroup`, `alerts.foodGroup` |
-  | Detaliul alertei (A3) | `alertDetail`, `alertDetail.header`, `alertDetail.detail`, `alertDetail.recommendation`, `alertDetail.med.<med_id>`, `alertDetail.status`, `alertDetail.pharmacistNote`, `alertDetail.source`, `alertDetail.understoodButton` |
+  | Detaliul alertei (A3) | `alertDetail`, `alertDetail.header`, `alertDetail.detail`, `alertDetail.recommendation`, `alertDetail.med.<med_id>`, `alertDetail.status`, `alertDetail.doctorNote`, `alertDetail.source`, `alertDetail.understoodButton` |
   | Detaliul medicamentului (A3) | `medDetail`, `medDetail.substances`, `medDetail.schedule`, `medDetail.alert.<alert_id>`, `medDetail.editButton` (deschide `ConfirmSheet` în modul de editare) |
   | Graf (A3) | `graph.web`, `graph.loading`, `graph.empty`, `graph.legend`, `graph.resetButton` |
   | Noutăți (placeholder) | `feed.placeholder` |

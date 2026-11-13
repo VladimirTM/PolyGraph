@@ -1,6 +1,6 @@
 # PolyGraph
 
-Pozezi cutiile de medicamente și rețetele bunicii; PolyGraph construiește graful ei terapeutic, găsește deterministic interacțiunile, dublurile și medicamentele nepotrivite vârstei, îi face un program zilnic simplu, o ascultă când spune cum se simte și ține familia, farmacistul și medicul de familie în aceeași buclă.
+Pozezi cutiile de medicamente și rețetele bunicii; PolyGraph construiește graful ei terapeutic, găsește deterministic interacțiunile, dublurile și medicamentele nepotrivite vârstei, îi face un program zilnic simplu, o ascultă când spune cum se simte și ține familia și medicul de familie în aceeași buclă.
 
 UniHack 2026 · The Bloom → Medical Renaissance · aplicație iOS nativă (SwiftUI) + backend Python (FastAPI).
 
