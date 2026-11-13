@@ -1,0 +1,8 @@
+// Copiați fișierul ca app/Signing.local.xcconfig (e în .gitignore) și completați-l cu datele voastre.
+// Fiecare developer are alt sufix, ca aplicațiile să nu se calce pe același iPhone.
+
+// Team ID: Xcode → Settings → Accounts → echipa → „Team ID” (10 caractere)
+DEVELOPMENT_TEAM = ABCDE12345
+
+// Bundle id-ul final: ro.polygraph.<sufix>
+PG_BUNDLE_SUFFIX = PolyGraph.numele-vostru
