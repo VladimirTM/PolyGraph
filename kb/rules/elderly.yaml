@@ -57,7 +57,7 @@ rules:
     severity: major
     title: "Antihistaminic de generația 1 la vârstnic"
     detail: "Are efect anticolinergic puternic: confuzie, constipație, gură uscată, retenție urinară, risc de cădere."
-    recommendation: "Discutați cu medicul sau cu farmacistul despre un antihistaminic mai nou."
+    recommendation: "Discutați cu medicul de familie despre un antihistaminic mai nou."
     source: "AGS Beers 2023, tabelul 2 (antihistaminice de primă generație)"
     stopp_id: ""
 

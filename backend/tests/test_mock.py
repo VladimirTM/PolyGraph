@@ -178,22 +178,8 @@ def _share(c):
 
 def _share_page(c):
     r = c.get(f"/share/{share_token(c)}")
-    assert r.status_code == 200 and "Maria" in r.text
+    assert r.status_code == 200 and "portal" in r.text.lower()
     assert c.get("/share/nu-exista").status_code == 404
-
-
-def _verify(c):
-    t = share_token(c)
-    r = c.post(f"/share/{t}/alerts/al_ddi_med_01_med_02/verify", json={"note": "Am vorbit cu medicul."})
-    assert r.status_code == 200
-    ok("alert", r.json())
-    assert r.json()["status"] == "verified_by_pharmacist"
-    a = next(x for x in c.get(f"{P}/analysis", headers=H).json()["alerts"] if x["id"] == "al_ddi_med_01_med_02")
-    assert a["resolution"]["note"] == "Am vorbit cu medicul."
-
-
-def _print(c):
-    assert c.get(f"/share/{share_token(c)}/print").status_code == 200
 
 
 def _graph_page(c):
@@ -241,8 +227,6 @@ CASES = {
     ("get", "/v1/patients/{id}/feed"): _feed,
     ("post", "/v1/patients/{id}/share"): _share,
     ("get", "/share/{token}"): _share_page,
-    ("post", "/share/{token}/alerts/{alert_id}/verify"): _verify,
-    ("get", "/share/{token}/print"): _print,
     ("get", "/share/{token}/graph"): _graph_page,
     ("get", "/v1/kb/search"): _kb_search,
     ("get", "/media/{name}"): _media,

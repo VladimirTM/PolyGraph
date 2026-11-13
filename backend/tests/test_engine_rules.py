@@ -49,7 +49,7 @@ def test_curated_direct_text_in_detail(mini_kb):
     a = ddi_alerts(analyze(PATIENT, meds, TODAY, kb=mini_kb))[("med_01", "med_02")]
     assert (a["severity"], a["basis"], a["source"]["db"]) == ("major", "direct", "curated")
     assert "amlodipina crește concentrația" in a["detail"]
-    assert a["route_to"][-2:] == ["caregiver", "pharmacist"]
+    assert a["route_to"][-2:] == ["caregiver", "doctor"]
 
 
 # --- T-B2-02 ---------------------------------------------------------------------------------

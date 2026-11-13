@@ -514,35 +514,18 @@ def _page(title: str, body: str) -> str:
         "<meta name='viewport' content='width=device-width,initial-scale=1'>"
         f"<title>{title}</title><style>body{{font:100%/1.5 system-ui;margin:1.5rem;max-width:48rem}}"
         "h1{letter-spacing:-0.02em;line-height:1.1}.sev{font-weight:600}</style></head>"
-        f"<body><p><em>Mock P0: pagina reală vine la B6.</em></p>{body}</body></html>"
-    )
-
-
-def _summary_html(pid: str) -> str:
-    p = state.patients[pid]
-    meds = "".join(
-        f"<li>{m['product']['brand']} {m['product']['strength_text'] or ''}: {m['dosage']['raw'] or ''}</li>"
-        for m in state.meds[pid].values()
-    )
-    alerts = "".join(
-        f"<li><span class='sev'>{a['severity']}</span> {a['title']}</li>"
-        for a in analysis_alerts(pid)
-        if a["severity"] != "minor"
-    )
-    return (
-        f"<h1>{p['name']}, {date.today().year - p['birth_year']} de ani</h1>"
-        f"<h2>Medicamente</h2><ul>{meds}</ul><h2>Alerte</h2><ul>{alerts}</ul>"
+        f"<body><p><em>Mock P0.</em></p>{body}</body></html>"
     )
 
 
 @app.get("/share/{token}", response_class=HTMLResponse)
 def share_page(token: str) -> str:
-    return _page("Fișa de medicație", _summary_html(share_pid(token)))
-
-
-@app.get("/share/{token}/print", response_class=HTMLResponse)
-def share_print(token: str) -> str:
-    return _page("Reconcilierea medicației", "<h1>Reconcilierea medicației</h1>" + _summary_html(share_pid(token)))
+    share_pid(token)
+    return _page(
+        "Portalul medicului",
+        "<h1>Portalul medicului de familie</h1><p>În backend-ul real (make dev), linkul îl adaugă pe pacient în lista "
+        "medicului din /portal. Mock-ul nu are portal.</p>",
+    )
 
 
 @app.get("/share/{token}/graph", response_class=HTMLResponse)
@@ -557,28 +540,6 @@ def share_graph(token: str, embed: int = 0) -> str:
         if e["data"]["type"] == "interacts"
     )
     return _page("Graf", f"<h1>Graf (mock)</h1><p>{len(g['nodes'])} noduri, {len(g['edges'])} muchii.</p><ul>{items}</ul>")
-
-
-@app.post("/share/{token}/alerts/{alert_id}/verify")
-def verify(token: str, alert_id: str, body: dict[str, Any]) -> dict[str, Any]:
-    pid = share_pid(token)
-    if alert_id not in {a["id"] for a in analysis_alerts(pid)}:
-        raise HTTPException(404, "Alerta nu există.")
-    st = {
-        "status": "verified_by_pharmacist",
-        "resolution": {"by": "pharmacist", "note": body.get("note", ""), "at": iso(now())},
-    }
-    state.alert_state[pid][alert_id] = st
-    alert = next(a for a in analysis_alerts(pid) if a["id"] == alert_id)
-    push_event(
-        pid,
-        "pharmacist_verified",
-        f"Farmacistul a verificat: {alert['title']}",
-        body.get("note", ""),
-        alert_id=alert_id,
-        med_ids=alert["med_ids"],
-    )
-    return alert
 
 
 # ---------------------------------------------------------------- kb

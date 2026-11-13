@@ -47,7 +47,7 @@ def _alert(ctx: Ctx, rule: dict, med_ids: list[str], extra: str = "") -> dict:
         patient_text=T.elderly_patient_text(sev, ctx.caregiver),
         detail=rule["detail"] + extra,
         recommendation=rule["recommendation"],
-        action="contact_doctor" if sev in ("critical", "major") else "ask_pharmacist",
+        action="contact_doctor" if sev in ("critical", "major") else "ask_doctor",
         source={"db": "beers" if "Beers" in src else "stopp", "ref": src, "url": None},
         suffix=rule["id"],
     )
