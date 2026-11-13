@@ -109,16 +109,27 @@ class Store:
             n += 1
         return f"med_{n:02d}"
 
-    def cached_gtin(self, gtin: str) -> int | None:
-        row = self._q("SELECT product FROM gtin_cache WHERE gtin = ?", (gtin,))
-        return int(row[0][0]) if row and row[0][0].isdigit() else None
+    def clear_gtin_cache(self) -> None:
+        self._x("DELETE FROM gtin_cache")
 
-    def add_med(self, pid: str, med: Json, catalog_id: int | None = None) -> None:
+    def cached_gtin(self, gtin: str, catalog_version: str) -> int | None:
+        row = self._q("SELECT product FROM gtin_cache WHERE gtin = ?", (gtin,))
+        if not row:
+            return None
+        version, _, product_id = row[0][0].rpartition("/")
+        return int(product_id) if version == catalog_version and product_id.isdecimal() else None
+
+    def add_med(self, pid: str, med: Json, catalog_product: tuple[str, int] | None = None) -> None:
         with self._lock, self._conn:
-            if catalog_id is not None:
+            if catalog_product is not None:
+                version, product_id = catalog_product
+                prefix = f"{version}/"
+                # Valorile vechi, fără versiune, nu pot fi atribuite unui catalog.
                 self._conn.execute(
-                    "INSERT OR IGNORE INTO gtin_cache(gtin, product) VALUES (?, ?)",
-                    (med["product"]["gtin"], str(catalog_id)),
+                    "INSERT INTO gtin_cache(gtin, product) VALUES (?, ?)"
+                    " ON CONFLICT(gtin) DO UPDATE SET product = excluded.product"
+                    " WHERE substr(gtin_cache.product, 1, ?) != ?",
+                    (med["product"]["gtin"], f"{prefix}{product_id}", len(prefix), prefix),
                 )
             self._conn.execute(
                 "INSERT INTO meds(patient_id, id, data, position)"

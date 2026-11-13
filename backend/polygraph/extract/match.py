@@ -29,7 +29,7 @@ def scan(kb: Kb, store: Store, kind: str, lines: list[OcrLine], image: bytes, mi
         elif image:
             code = decode_datamatrix(image)
 
-    cached_id = store.cached_gtin(code["gtin"]) if code else None
+    cached_id = store.cached_gtin(code["gtin"], kb.version) if code else None
     cached = catalog(kb)[0].get(cached_id) if cached_id is not None else None
     if cached:
         matches, missing, route = [Match(cached, RawExtraction(), "gtin_cache", 1.0)], False, "gtin_cache"

@@ -63,11 +63,18 @@ class Ddi:
     source_url: str | None
 
 
+def catalog_version(path: Path) -> str:
+    try:
+        stat = path.stat()
+    except FileNotFoundError:
+        raise KbMissing(f"{path} nu există (make kb)") from None
+    return f"{stat.st_dev}:{stat.st_ino}:{stat.st_size}:{stat.st_mtime_ns}:{stat.st_ctime_ns}"
+
+
 class Kb:
     def __init__(self, path: Path | str | None = None):
         self.path = Path(path or os.environ.get("PG_KB") or DEFAULT_KB)
-        if not self.path.exists():
-            raise KbMissing(f"{self.path} nu există (make kb)")
+        self.version = catalog_version(self.path)
         self._local = threading.local()
         self.meta = dict(self._q("SELECT key, value FROM kb_meta"))
         self.age_min = int(self.meta.get("elderly_age_min", 65))
@@ -102,6 +109,10 @@ class Kb:
         conn = getattr(self._local, "conn", None)
         if conn is None:
             conn = sqlite3.connect(f"file:{self.path}?mode=ro", uri=True, check_same_thread=False)
+            # O conexiune deschisă după înlocuire nu trebuie amestecată cu datele instanței vechi.
+            if catalog_version(self.path) != self.version:
+                conn.close()
+                raise KbMissing("Catalogul a fost reconstruit. Reîncercați cererea.")
             self._local.conn = conn
         return conn
 
@@ -245,10 +256,13 @@ class Kb:
 
 
 _DEFAULT: Kb | None = None
+_DEFAULT_LOCK = threading.Lock()
 
 
 def default_kb() -> Kb:
     global _DEFAULT
-    if _DEFAULT is None:
-        _DEFAULT = Kb()
-    return _DEFAULT
+    path = Path(os.environ.get("PG_KB") or DEFAULT_KB)
+    with _DEFAULT_LOCK:
+        if _DEFAULT is None or _DEFAULT.path != path or _DEFAULT.version != catalog_version(path):
+            _DEFAULT = Kb(path)
+        return _DEFAULT

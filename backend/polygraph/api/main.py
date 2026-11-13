@@ -71,9 +71,7 @@ def store() -> Store:
 
 
 def kb() -> Kb:
-    if deps.kb is None:
-        deps.kb = default_kb()
-    return deps.kb
+    return deps.kb if deps.kb is not None else default_kb()
 
 
 def today() -> date:
@@ -220,13 +218,16 @@ def add_med(pid: str, body: dict[str, Any], x_patient_token: str | None = Header
     invalid("medication_item", body)
     med = copy.deepcopy(body)
     med["id"] = store().free_med_id(pid, med.get("id"))
-    catalog_id = None
+    catalog_product = None
     if med["product"].get("gtin"):
         try:
-            catalog_id = confirmed_product(kb(), med)
+            catalog = kb()
+            catalog_id = confirmed_product(catalog, med)
+            if catalog_id is not None:
+                catalog_product = (catalog.version, catalog_id)
         except KbMissing:
             pass
-    store().add_med(pid, med, catalog_id)
+    store().add_med(pid, med, catalog_product)
     return med
 
 
@@ -435,6 +436,7 @@ def demo_reset(live_scan: int = 0) -> dict[str, Any]:
     if not demo_mode():
         raise HTTPException(404, "Ruta există doar cu DEMO_MODE=1.")
     reset_demo(live_scan=bool(live_scan))
+    store().clear_gtin_cache()
     return {"id": DEMO_ID, "patient_token": DEMO_TOKEN, "patient": store().get_patient(DEMO_ID)}
 
 
