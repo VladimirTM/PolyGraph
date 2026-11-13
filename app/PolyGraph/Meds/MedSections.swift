@@ -1,17 +1,14 @@
 import Foundation
 
 /// O secțiune din lista de medicamente: medicii, după specialitate, iar la final „Fără rețetă”.
-struct MedSection: Identifiable, Equatable {
+/// Fără `Equatable`: o comparație doar pe id-uri ar face SwiftUI să nu redeseneze un rând editat.
+struct MedSection: Identifiable {
     static let withoutPrescription = "Fără rețetă"
 
     let title: String
     let meds: [MedicationItem]
 
     var id: String { title }
-
-    static func == (lhs: MedSection, rhs: MedSection) -> Bool {
-        lhs.title == rhs.title && lhs.meds.map(\.id) == rhs.meds.map(\.id)
-    }
 
     /// Secțiunile în ordinea în care apare prima dată fiecare medic; „Fără rețetă” la final.
     /// Specialitățile se compară fără majuscule și spații la capete.
