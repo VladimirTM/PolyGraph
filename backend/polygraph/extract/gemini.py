@@ -6,11 +6,9 @@ import json
 import mimetypes
 import os
 import re
-import time
 from dataclasses import fields
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from dotenv import dotenv_values
@@ -62,19 +60,14 @@ def extract_image(image: bytes, kind: str, mime_type: str = "image/jpeg") -> lis
         data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json", "x-goog-api-key": key},
     )
-    for attempt in range(2):
-        try:
-            with urlopen(request, timeout=8) as response:
-                body = json.load(response)
-            parts = body["candidates"][0]["content"]["parts"]
-            rows = ADAPTER.validate_json("".join(p.get("text", "") for p in parts), strict=True)
-            break
-        except HTTPError as exc:
-            if attempt or exc.code not in (429, 503):
-                return []
-            time.sleep(4)
-        except (OSError, ValueError, KeyError, IndexError, TypeError, AttributeError):
-            return []
+    # Un singur apel, fără reîncercare: o scanare așteaptă cel mult 8 s, apoi completare manuală.
+    try:
+        with urlopen(request, timeout=8) as response:
+            body = json.load(response)
+        parts = body["candidates"][0]["content"]["parts"]
+        rows = ADAPTER.validate_json("".join(p.get("text", "") for p in parts), strict=True)
+    except (OSError, ValueError, KeyError, IndexError, TypeError, AttributeError):
+        return []
 
     # Un răspuns gol nu se păstrează, ca aceeași poză să poată fi trimisă din nou.
     if not rows:

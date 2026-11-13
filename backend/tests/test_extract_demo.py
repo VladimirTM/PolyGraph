@@ -3,6 +3,7 @@ from contextlib import nullcontext
 from io import BytesIO
 from pathlib import Path
 from time import perf_counter
+from urllib.error import HTTPError
 
 import pytest
 import validate as contracts
@@ -243,3 +244,17 @@ def test_gemini_empty_answer_is_not_cached(tmp_path, monkeypatch):
     assert not list(tmp_path.iterdir())
     assert gemini.extract_image(b"image", "box") == [raw]
     assert len(list(tmp_path.iterdir())) == 1
+
+
+def test_gemini_does_not_retry(tmp_path, monkeypatch):
+    monkeypatch.setattr(gemini, "CACHE", tmp_path)
+    monkeypatch.setenv("GEMINI_API_KEY", "test")
+    calls = []
+
+    def busy(request, timeout):
+        calls.append(timeout)
+        raise HTTPError(request.full_url, 503, "Service Unavailable", {}, None)
+
+    monkeypatch.setattr(gemini, "urlopen", busy)
+    assert gemini.extract_image(b"image", "box") == []
+    assert calls == [8]
