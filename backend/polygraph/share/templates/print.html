@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Reconcilierea medicației · {{ patient.name }}{% endblock %}
+{% block body_class %}print{% endblock %}
+{% block body %}
+<main class="sheet">
+  <p class="screen-only print-bar">
+    <a href="/share/{{ token }}">← Înapoi la fișă</a>
+    <span class="muted">Din meniul browserului: Tipărire → Salvează ca PDF.</span>
+  </p>
+
+  <header class="sheet-head">
+    <h1 class="page-title">Reconcilierea medicației</h1>
+    <p><strong>{{ patient.name }}</strong>{% if age %}, {{ age }} de ani{% endif %} · generată la {{ generated }}</p>
+    <p class="summary-line">{{ summary | join(" · ") }}</p>
+    <p class="disclaimer">Fișă generată de PolyGraph din cutiile și rețetele introduse de familie; nu înlocuiește evaluarea profesională.</p>
+  </header>
+
+  <section>
+    <h2>Medicamente, pe prescriptori</h2>
+    <table class="meds compact">
+      <thead><tr><th scope="col">Medicament</th><th scope="col">DCI · ATC</th><th scope="col">Posologie</th><th scope="col">De când</th></tr></thead>
+      {% for who, rows in by_prescriber %}
+      <tbody>
+        <tr class="group"><th colspan="4" scope="rowgroup">{{ who }}</th></tr>
+        {% for m in rows %}
+        <tr><th scope="row">{{ m.name }}</th><td>{{ m.dci }} · <span class="mono">{{ m.atc }}</span></td><td>{{ m.posology }}</td><td class="nowrap">{{ m.since }}</td></tr>
+        {% endfor %}
+      </tbody>
+      {% endfor %}
+    </table>
+  </section>
+
+  <section>
+    <h2>Probleme găsite</h2>
+    {% for a in grave %}
+    <div class="problem sev-{{ a.severity }}">
+      <p class="problem-title"><span class="badge sev-{{ a.severity }}">{{ a.severity_label }}</span> {{ a.title }}{% if a.verified %} <span class="tag">verificat de farmacist</span>{% endif %}</p>
+      <p>{{ a.detail }}</p>
+      <p><em>{{ a.recommendation }}</em></p>
+      <p class="small">Sursa: {{ a.source_label }}{% if a.source.ref %}: {{ a.source.ref }}{% endif %}{% if a.basis == "class_analogy" %} (prin analogie de clasă, de confirmat){% endif %}{% if a.verified and a.resolution.note %} · Nota farmacistului: „{{ a.resolution.note }}”{% endif %}</p>
+    </div>
+    {% else %}
+    <p>Nicio problemă gravă.</p>
+    {% endfor %}
+    {% set rest = other | selectattr("severity", "equalto", "moderate") | list %}
+    {% if rest %}
+    <table class="problems compact">
+      <caption>Moderate ({{ rest | length }})</caption>
+      <tbody>
+      {% for a in rest %}
+        <tr><td>{{ a.title }}{% if a.verified %} <span class="tag">verificat</span>{% endif %}</td><td class="small">{{ a.source_label }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+    {% set minor = other | rejectattr("severity", "equalto", "moderate") | list %}
+    {% if minor %}<p class="small muted">Încă {{ minor | length }} observații minore sau informative, în fișa online.</p>{% endif %}
+  </section>
+
+  {% if questions %}
+  <section>
+    <h2>Întrebări propuse pentru consultație</h2>
+    <ol class="questions">{% for q in questions %}<li>{{ q }}</li>{% endfor %}</ol>
+  </section>
+  {% endif %}
+
+  <section class="signature">
+    <h2>Concluzia medicului</h2>
+    <div class="lines" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="sign-row">
+      <p>Medic: <span class="blank"></span></p>
+      <p>Semnătura și parafa: <span class="blank"></span></p>
+      <p>Data: <span class="blank short"></span></p>
+    </div>
+  </section>
+</main>
+{% endblock %}
