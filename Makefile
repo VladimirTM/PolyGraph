@@ -3,7 +3,7 @@ SHELL := /bin/bash
 UV := uv run --project backend
 PORT ?= 8000
 # Simulatorul pentru check-ios: primul iPhone disponibil (se poate forța: make check-ios SIM="iPhone 16")
-SIM ?= $(shell xcrun simctl list devices available 2>/dev/null | grep -m1 -oE 'iPhone [^(]+' | sed 's/ *$$//')
+SIM ?= $(shell xcrun simctl list devices available 2>/dev/null | grep -m1 -oE 'iPhone [A-Za-z0-9 ]+' | sed 's/ *$$//')
 
 .PHONY: help setup check check-contracts lint test check-ios models mock dev kb demo-check review
 
@@ -37,6 +37,8 @@ models: ## modelele Swift din contracts/schema (quicktype)
 	mkdir -p app/PolyGraph/Models
 	npx -y quicktype@23 --src-lang schema --lang swift --acronym-style original \
 		-o app/PolyGraph/Models/Contracts.swift contracts/schema/*.schema.json
+	@# quicktype numește tipurile anonime după schemă: `Result` ar ascunde Swift.Result în tot modulul
+	perl -pi -e 's/\bResult\b/KBSearchHit/g; s/\bMedicationItemSchema\b/Substance/g' app/PolyGraph/Models/Contracts.swift
 	@echo "Generat app/PolyGraph/Models/Contracts.swift (nu se editează de mână)."
 
 mock: ## serverul mock pe 0.0.0.0:$(PORT) (fixture-urile din contracts/)
