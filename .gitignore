@@ -25,6 +25,7 @@ kb/raw/**
 
 # Baze generate
 kb/kb.sqlite
+kb/.polygraph-kb-*/
 *.sqlite
 *.sqlite-journal
 
