@@ -10,7 +10,7 @@
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem:** P0 în lucru: repo-ul, contractele, fixture-urile și mock-ul sunt pe branch-ul `chore/p0-repo-contracts` (PR deschis); rămân de făcut de om proiectul Xcode gol și rularea pe ambele iPhone-uri. Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (13.11.2026):** P0 aproape gata: contractele, fixture-urile, mock-ul, Makefile-ul, CI-ul și hook-ul sunt în [PR #1](https://github.com/VladimirTM/PolyGraph/pull/1) (`chore/p0-repo-contracts`, `make check` verde, 45 de teste). Rămân pentru S0: proiectul Xcode gol în `app/` rulat pe ambele iPhone-uri (pașii în `app/README.md`), `.claude/settings.json` + `.claude/skills/apple-design/` adăugate de mână, confirmarea deciziilor din `contracts/fixtures/README.md`, apoi merge pe `main`. Actualizați coloana „Status” la fiecare sync point.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
@@ -620,17 +620,17 @@ Fiecare prompt începe cu aceeași linie de workflow (prescurtată mai jos ca `[
 **Responsabil:** amândoi (B scrie contractele și mock-ul, A scrie scheletul Makefile / CI și face review la contracte) · **Depinde de:** pregătirea din secțiunea 10 · **Durată:** 2 h · **Se termină cu:** S0
 
 **Checklist**
-- [ ] Repo `polygraph` pe GitHub, `README.md` cu pitch-ul într-o frază și cum se pornește
-- [ ] Structura de foldere din 5.1, cu un README scurt în fiecare
-- [ ] `contracts/schema/*.schema.json` (2020-12, `additionalProperties: false`, enum-uri) pentru 5.2–5.6 + `extraction.schema.json`
-- [ ] `contracts/api/openapi.yaml` (5.7)
-- [ ] `contracts/symptoms.md` (vocabularul de simptome, sinonime RO, `red_flag`)
-- [ ] `contracts/fixtures/` (5.8) + `contracts/examples/`
-- [ ] `contracts/validate.py`
-- [ ] `backend/mock_server.py` care servește fixture-urile pe toate rutele
-- [ ] `Makefile` (`setup`, `check`, `mock`, `dev`, `kb`, `demo-check`), `.githooks/commit-msg`, `CONTRIBUTING.md`, `AGENTS.md`, `CLAUDE.md`
-- [ ] `.claude/skills/apple-design/SKILL.md` + `LICENSE` (MIT, Emil Kowalski), copiate neschimbat din `emilkowalski/skills` (commit `4061b67`); `docs/PLAN.md` = acest plan
-- [ ] `.github/workflows/ci.yml` (contracts, python; iOS rulează local prin `make check-ios`)
+- [x] Repo `polygraph` pe GitHub, `README.md` cu pitch-ul într-o frază și cum se pornește
+- [x] Structura de foldere din 5.1, cu un README scurt în fiecare
+- [x] `contracts/schema/*.schema.json` (2020-12, `additionalProperties: false`, enum-uri) pentru 5.2–5.6 + `extraction.schema.json`
+- [x] `contracts/api/openapi.yaml` (5.7)
+- [x] `contracts/symptoms.md` (vocabularul de simptome, sinonime RO, `red_flag`)
+- [x] `contracts/fixtures/` (5.8) + `contracts/examples/`
+- [x] `contracts/validate.py`
+- [x] `backend/mock_server.py` care servește fixture-urile pe toate rutele
+- [x] `Makefile` (`setup`, `check`, `mock`, `dev`, `kb`, `demo-check`), `.githooks/commit-msg`, `CONTRIBUTING.md`, `AGENTS.md`, `CLAUDE.md`
+- [ ] *(de adăugat de mână: agentul nu are voie să scrie în `.claude/`; `docs/PLAN.md` și `docs/DESIGN.md` sunt gata)* `.claude/skills/apple-design/SKILL.md` + `LICENSE` (MIT, Emil Kowalski), copiate neschimbat din `emilkowalski/skills` (commit `4061b67`); `docs/PLAN.md` = acest plan
+- [x] `.github/workflows/ci.yml` (contracts, python; iOS rulează local prin `make check-ios`)
 - [ ] Proiectul Xcode gol creat **de om, din Xcode** (New Project → iOS App, SwiftUI, în `app/`, cu folderele sincronizate) și rulat pe ambele iPhone-uri; agenții nu creează proiectul, doar adaugă fișiere în el
 
 ~~~text
@@ -655,9 +655,9 @@ Nu face: ecranele aplicației, ingestia datelor, motorul.
 ~~~
 
 **Teste**
-- [ ] T-P0-01 `validate.py` trece pe toate exemplele și fixture-urile; pică pe o mutație (enum invalid, câmp în plus, câmp obligatoriu lipsă).
-- [ ] T-P0-02 `pytest backend/tests/test_mock.py`: fiecare rută din `openapi.yaml` răspunde, iar răspunsul validează după schemă.
-- [ ] T-P0-03 Hook-ul `commit-msg` respinge un mesaj fără co-author și unul cu mențiune AI.
+- [x] T-P0-01 `validate.py` trece pe toate exemplele și fixture-urile; pică pe o mutație (enum invalid, câmp în plus, câmp obligatoriu lipsă).
+- [x] T-P0-02 `pytest backend/tests/test_mock.py`: fiecare rută din `openapi.yaml` răspunde, iar răspunsul validează după schemă.
+- [x] T-P0-03 Hook-ul `commit-msg` respinge un mesaj fără co-author și unul cu mențiune AI.
 
 ---
 
