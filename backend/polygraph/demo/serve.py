@@ -53,6 +53,17 @@ def local_ips() -> list[str]:
     return [ip for _, ip in sorted(dict.fromkeys(found))] or ["127.0.0.1"]
 
 
+def port_free(port: int) -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        # ca uvicorn: conexiunile rămase în TIME_WAIT după un Ctrl+C nu înseamnă port ocupat
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            s.bind(("0.0.0.0", port))
+        except OSError:
+            return False
+    return True
+
+
 def qr_lines(text: str) -> list[str]:
     """QR-ul în terminal, cu semi-blocuri (2 module pe un rând), alb pe negru ca să meargă și pe teme închise."""
     barcode = zxingcpp.create_barcode(text, zxingcpp.BarcodeFormat.QRCode)
@@ -79,6 +90,12 @@ def readiness() -> list[str]:
 
 def main() -> None:
     port = int(os.environ.get("PORT") or 8000)
+    if not port_free(port):
+        # altfel QR-ul de mai jos ar trimite telefoanele la alt server (de obicei un `make dev` uitat deschis)
+        sys.exit(
+            f"Portul {port} e ocupat: opriți serverul care îl folosește (make dev / make mock) sau porniți cu "
+            f"make demo PORT={port + 1}.\nCe îl ține: lsof -nP -iTCP:{port} -sTCP:LISTEN"
+        )
     os.environ["DEMO_MODE"] = "1"
     ips = local_ips()
     url = f"http://{ips[0]}:{port}"

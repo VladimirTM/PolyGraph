@@ -19,6 +19,7 @@ import os
 import sys
 import tempfile
 import time
+import warnings
 from collections.abc import Callable
 from datetime import date, timedelta
 from pathlib import Path
@@ -267,7 +268,10 @@ def in_process(code: str) -> bool:
     os.environ.update(DEMO_MODE="1", PG_TODAY=EXPECTED["today"], GEMINI_API_KEY="")
     with tempfile.TemporaryDirectory() as tmp:
         os.environ["PG_MEDIA_DIR"] = str(Path(tmp) / "media")
-        from fastapi.testclient import TestClient
+        with warnings.catch_warnings():
+            # avertismentul Starlette despre httpx nu ține de scenariu și ar ascunde rezultatul
+            warnings.simplefilter("ignore")
+            from fastapi.testclient import TestClient
 
         from polygraph.api import main
         from polygraph.store import Store
