@@ -14,10 +14,13 @@ from urllib.request import Request, urlopen
 from dotenv import dotenv_values
 from pydantic import TypeAdapter, ValidationError
 
+from polygraph.deadline import within
 from polygraph.extract.ocr_match import RawExtraction
 from polygraph.kb import ROOT
 
 CACHE = ROOT / "demo" / "llm_cache"
+# Decis la 13.11.2026 (B3): o scanare așteaptă cel mult 8 s (B7 pomenea 12 s; a rămas valoarea mai strictă).
+SCAN_DEADLINE = 8.0
 ADAPTER = TypeAdapter(list[RawExtraction])
 SCHEMA = {
     "type": "array",
@@ -60,13 +63,9 @@ def extract_image(image: bytes, kind: str, mime_type: str = "image/jpeg") -> lis
         data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json", "x-goog-api-key": key},
     )
-    # Un singur apel, fără reîncercare: o scanare așteaptă cel mult 8 s, apoi completare manuală.
-    try:
-        with urlopen(request, timeout=8) as response:
-            body = json.load(response)
-        parts = body["candidates"][0]["content"]["parts"]
-        rows = ADAPTER.validate_json("".join(p.get("text", "") for p in parts), strict=True)
-    except (OSError, ValueError, KeyError, IndexError, TypeError, AttributeError):
+    # Un singur apel, fără reîncercare: o scanare așteaptă cel mult SCAN_DEADLINE, apoi completare manuală.
+    rows = within(SCAN_DEADLINE, lambda: _fetch(request), "gemini scan")
+    if rows is None:
         return []
 
     # Un răspuns gol nu se păstrează, ca aceeași poză să poată fi trimisă din nou.
@@ -87,20 +86,45 @@ def extract_image(image: bytes, kind: str, mime_type: str = "image/jpeg") -> lis
     return rows
 
 
+def _fetch(request: Request) -> list[RawExtraction]:
+    with urlopen(request, timeout=SCAN_DEADLINE) as response:
+        body = json.load(response)
+    parts = body["candidates"][0]["content"]["parts"]
+    return ADAPTER.validate_json("".join(p.get("text", "") for p in parts), strict=True)
+
+
 def warm_demo() -> None:
+    """`make demo-warm` (cu internet, înainte de scenă): răspunsurile Gemini pentru fotografiile demo și pentru
+    transcrierile pe care sinonimele nu le înțeleg ajung în demo/llm_cache, ca demo-ul să meargă și fără rețea."""
+    from polygraph.voice.understand import CACHE as CHECKIN_CACHE
+    from polygraph.voice.understand import understand
+
     CACHE.mkdir(parents=True, exist_ok=True)
     files = sorted((ROOT / "demo" / "photos").glob("*")) + sorted((ROOT / "demo" / "rx").glob("*"))
     images = [(p, mimetypes.guess_type(p)[0]) for p in files]
     images = [(p, mime) for p, mime in images if mime and mime.startswith("image/")]
-    if not images:
-        raise SystemExit("Nu există fotografii demo în demo/photos sau demo/rx.")
     failures = []
     for path, mime in images:
-        image = path.read_bytes()
-        rows = extract_image(image, "prescription" if path.parent.name == "rx" else "box", mime)
+        rows = extract_image(path.read_bytes(), "prescription" if path.parent.name == "rx" else "box", mime)
+        print(f"  {'✓' if rows else '✗'} {path.relative_to(ROOT)}")
         if not rows:
             failures.append(path.name)
-            continue
+    if not images:
+        print("  · nicio fotografie în demo/photos sau demo/rx (scanarea live merge pe OCR-ul telefonului)")
+
+    checkin = json.loads((ROOT / "contracts" / "fixtures" / "checkin_demo.json").read_text(encoding="utf-8"))
+    texts = [("checkin_demo.json", checkin["transcript"])] + [
+        (p.name, p.read_text(encoding="utf-8")) for p in sorted((ROOT / "demo" / "transcripts").glob("*.txt"))
+    ]
+    for name, text in texts:
+        # aceeași decizie ca la un check-in real: Gemini doar când sinonimele nu găsesc nimic
+        u = understand(text)
+        if u.used_llm:
+            print(f"  ✓ {name}: răspunsul Gemini e în {CHECKIN_CACHE.relative_to(ROOT)}")
+        elif u.symptoms:
+            print(f"  ✓ {name}: sinonimele ajung, fără Gemini")
+        else:
+            print(f"  · {name}: fără simptome (intent {u.intent}); nimic de pus în cache")
     if failures:
         raise SystemExit("Extracția a eșuat pentru: " + ", ".join(failures))
 

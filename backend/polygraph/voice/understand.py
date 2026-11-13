@@ -8,18 +8,21 @@ un răspuns cu un cod din afara vocabularului e respins întreg.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
 import sys
 from dataclasses import dataclass, field
 from functools import cache
+from pathlib import Path
 from typing import Any
 from urllib.request import Request, urlopen
 
 from dotenv import dotenv_values
 from rapidfuzz import fuzz
 
+from polygraph.deadline import within
 from polygraph.kb import ROOT, Kb, norm
 
 sys.path.insert(0, str(ROOT / "contracts"))
@@ -31,6 +34,7 @@ THRESHOLD = 85
 SHORT = 5  # sinonimele de cel mult atâtea litere („vars”, „tremur”) se potrivesc doar exact
 LLM_MIN_WORDS = 5
 LLM_TIMEOUT = 5
+CACHE = ROOT / "demo" / "llm_cache"
 
 INTENSE = {"foarte", "tare", "rau", "groaznic", "ingrozitor", "insuportabil", "puternic", "puternica", "mult"}
 MILD = {"putin", "usor", "pic", "uneori", "cateodata"}
@@ -314,20 +318,38 @@ def _gemini(text: str) -> str | None:
         data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json", "x-goog-api-key": key},
     )
-    try:
-        with urlopen(request, timeout=LLM_TIMEOUT) as response:
-            body = json.load(response)
-        return "".join(p.get("text", "") for p in body["candidates"][0]["content"]["parts"])
-    except (OSError, ValueError, KeyError, IndexError, TypeError, AttributeError):
-        return None
+    # B7: tot apelul are cel mult LLM_TIMEOUT; după termen rămâne rezultatul sinonimelor (niciun simptom).
+    return within(LLM_TIMEOUT, lambda: _fetch(request), "gemini check-in")
+
+
+def _fetch(request: Request) -> str:
+    with urlopen(request, timeout=LLM_TIMEOUT) as response:
+        body = json.load(response)
+    return "".join(p.get("text", "") for p in body["candidates"][0]["content"]["parts"])
+
+
+def _cache_path(text: str) -> Path:
+    return CACHE / f"checkin-{hashlib.sha256(norm(text).encode()).hexdigest()}.json"
 
 
 def symptoms_from_llm(text: str) -> list[Symptom]:
-    raw = _gemini(text)
-    if not raw:
-        return []
+    # cache-ul demo (make demo-warm): transcrierile de la repetiții răspund la fel și fără internet
+    path = _cache_path(text)
+    try:
+        codes = parse_llm(path.read_text(encoding="utf-8"))
+    except OSError:
+        codes = []
+    if not codes:
+        raw = _gemini(text)
+        codes = parse_llm(raw) if raw else []
+        if codes:
+            try:
+                CACHE.mkdir(parents=True, exist_ok=True)
+                path.write_text(json.dumps({"symptoms": codes}), encoding="utf-8")
+            except OSError:
+                pass
     vocab = vocabulary()
-    return [Symptom(c, vocab[c]["label"], "moderate", vocab[c]["red_flag"], vocab[c]["advice"]) for c in parse_llm(raw)]
+    return [Symptom(c, vocab[c]["label"], "moderate", vocab[c]["red_flag"], vocab[c]["advice"]) for c in codes]
 
 
 def understand(text: str, meds: list[Json] | None = None, kb: Kb | None = None) -> Understanding:
