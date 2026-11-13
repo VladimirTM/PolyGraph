@@ -1,0 +1,37 @@
+{
+  "kind" : "box",
+  "ocr_lines" : [
+    {
+      "height" : 0.029538468709067733,
+      "text" : "Sintrom"
+    },
+    {
+      "height" : 0.02243834071689177,
+      "text" : "4 mg"
+    },
+    {
+      "height" : 0.017441861213199683,
+      "text" : "Acenocumarol"
+    },
+    {
+      "height" : 0.02294028183770558,
+      "text" : "30 comprimate"
+    },
+    {
+      "height" : 0.013966898123423332,
+      "text" : "EXP 03/2028 LOT AB123"
+    },
+    {
+      "height" : 0.010570584781586234,
+      "text" : "CUTIE DE TEST • nu e un medicament real"
+    },
+    {
+      "height" : 0.011627906844729474,
+      "text" : "821234104"
+    },
+    {
+      "height" : 0.0072674415414295535,
+      "text" : "option"
+    }
+  ]
+}

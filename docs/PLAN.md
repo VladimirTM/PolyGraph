@@ -10,7 +10,7 @@
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e în `main`** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9)), partea de backend: `/scan` real (GTIN cache → potrivire OCR → Gemini cu cache → completare manuală), `make demo-b3` arată fluxul cap-coadă pe date sintetice; rămân T-B3-02 și T-B3-04, care așteaptă OCR-ul și parserul GS1 din A2. `make check` are 170 de teste (în CI: 96 + 74 sărite fără `kb.sqlite`). **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e în `main`** ([PR #13](https://github.com/VladimirTM/PolyGraph/pull/13)): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_pharmacist`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. `make check` are 186 de teste. **Urmează:** Dev A pornește A2 (`feature/a2-scan`), Dev B închide B3 când vin datele din A2 (`demo/ocr/`, `GS1Tests`). Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e în `main`** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9)), partea de backend: `/scan` real (GTIN cache → potrivire OCR → Gemini cu cache → completare manuală), `make demo-b3` arată fluxul cap-coadă pe date sintetice; rămân T-B3-02 și T-B3-04, care așteaptă OCR-ul și parserul GS1 din A2. `make check` are 170 de teste (în CI: 96 + 74 sărite fără `kb.sqlite`). **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e în `main`** ([PR #13](https://github.com/VladimirTM/PolyGraph/pull/13)): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_pharmacist`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. `make check` are 186 de teste. **A2 e gata** ([PR #15](https://github.com/VladimirTM/PolyGraph/pull/15)): cutie (DataMatrix + poză) și rețetă (camera de documente), OCR pe telefon, `/scan`, sheet-ul de confirmare cu câmpurile „verificați” și avertizări de expirare / duplicat, camera falsă `PG_FAKE_SCAN`; `make check-ios` verde, încercat pe iPhone cu cutiile de test din `demo/datamatrix/`; rămân cutiile fizice în sală (T-A2-03). **Urmează:** Dev B închide B3 cu datele din A2 (OCR real de pe iPhone în `demo/ocr/`, `GS1Tests` pe același `gs1_cases.json`); Dev A pornește A3. Actualizați coloana „Status” la fiecare sync point.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
@@ -24,7 +24,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | ✅ | app pe mock, pe ambele iPhone-uri (`make check-ios` verde, 18 teste) |
 | B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | ✅ | `make kb`, substanțele demo găsite |
 | Q0 infrastructura de review | agent (worktree) | în paralel cu A2 | V seara | ⬜ | `make review Q=…` |
-| A2 scanarea (DataMatrix, poză, rețetă, confirmare) | Dev A | W4–W8 | V 22:00–02:00 | ⬜ | cutie → listă, pe mock |
+| A2 scanarea (DataMatrix, poză, rețetă, confirmare) | Dev A | W4–W8 | V 22:00–02:00 | 🟡 | `make check-ios` verde, merge pe iPhone cu cutiile de test; rămân cutiile fizice în sală (T-A2-03) |
 | B2 motorul de interacțiuni + graful | Dev B | W4–W12 | V 22:00–S 13:00 | ✅ | golden test = `expected_alerts.json` |
 | **S1** | amândoi | W8 | S 02:00 | ⬜ | |
 | Q1 review (noaptea) | agent | somn | S 02:00–09:00 | ⬜ | `docs/reviews/Q1.md`, triere 10 min |
@@ -711,12 +711,12 @@ Nu face: camera, audio, TTS, graful, ecranele de alerte (doar placeholder-ele lo
 **Responsabil:** Dev A · **Depinde de:** A1 · **Durată:** 4 h · **Branch:** `feature/a2-scan`
 
 **Checklist**
-- [ ] Mod **Cutie**: VisionKit `DataScannerViewController` (DataMatrix) + `capturePhoto()` pentru fața cutiei, într-un singur ecran
-- [ ] Mod **Rețetă**: `VNDocumentCameraViewController` (decupează și îndreaptă foaia)
-- [ ] Parser GS1 în Swift
-- [ ] Upload multipart către `/scan`, cu stări de progres în cuvinte
-- [ ] Sheet-ul de confirmare (detent `.large`), câmpurile nesigure marcate, „Salvează” → `POST /meds`
-- [ ] Rețetă cu mai multe medicamente → pași „1 din 3” în același sheet
+- [x] Mod **Cutie**: VisionKit `DataScannerViewController` (DataMatrix) + `capturePhoto()` pentru fața cutiei, într-un singur ecran
+- [x] Mod **Rețetă**: `VNDocumentCameraViewController` (decupează și îndreaptă foaia)
+- [x] Parser GS1 în Swift
+- [x] Upload multipart către `/scan`, cu stări de progres în cuvinte
+- [x] Sheet-ul de confirmare (detent `.large`), câmpurile nesigure marcate, „Salvează” → `POST /meds`
+- [x] Rețetă cu mai multe medicamente → pași „1 din 3” în același sheet
 
 ~~~text
 [WORKFLOW] Branch: feature/a2-scan.
@@ -741,9 +741,9 @@ Nu face: lista și alertele (A3), modul senior.
 ~~~
 
 **Teste**
-- [ ] T-A2-01 `GS1Tests` pe `contracts/fixtures/gs1_cases.json` (aceleași cazuri ca în Python, T-B3-04).
-- [ ] T-A2-02 Unit: din `ExtractionResult`-ul fixture, modelul de confirmare marchează exact câmpurile cu `needs_review`, iar „Salvează” produce `MedicationItem`-ul editat.
-- [ ] T-A2-03 Manual: 3 cutii demo + rețeta tipărită, pe iPhone, în lumina sălii.
+- [x] T-A2-01 `GS1Tests` pe `contracts/fixtures/gs1_cases.json` (aceleași cazuri ca în Python, T-B3-04). *(13.11.2026: `make check-ios` verde)*
+- [x] T-A2-02 Unit: din `ExtractionResult`-ul fixture, modelul de confirmare marchează exact câmpurile cu `needs_review`, iar „Salvează” produce `MedicationItem`-ul editat. *(13.11.2026: `make check-ios` verde)*
+- [ ] T-A2-03 Manual: 3 cutii demo + rețeta tipărită, pe iPhone, în lumina sălii. *(13.11.2026: pe iPhone, cu cutiile de test din `demo/datamatrix/test_*.png` și `demo/rx/reteta_demo_fromilid.pdf` afișate pe ecran: cod citit, poză, OCR, confirmare, salvare; OCR-ul salvat în `demo/ocr/`. Rămân cutiile fizice în lumina sălii.)*
 
 ---
 

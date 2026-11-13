@@ -33,6 +33,8 @@ enum PgColor {
     static let onAccent = Color("PGOnAccent")
     /// nisip cald: cardurile pacientului (fără roșu de alarmă)
     static let calmCard = Color("PGCalmCard")
+    /// galben deschis sub câmpurile marcate „verificați” la confirmarea scanării (doar aparținător)
+    static let review = Color.yellow.opacity(0.22)
 }
 
 extension Severity {

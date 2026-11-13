@@ -1,0 +1,30 @@
+{
+  "datamatrix" : "010594900000001417240131\u001d10OLD1",
+  "kind" : "box",
+  "ocr_lines" : [
+    {
+      "height" : 0.02761627946581169,
+      "text" : "Sintrom"
+    },
+    {
+      "height" : 0.01934643208034459,
+      "text" : "4 mg"
+    },
+    {
+      "height" : 0.015988372621082214,
+      "text" : "Acenocumarol"
+    },
+    {
+      "height" : 0.023876534567938923,
+      "text" : "30 comprimate"
+    },
+    {
+      "height" : 0.012271520637330613,
+      "text" : "EXP 01/2024 LOT OLD1"
+    },
+    {
+      "height" : 0.008411170944334967,
+      "text" : "ament real"
+    }
+  ]
+}

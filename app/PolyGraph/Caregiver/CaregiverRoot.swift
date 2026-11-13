@@ -12,7 +12,7 @@ struct CaregiverRoot: View {
     var body: some View {
         TabView(selection: $tab) {
             Tab("Medicamente", systemImage: "pills", value: CaregiverTab.meds) {
-                NavigationStack { MedsListView() }
+                NavigationStack { MedsListView(showAlerts: { tab = .alerts }) }
                     .accessibilityIdentifier("tab.meds")
             }
             Tab("Alerte", systemImage: "exclamationmark.triangle", value: CaregiverTab.alerts) {

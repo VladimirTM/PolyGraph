@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import OSLog
+import SwiftUI
 
 /// Starea comună a aplicației: pacientul, medicamentele, analiza și programul zilei.
 /// Orice schimbare a listei de medicamente reîncarcă analiza și programul.
@@ -118,11 +119,18 @@ final class AppStore {
 
     // MARK: - Medicamente
 
-    func addMed(_ med: MedicationItem) async throws {
+    /// Întoarce câte alerte noi a adus medicamentul (pentru „Am salvat. 2 alerte noi”).
+    @discardableResult
+    func addMed(_ med: MedicationItem) async throws -> Int {
         let id = try requirePatientID()
+        let before = Set(analysis?.alerts.map(\.id) ?? [])
         let saved = try await api.addMed(patientID: id, med)
-        meds.append(saved)
+        withPgAnimation(.pgStandard) {
+            meds.append(saved)
+        }
         await reloadAnalysis()
+        let after = Set(analysis?.alerts.map(\.id) ?? [])
+        return after.subtracting(before).count
     }
 
     func updateMed(id medID: String, _ changes: MedicationUpdate) async throws {

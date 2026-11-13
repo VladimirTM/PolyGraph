@@ -37,3 +37,4 @@ app/Signing.local.xcconfig
 
 # Review pe simulator (capturi mari; raportul final merge în docs/reviews/)
 .review/
+app/PolyGraph.xcodeproj/xcshareddata/

@@ -19,9 +19,20 @@ extension MedicationItem {
 
     /// „Acenocumarol”; DCI-ul din catalogul românesc e în latină și cu majuscule.
     var substanceNames: String {
-        substances
-            .compactMap { $0.dci ?? $0.inn }
-            .map { $0.capitalized(with: Locale(identifier: "ro_RO")) }
-            .joined(separator: " + ")
+        substances.displayNames
+    }
+}
+
+extension Substance {
+    /// „Acenocumarol”
+    var displayName: String? {
+        (dci ?? inn).map { $0.capitalized(with: Locale(identifier: "ro_RO")) }
+    }
+}
+
+extension Array where Element == Substance {
+    /// „Ibuprofen + Paracetamol”
+    var displayNames: String {
+        compactMap(\.displayName).joined(separator: " + ")
     }
 }
