@@ -1,7 +1,7 @@
 """Backend-ul real PolyGraph (FastAPI), din B2: pacienți, medicamente, analiză, what-if, căutare în kb.
 
-Pornire: `make dev` (0.0.0.0:8000). Rutele care vin în etapele următoare (schedule B4, checkins B5,
-share B6) rămân deocamdată pe mock. Variabile de mediu:
+Pornire: `make dev` (0.0.0.0:8000). Programul zilei și dozele vin din B4; rutele care vin în etapele
+următoare (checkins B5, share B6) rămân deocamdată pe mock. Variabile de mediu:
 - PG_KB: calea către kb.sqlite (implicit kb/kb.sqlite, `make kb`)
 - PG_APP_DB: calea către app.sqlite (implicit backend/app.sqlite)
 - PG_TODAY: data „de azi” (ISO), pentru demo și teste; implicit data din Europe/Bucharest
@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 from zoneinfo import ZoneInfo
 
-from fastapi import FastAPI, File, Form, Header, HTTPException, Request, Response, UploadFile
+from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Request, Response, UploadFile
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
@@ -34,6 +34,7 @@ from polygraph.engine import analyze, new_alerts  # noqa: E402
 from polygraph.extract.match import confirmed_product, scan  # noqa: E402
 from polygraph.extract.ocr_match import OcrLine  # noqa: E402
 from polygraph.kb import Kb, KbMissing, default_kb  # noqa: E402
+from polygraph.schedule import build_schedule  # noqa: E402
 from polygraph.store import Store  # noqa: E402
 
 FIX = ROOT / "contracts" / "fixtures"
@@ -303,6 +304,34 @@ def what_if(pid: str, body: dict[str, Any], x_patient_token: str | None = Header
     before = run_analysis(pid, patient, meds)["alerts"]
     after = run_analysis(pid, patient, [*meds, matched])["alerts"]
     return {"matched": matched, "new_alerts": new_alerts(before, after)}
+
+
+# ---------------------------------------------------------------- ziua (B4)
+
+
+@app.get("/v1/patients/{pid}/schedule")
+def schedule(pid: str, day: Annotated[date | None, Query(alias="date")] = None, x_patient_token: str | None = Header(None)):
+    patient = auth(pid, x_patient_token)
+    return build_schedule(patient, store().list_meds(pid), day or today(), kb())
+
+
+@app.post("/v1/patients/{pid}/doses")
+def record_dose(pid: str, body: dict[str, Any], x_patient_token: str | None = Header(None)) -> dict[str, Any]:
+    auth(pid, x_patient_token)
+    invalid("dose", body)
+    if store().get_med(pid, body["med_id"]) is None:
+        raise HTTPException(404, "Medicamentul nu există.")
+    try:
+        at = datetime.fromisoformat(body["scheduled_at"].replace("Z", "+00:00"))
+    except ValueError:
+        raise HTTPException(422, "scheduled_at nu e o dată validă.") from None
+    if at.tzinfo is None:
+        at = at.replace(tzinfo=TZ)
+    # cheia de idempotență nu depinde de fusul în care telefonul a scris ora
+    key = at.astimezone(UTC).isoformat()
+    dose = {"med_id": body["med_id"], "scheduled_at": body["scheduled_at"], "status": body["status"], "recorded_at": now_iso()}
+    store().record_dose(pid, key, dose)
+    return dose
 
 
 # ---------------------------------------------------------------- kb

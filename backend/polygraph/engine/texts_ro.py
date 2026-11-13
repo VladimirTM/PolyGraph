@@ -179,3 +179,19 @@ def expired_patient_text(brand: str) -> str:
 
 
 EXPIRED_RECOMMENDATION = "Cereți la farmacie o cutie nouă și duceți-o pe cea expirată acolo, pentru reciclare."
+
+
+# ---------------------------------------------------------------- timing (B4)
+
+
+def timing_title(brands: list[str]) -> str:
+    return f"Orele pentru {' și '.join(brands)} nu se potrivesc cu toate regulile"
+
+
+def timing_patient_text(caregiver: str | None) -> str:
+    who = f"{caregiver} și farmacistul vor" if caregiver else "Farmacistul va"
+    return f"{who} verifica orele la care luați pastilele. Până atunci, luați-le ca de obicei."
+
+
+def timing_recommendation(brands: list[str]) -> str:
+    return f"Arătați programul farmacistului și întrebați-l cum se pot împărți orele pentru {' și '.join(brands)}."

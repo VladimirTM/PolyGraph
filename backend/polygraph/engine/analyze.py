@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Any, TypedDict
 
-from polygraph.engine import acb, ddi, duplicate, elderly, expiry, food
+from polygraph.engine import acb, ddi, duplicate, elderly, expiry, food, timing
 from polygraph.engine.context import Component, Ctx, Json
 from polygraph.graph.build import build as build_graph
 from polygraph.kb import SEV_RANK, Kb, default_kb
@@ -48,6 +48,7 @@ def sort_key(a: Json) -> tuple:
 def run_checks(ctx: Ctx) -> tuple[list[Json], int]:
     ddi_alerts = ddi.check(ctx)
     alerts = [*ddi_alerts, *food.check(ctx), *duplicate.check(ctx), *elderly.check(ctx, ddi_alerts), *expiry.check(ctx)]
+    alerts += timing.check(ctx)
     acb_total, acb_alerts = acb.check(ctx)
     alerts += acb_alerts
     return sorted({a["id"]: a for a in alerts}.values(), key=sort_key), acb_total

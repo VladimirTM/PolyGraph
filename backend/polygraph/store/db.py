@@ -133,6 +133,19 @@ class Store:
         for m in meds:
             self.add_med(pid, m)
 
+    # ---------------------------------------------------------------- doze (B4: „Am luat” / „Am sărit” / anulare)
+
+    def record_dose(self, pid: str, key: str, dose: Json) -> None:
+        """Idempotent: aceeași (med_id, scheduled_at) suprascrie starea anterioară."""
+        self._x(
+            "INSERT OR REPLACE INTO doses(patient_id, med_id, scheduled_at, data) VALUES (?, ?, ?, ?)",
+            (pid, dose["med_id"], key, _dump(dose)),
+        )
+
+    def list_doses(self, pid: str) -> list[Json]:
+        rows = self._q("SELECT data FROM doses WHERE patient_id = ? ORDER BY scheduled_at, med_id", (pid,))
+        return [json.loads(r[0]) for r in rows]
+
     # ---------------------------------------------------------------- check-in-uri (scrise de B5; citite de graf)
 
     def add_checkin(self, pid: str, checkin: Json) -> None:
