@@ -21,7 +21,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | Pregătirea (secțiunea 10) | amândoi | înainte de start | până vineri | 🔄 | date, reguli YAML, conturi; rămân cutiile, rețeta tipărită, transcrierile, cablurile |
 | **P0** repo, contracte, mock | amândoi | W0–W1.5 | V 18:00–19:30 | ✅ | `contracts/`, mock server, Makefile, CI, proiectul Xcode pe ambele iPhone-uri |
 | **S0** | amândoi | W1.5 | V 19:30 | ✅ | contracte în `main`, mock pornit, Xcode pe ambele telefoane |
-| A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | ⬜ | app pe mock |
+| A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | 🔄 | app pe mock (`make check-ios` verde, 18 teste; rămâne T-A1-04, verificarea manuală pe ambele iPhone-uri) |
 | B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | ⬜ | `make kb`, substanțele demo găsite |
 | Q0 infrastructura de review | agent (worktree) | în paralel cu A2 | V seara | ⬜ | `make review Q=…` |
 | A2 scanarea (DataMatrix, poză, rețetă, confirmare) | Dev A | W4–W8 | V 22:00–02:00 | ⬜ | cutie → listă, pe mock |
@@ -666,14 +666,14 @@ Nu face: ecranele aplicației, ingestia datelor, motorul.
 **Responsabil:** Dev A · **Depinde de:** P0 · **Durată:** 2.5 h · **Branch:** `feature/a1-app-skeleton`
 
 **Checklist**
-- [ ] Proiect Xcode `app/PolyGraph.xcodeproj`, SwiftUI, iOS 18.0+, doar iPhone, portret; **fără dependențe externe**
-- [ ] Semnarea din `app/Signing.local.xcconfig` (gitignored: Team ID + sufixul bundle id-ului), ca fiecare să ruleze pe iPhone-ul lui fără conflicte
-- [ ] Modele `Codable` generate din schemele contractelor (`make models`, quicktype)
-- [ ] `APIClient` (URLSession, async/await) cu `baseURL` din setări
-- [ ] Două moduri: **Senior** (`NavigationStack`, fără tab-uri) și **Aparținător** (`TabView`: Medicamente, Alerte, Graf, Noutăți)
-- [ ] Tokenii din 2.4.3 în `Design/` + `PressableButtonStyle` + `withPgAnimation`
-- [ ] Onboarding minimal → `POST /v1/patients`
-- [ ] Hook-urile de test doar în Debug (`PG_*` din tabelul Q0) și `accessibilityIdentifier` pe toate elementele interactive
+- [x] Proiect Xcode `app/PolyGraph.xcodeproj`, SwiftUI, iOS 18.0+, doar iPhone, portret; **fără dependențe externe** (`PolyGraph.xcconfig` legat din Xcode, `Config/Info.plist` cu cheile de cameră / microfon / vorbire / rețea locală / ATS)
+- [x] Semnarea din `app/Signing.local.xcconfig` (gitignored: Team ID + sufixul bundle id-ului), ca fiecare să ruleze pe iPhone-ul lui fără conflicte (`Signing.local.xcconfig.example` în git)
+- [x] Modele `Codable` generate din schemele contractelor (`make models`, quicktype)
+- [x] `APIClient` (URLSession, async/await) cu `baseURL` din setări
+- [x] Două moduri: **Senior** (`NavigationStack`, fără tab-uri) și **Aparținător** (`TabView`: Medicamente, Alerte, Graf, Noutăți)
+- [x] Tokenii din 2.4.3 în `Design/` + `PressableButtonStyle` + `withPgAnimation`
+- [x] Onboarding minimal → `POST /v1/patients`
+- [x] Hook-urile de test doar în Debug (`PG_*` din tabelul Q0) și `accessibilityIdentifier` pe toate elementele interactive
 
 ~~~text
 [WORKFLOW] Branch: feature/a1-app-skeleton.
@@ -699,9 +699,9 @@ Nu face: camera, audio, TTS, graful, ecranele de alerte (doar placeholder-ele lo
 ~~~
 
 **Teste**
-- [ ] T-A1-01 Decodare + encodare pentru fiecare fișier din `contracts/examples/` și `contracts/fixtures/` (adăugate ca folder reference în ținta de teste).
-- [ ] T-A1-02 `GuardedAction`: două apeluri la 300 ms → o execuție; la 1.2 s → două.
-- [ ] T-A1-03 `withPgAnimation` cu Reduce Motion → animația de rezervă.
+- [x] T-A1-01 Decodare + encodare pentru fiecare fișier din `contracts/examples/` și `contracts/fixtures/` (citite direct din repo prin `#filePath`, fără folder reference, deci fără `project.pbxproj` atins).
+- [x] T-A1-02 `GuardedAction`: două apeluri la 300 ms → o execuție; la 1.2 s → două.
+- [x] T-A1-03 `withPgAnimation` cu Reduce Motion → animația de rezervă.
 - [ ] T-A1-04 Manual: pe ambele iPhone-uri, onboarding → lista cu 8 medicamente din mock.
 
 ---
