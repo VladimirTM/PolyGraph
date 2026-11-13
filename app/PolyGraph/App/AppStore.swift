@@ -19,11 +19,20 @@ final class AppStore {
     private(set) var didBootstrap = false
     /// ultimul mesaj de eroare, în română, afișabil
     var lastError: String?
+    /// alertele la care aparținătorul a apăsat „Am înțeles” (doar pe telefon; contractul nu are rută pentru asta)
+    private(set) var acknowledgedAlertIDs: Set<String> = []
+    /// creat o singură dată, pentru graf (B6) și „Arată farmacistului” (A6)
+    private(set) var shareToken: String?
+    /// ștergerea cu „Anulează” din lista de medicamente
+    @ObservationIgnored private(set) var deletions = DeleteUndoQueue()
 
     init(settings: AppSettings = AppSettings(), debug: DebugEnvironment = .current) {
         self.settings = settings
         self.debug = debug
         clock = debug.now.map { FixedClock(now: $0) as any AppClock } ?? SystemClock()
+        deletions = DeleteUndoQueue { [weak self] medID in
+            try await self?.deleteMed(id: medID)
+        }
     }
 
     var api: APIClient {
@@ -32,6 +41,16 @@ final class AppStore {
 
     func med(id: String) -> MedicationItem? {
         meds.first { $0.id == id }
+    }
+
+    func alert(id: String) -> Alert? {
+        analysis?.alerts.first { $0.id == id }
+    }
+
+    /// Lista fără medicamentele șterse care încă se pot anula.
+    var visibleMeds: [MedicationItem] {
+        let hidden = deletions.hiddenIDs
+        return hidden.isEmpty ? meds : meds.filter { !hidden.contains($0.id) }
     }
 
     // MARK: - Pornire
@@ -62,6 +81,7 @@ final class AppStore {
         let created = try await api.createPatient(body)
         settings.role = role
         settings.signIn(patientID: created.id, token: created.patientToken)
+        shareToken = nil
         patient = created.patient
         Log.app.info("Pacient creat: \(created.id, privacy: .public)")
         await refreshAll()
@@ -73,6 +93,7 @@ final class AppStore {
         do {
             let created = try await api.demoReset(liveScan: liveScan)
             settings.signIn(patientID: created.id, token: created.patientToken)
+            shareToken = nil
             patient = created.patient
         } catch {
             Log.app.error("demo/reset a eșuat: \(String(describing: error), privacy: .public)")
@@ -82,12 +103,15 @@ final class AppStore {
     }
 
     func signOut() {
+        deletions.cancelAll()
         settings.signOut()
         patient = nil
         meds = []
         analysis = nil
         schedule = nil
         lastError = nil
+        acknowledgedAlertIDs = []
+        shareToken = nil
     }
 
     // MARK: - Încărcare
@@ -136,15 +160,34 @@ final class AppStore {
     func updateMed(id medID: String, _ changes: MedicationUpdate) async throws {
         let id = try requirePatientID()
         let saved = try await api.updateMed(patientID: id, medID: medID, changes)
-        if let index = meds.firstIndex(where: { $0.id == medID }) { meds[index] = saved }
+        if let index = meds.firstIndex(where: { $0.id == medID }) {
+            withPgAnimation(.pgStandard) { meds[index] = saved }
+        }
         await reloadAnalysis()
     }
 
     func deleteMed(id medID: String) async throws {
         let id = try requirePatientID()
         try await api.deleteMed(patientID: id, medID: medID)
-        meds.removeAll { $0.id == medID }
+        withPgAnimation(.pgStandard) {
+            meds.removeAll { $0.id == medID }
+        }
         await reloadAnalysis()
+    }
+
+    // MARK: - Alerte și partajare
+
+    func acknowledge(alertID: String) {
+        acknowledgedAlertIDs.insert(alertID)
+    }
+
+    /// Token-ul de partajare: cerut o singură dată și ținut cât e legat pacientul.
+    func ensureShareToken() async throws -> String {
+        if let shareToken { return shareToken }
+        let id = try requirePatientID()
+        let link = try await api.createShare(patientID: id)
+        shareToken = link.shareToken
+        return link.shareToken
     }
 
     // MARK: - Ajutătoare

@@ -133,6 +133,49 @@ final class MedDraft: Identifiable {
             .joined(separator: " ")
     }
 
+    // MARK: - Concentrația și substanța
+
+    /// Concentrația scrisă de mână nu mai e cea venită de la server sau din catalog.
+    var strengthEdited: Bool {
+        !pickedFromCatalog
+            && Self.compact(strengthText) != Self.compact(original.product.strengthText ?? "")
+    }
+
+    /// Cu o singură substanță, concentrația nouă devine doza ei (`strength_mg`); ATC-ul rămâne același.
+    var adjustedSubstances: [Substance] {
+        guard strengthEdited, substances.count == 1, let mg = Self.milligrams(in: strengthText) else {
+            return substances
+        }
+        return [substances[0].with(strengthMg: .some(mg))]
+    }
+
+    /// Cu mai multe substanțe (sau un text de nedescifrat), doza fiecăreia nu se poate deduce:
+    /// omul e trimis în catalog, unde alege produsul cu concentrația corectă.
+    var strengthNeedsCatalog: Bool {
+        guard strengthEdited, !substances.isEmpty else { return false }
+        return substances.count > 1 || Self.milligrams(in: strengthText) == nil
+    }
+
+    /// „4 mg” → 4, „75 mcg” → 0,075, „2,5 mg” → 2,5, „1 g” → 1000; altceva → nil.
+    nonisolated static func milligrams(in text: String) -> Double? {
+        let pattern = "(\\d+(?:[.,]\\d+)?)\\s*(mg|mcg|µg|μg|g)(?![a-z])"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else { return nil }
+        let ns = text as NSString
+        let matches = regex.matches(in: text, range: NSRange(location: 0, length: ns.length))
+        guard matches.count == 1, let match = matches.first,
+            let value = Double(ns.substring(with: match.range(at: 1)).replacingOccurrences(of: ",", with: "."))
+        else { return nil }
+        switch ns.substring(with: match.range(at: 2)).lowercased() {
+        case "mg": return value
+        case "g": return value * 1000
+        default: return value / 1000
+        }
+    }
+
+    private static func compact(_ text: String) -> String {
+        text.lowercased().filter { !$0.isWhitespace }
+    }
+
     /// Alegerea din /v1/kb/search înlocuiește identificarea (nume, concentrație, formă, substanțe).
     func apply(_ hit: KBSearchHit) {
         brand = hit.brand
@@ -161,7 +204,7 @@ final class MedDraft: Identifiable {
             ? Match(confidence: 1.0, method: .manual, needsReview: false)
             : original.match.with(needsReview: false)
         return original.with(
-            dosage: dosage, match: match, prescriber: prescriber, product: product, substances: substances)
+            dosage: dosage, match: match, prescriber: prescriber, product: product, substances: adjustedSubstances)
     }
 
     // MARK: - Ajutătoare

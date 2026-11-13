@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Graf</title>
+<style>
+  :root { color-scheme: light dark; }
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden;
+               -webkit-user-select: none; -webkit-touch-callout: none; }
+  #cy { position: absolute; inset: 0; }
+</style>
+<script src="cytoscape.min.js"></script>
+</head>
+<body>
+<div id="cy"></div>
+<script>
+// Graful din aplicație până la B6. Primește JSON-ul Cytoscape (contracts/schema/graph.schema.json)
+// prin window.pgRender(...) și trimite înapoi atingerile: messageHandlers.alert (id-ul alertei de
+// pe muchie) și messageHandlers.med (id-ul medicamentului). Pagina lui B6 cu ?embed=1 trimite la fel.
+(function () {
+  // PG_LAYOUT_BEGIN
+  // Layout radial determinist: pacientul în centru; medicamentele pe primul inel, ordonate astfel încât
+  // perechile care interacționează să fie apropiate (mai puține linii care traversează desenul); fiecare
+  // substanță pe aceeași rază cu medicamentul ei; clasele, alimentele și simptomele în afară, în direcția
+  // substanțelor de care țin. Inelele sunt elipse, ca desenul să umple ecranul pe înălțime.
+  function pgRadialPositions(cy, W, H) {
+    const TAU = Math.PI * 2;
+    const products = cy.nodes('[type = "product"]').map((n) => n.id()).sort();
+    const productOf = {};
+    cy.edges('[type = "contains"]').forEach((e) => { productOf[e.data('target')] = e.data('source'); });
+    const sevWeight = { critical: 6, major: 6, moderate: 2, minor: 1, unknown: 0.5 };
+    const pairs = [];
+    cy.edges('[type = "interacts"]').forEach((e) => {
+      const a = productOf[e.data('source')], b = productOf[e.data('target')];
+      if (a && b && a !== b) pairs.push([a, b, sevWeight[e.data('severity')] || 1]);
+    });
+  
+    // ordinea pe cerc: căutare locală prin schimburi, pornind de la ordinea alfabetică (id-uri)
+    const n = products.length;
+    function cost(order) {
+      const at = {}; order.forEach((id, i) => { at[id] = i; });
+      let c = 0;
+      for (const [a, b, w] of pairs) { const d = Math.abs(at[a] - at[b]); c += w * Math.min(d, n - d); }
+      for (let i = 0; i < pairs.length; i++) {
+        for (let j = i + 1; j < pairs.length; j++) {
+          let [a, b] = [at[pairs[i][0]], at[pairs[i][1]]]; if (a > b) [a, b] = [b, a];
+          const c1 = at[pairs[j][0]], c2 = at[pairs[j][1]];
+          if (c1 === a || c1 === b || c2 === a || c2 === b) continue;
+          if ((c1 > a && c1 < b) !== (c2 > a && c2 < b)) c += 1.5;
+        }
+      }
+      return c;
+    }
+    let order = products.slice(), best = cost(order), improved = true;
+    if (n >= 4 && n <= 8) {
+      // până la 8 medicamente: toate ordinile, cu primul fixat (rotațiile dau același desen)
+      const rest = products.slice(1), used = new Array(rest.length).fill(false), current = [products[0]];
+      (function permute() {
+        if (current.length === n) { const c = cost(current); if (c < best - 1e-9) { best = c; order = current.slice(); } return; }
+        for (let i = 0; i < rest.length; i++) {
+          if (used[i]) continue;
+          used[i] = true; current.push(rest[i]); permute(); current.pop(); used[i] = false;
+        }
+      })();
+      improved = false;
+    }
+    while (improved) {
+      improved = false;
+      for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+        const next = order.slice(); [next[i], next[j]] = [next[j], next[i]];
+        const c = cost(next); if (c < best - 1e-9) { best = c; order = next; improved = true; }
+      }
+    }
+  
+    const angle = {};
+    order.forEach((id, i) => { angle[id] = -Math.PI / 2 + (i * TAU) / Math.max(n, 1); });
+    const meanAngle = (list) => {
+      let x = 0, y = 0; list.forEach((a) => { x += Math.cos(a); y += Math.sin(a); });
+      return Math.atan2(y, x);
+    };
+    // substanțele: pe raza medicamentului; mai multe substanțe se desfac puțin în jurul ei
+    const byProduct = {};
+    Object.keys(productOf).sort().forEach((s) => { (byProduct[productOf[s]] = byProduct[productOf[s]] || []).push(s); });
+    const spread = (TAU / Math.max(n, 1)) * 0.75;
+    for (const [p, subs] of Object.entries(byProduct)) {
+      subs.forEach((s, i) => { angle[s] = angle[p] + (subs.length === 1 ? 0 : spread * (i / (subs.length - 1) - 0.5)); });
+    }
+    // inelul exterior: direcția medie a substanțelor (sau medicamentelor) de care ține nodul
+    const outer = cy.nodes('[type = "atc_class"], [type = "food"], [type = "symptom"]');
+    outer.forEach((node) => {
+      const linked = node.connectedEdges().connectedNodes().filter((m) => m.id() !== node.id() && angle[m.id()] !== undefined);
+      angle[node.id()] = linked.length ? meanAngle(linked.map((m) => angle[m.id()])) : 0;
+    });
+    // pe fiecare inel, nodurile care ar cădea unul peste altul se împing la o distanță minimă
+    function separate(ids, minGap) {
+      if (ids.length < 2) return;
+      const gap = Math.min(minGap, TAU / ids.length);
+      const items = ids.map((id) => ({ id, a: ((angle[id] % TAU) + TAU) % TAU })).sort((p, q) => p.a - q.a || (p.id < q.id ? -1 : 1));
+      for (let pass = 0; pass < 4; pass++) {
+        for (let i = 1; i < items.length; i++) if (items[i].a - items[i - 1].a < gap) items[i].a = items[i - 1].a + gap;
+        const wrap = items[0].a + TAU - items[items.length - 1].a;
+        if (wrap < gap) items.forEach((it, i) => { it.a -= (gap - wrap) * (i / items.length); });
+      }
+      items.forEach((it) => { angle[it.id] = it.a; });
+    }
+    const subsIds = Object.keys(productOf);
+    separate(subsIds, TAU / 22);
+    const classes = cy.nodes('[type = "atc_class"]').map((m) => m.id());
+    const foods = cy.nodes('[type = "food"], [type = "symptom"]').map((m) => m.id());
+    separate(classes, TAU / 22);
+    separate(foods, TAU / 14);
+  
+    const rx = W / 2, ry = Math.min(H / 2, rx * 1.45);
+    const ring = { product: 0.5, substance: 0.72, atc_class: 0.88, food: 1.02, symptom: 1.02 };
+    const positions = {};
+    cy.nodes().forEach((node) => {
+      const type = node.data('type');
+      if (type === 'patient') { positions[node.id()] = { x: 0, y: 0 }; return; }
+      const r = ring[type] || 1.0, a = angle[node.id()] || 0;
+      positions[node.id()] = { x: Math.cos(a) * rx * r, y: Math.sin(a) * ry * r };
+      // etichetele de pe inelele exterioare stau spre exterior, nu peste linii
+      if (type === 'food' || type === 'symptom') {
+        const c = Math.cos(a), s = Math.sin(a);
+        node.data('lh', c > 0.4 ? 'right' : c < -0.4 ? 'left' : 'center');
+        node.data('lv', Math.abs(c) > 0.4 ? 'center' : s < 0 ? 'top' : 'bottom');
+      }
+    });
+    return positions;
+  }
+  // PG_LAYOUT_END
+
+  const dark = window.matchMedia('(prefers-color-scheme: dark)');
+  let cy = null;
+  let lastElements = null;
+
+  function palette() {
+    const d = dark.matches;
+    return {
+      text: d ? '#F2F2F7' : '#1C1C1E',
+      muted: d ? '#8E8E93' : '#8E8E93',
+      faint: d ? 'rgba(235,235,245,0.18)' : 'rgba(60,60,67,0.18)',
+      node: d ? '#2C2C2E' : '#FFFFFF',
+      nodeBorder: d ? '#48484A' : '#D1D1D6',
+      accent: d ? '#5CC2BC' : '#0E6B68',
+      red: d ? '#FF453A' : '#FF3B30',
+      orange: d ? '#FF9F0A' : '#FF9500',
+      gray: d ? '#636366' : '#AEAEB2',
+      purple: d ? '#BF5AF2' : '#AF52DE',
+      green: d ? '#30D158' : '#34C759',
+    };
+  }
+
+  function severityColor(p, s) {
+    switch (s) {
+      case 'critical': case 'major': return p.red;
+      case 'moderate': return p.orange;
+      case 'minor': return p.gray;
+      default: return p.gray;
+    }
+  }
+
+  function style(p) {
+    return [
+      { selector: 'node', style: {
+          'label': 'data(label)', 'color': p.text, 'font-family': '-apple-system, system-ui',
+          'font-size': 11, 'text-valign': 'bottom', 'text-margin-y': 4,
+          'text-wrap': 'wrap', 'text-max-width': 90,
+          'background-color': p.node, 'border-width': 1.5, 'border-color': p.nodeBorder,
+          'width': 18, 'height': 18 } },
+      { selector: 'node[type = "patient"]', style: {
+          'background-color': p.accent, 'border-width': 0, 'width': 34, 'height': 34,
+          'font-size': 13, 'font-weight': 600 } },
+      { selector: 'node[type = "product"]', style: {
+          'shape': 'round-rectangle', 'width': 26, 'height': 26, 'font-size': 12, 'font-weight': 600,
+          'border-color': p.accent, 'border-width': 2 } },
+      { selector: 'node[type = "product"][severity = "critical"], node[type = "product"][severity = "major"]',
+        style: { 'border-color': p.red } },
+      { selector: 'node[type = "product"][severity = "moderate"]', style: { 'border-color': p.orange } },
+      { selector: 'node[type = "substance"]', style: {
+          'width': 12, 'height': 12, 'font-size': 10, 'color': p.muted, 'text-max-width': 70,
+          'min-zoomed-font-size': 7 } },
+      // clasele ATC: eticheta apare doar la zoom, altfel aglomerează marginea
+      { selector: 'node[type = "atc_class"]', style: {
+          'shape': 'diamond', 'width': 10, 'height': 10, 'font-size': 9, 'color': p.muted,
+          'min-zoomed-font-size': 12 } },
+      { selector: 'node[type = "food"]', style: {
+          'shape': 'round-tag', 'width': 14, 'height': 14, 'border-color': p.green, 'font-size': 10 } },
+      { selector: 'node[type = "symptom"]', style: {
+          'shape': 'star', 'width': 16, 'height': 16, 'border-color': p.purple, 'font-size': 10 } },
+      { selector: 'node[lh]', style: { 'text-halign': 'data(lh)', 'text-valign': 'data(lv)', 'text-margin-y': 0 } },
+      { selector: 'node[lh = "left"]', style: { 'text-margin-x': -4 } },
+      { selector: 'node[lh = "right"]', style: { 'text-margin-x': 4 } },
+      { selector: 'node[lv = "top"]', style: { 'text-margin-y': -4 } },
+      { selector: 'node[lv = "bottom"]', style: { 'text-margin-y': 4 } },
+
+      { selector: 'edge', style: {
+          'width': 1, 'line-color': p.faint, 'curve-style': 'bezier', 'target-arrow-shape': 'none' } },
+      { selector: 'edge[type = "in_class"]', style: { 'line-style': 'dotted' } },
+      { selector: 'edge[type = "interacts"], edge[type = "food_interaction"]', style: {
+          'width': 2.5, 'line-color': (e) => severityColor(p, e.data('severity')), 'z-index': 10 } },
+      { selector: 'edge[type = "interacts"][severity = "critical"], edge[type = "interacts"][severity = "major"]',
+        style: { 'width': 4 } },
+      { selector: 'edge[type = "food_interaction"]', style: { 'line-style': 'dashed' } },
+      { selector: 'edge[severity = "unknown"]', style: { 'line-style': 'dashed', 'width': 1, 'line-color': p.gray } },
+      { selector: 'edge[type = "possibly_related"], edge[type = "reported"]', style: {
+          'line-style': 'dashed', 'line-color': p.purple, 'width': 1.5 } },
+      { selector: 'edge[alert_id]', style: { 'overlay-padding': 10 } },
+      { selector: ':selected', style: { 'overlay-opacity': 0.12, 'overlay-color': p.accent } },
+    ];
+  }
+
+  const PADDING = 24;
+
+  function post(name, value) {
+    const handler = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers[name];
+    if (handler) handler.postMessage(value);
+  }
+
+  function render(elements) {
+    lastElements = elements;
+    if (cy) cy.destroy();
+    cy = cytoscape({
+      container: document.getElementById('cy'),
+      elements: elements,
+      style: style(palette()),
+      layout: { name: 'null' },
+      minZoom: 0.3, maxZoom: 4,
+      boxSelectionEnabled: false, autoungrabify: true,
+    });
+    const positions = pgRadialPositions(cy, Math.max(window.innerWidth - 60, 200), Math.max(window.innerHeight - 60, 200));
+    cy.layout({ name: 'preset', positions: (n) => positions[n.id()], fit: true, padding: PADDING, animate: false }).run();
+    cy.on('tap', 'edge', (event) => {
+      const id = event.target.data('alert_id');
+      if (id) post('alert', id);
+    });
+    cy.on('tap', 'node[type = "product"]', (event) => post('med', event.target.id()));
+    post('ready', elements.nodes.length);
+  }
+
+  dark.addEventListener('change', () => { if (cy) cy.style(style(palette())); });
+  window.addEventListener('resize', () => { if (cy) { cy.resize(); cy.fit(undefined, PADDING); } });
+  window.pgRender = (elements) => render(elements);
+  // butonul „Recentrează” din aplicație: înapoi la tot graful, centrat
+  window.pgResetView = (animated) => {
+    if (!cy) return;
+    if (animated) cy.animate({ fit: { padding: PADDING } }, { duration: 300, easing: 'ease-out-cubic' });
+    else cy.fit(undefined, PADDING);
+  };
+})();
+</script>
+</body>
+</html>
