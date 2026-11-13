@@ -27,6 +27,8 @@ final class AppStore {
     @ObservationIgnored private(set) var deletions = DeleteUndoQueue()
     /// „Am luat” / „Am sărit” din modul senior
     @ObservationIgnored private(set) var doseLog = DoseLog()
+    /// tab-ul Noutăți al aparținătorului
+    @ObservationIgnored private(set) var feed = FeedModel()
 
     init(settings: AppSettings = AppSettings(), debug: DebugEnvironment = .current) {
         self.settings = settings
@@ -38,6 +40,12 @@ final class AppStore {
         doseLog = DoseLog { [weak self] dose in
             try await self?.recordDose(dose)
         }
+        feed = FeedModel(
+            fetch: { [weak self] since in
+                guard let self else { return [] }
+                return try await self.fetchFeed(since: since)
+            },
+            notify: { FeedAlerts.notify($0) })
     }
 
     var api: APIClient {
@@ -102,6 +110,7 @@ final class AppStore {
             patient = created.patient
             // pacientul demo pornește de la zero: nimic confirmat, alertele de pacient din nou nevăzute
             doseLog.clear()
+            feed.reset()
             settings.seenPatientAlertIDs = []
         } catch {
             Log.app.error("demo/reset a eșuat: \(String(describing: error), privacy: .public)")
@@ -113,6 +122,7 @@ final class AppStore {
     func signOut() {
         deletions.cancelAll()
         doseLog.clear()
+        feed.reset()
         Reminders.cancelAll()
         settings.signOut()
         patient = nil
@@ -213,6 +223,31 @@ final class AppStore {
             isDone: { self.doseLog.isDone($0, day: schedule.date) },
             now: clock.now)
         await Reminders.replaceAll(with: planned)
+    }
+
+    // MARK: - Check-in vocal și Noutăți
+
+    func sendCheckIn(text: String) async throws -> CheckIn {
+        let id = try requirePatientID()
+        return try await api.createCheckIn(patientID: id, text: text)
+    }
+
+    func fetchFeed(since: Date?) async throws -> [FeedEvent] {
+        let id = try requirePatientID()
+        return try await api.getFeed(patientID: id, since: since)
+    }
+
+    /// Cuvintele pe care recunoașterea vocală trebuie să le știe: brandurile și substanțele pacientului,
+    /// apoi cele mai frecvente branduri din catalog.
+    var speechHints: [String] {
+        var hints: [String] = []
+        for med in meds {
+            hints.append(med.product.brand)
+            hints.append(contentsOf: med.substances.compactMap(\.displayName))
+        }
+        hints.append(contentsOf: Listener.commonBrands)
+        var seen: Set<String> = []
+        return hints.filter { seen.insert($0.lowercased()).inserted }
     }
 
     // MARK: - Alerte și partajare

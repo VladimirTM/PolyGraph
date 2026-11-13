@@ -9,6 +9,7 @@ struct NowView: View {
     /// `nil`: momentul curent, care avansează după „Am luat”; altfel momentul ales din „Ziua de azi”
     let pinnedTime: String?
     let onShowDay: () -> Void
+    let onCheckIn: () -> Void
 
     @Namespace private var flight
     /// momentul a cărui bifă mare e pe ecran, înainte să zboare în cronologie
@@ -23,9 +24,10 @@ struct NowView: View {
     @ScaledMetric(relativeTo: .title2) private var textSize: CGFloat = 22
     @ScaledMetric(relativeTo: .largeTitle) private var bigCheckSize: CGFloat = 160
 
-    init(pinnedTime: String? = nil, onShowDay: @escaping () -> Void = {}) {
+    init(pinnedTime: String? = nil, onShowDay: @escaping () -> Void = {}, onCheckIn: @escaping () -> Void = {}) {
         self.pinnedTime = pinnedTime
         self.onShowDay = onShowDay
+        self.onCheckIn = onCheckIn
     }
 
     private var log: DoseLog { store.doseLog }
@@ -79,6 +81,9 @@ struct NowView: View {
                     SeniorButton(
                         "Ziua de azi", systemImage: "calendar", prominence: .secondary,
                         identifier: "now.dayButton", action: onShowDay)
+                    SeniorButton(
+                        "Spuneți-mi cum vă simțiți", systemImage: "mic", prominence: .secondary,
+                        identifier: "now.checkInButton", action: onCheckIn)
                 }
             }
             .padding(Spacing.m)

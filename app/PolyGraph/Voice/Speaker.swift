@@ -11,6 +11,8 @@ final class Speaker {
     private let synthesizer = AVSpeechSynthesizer()
     private let releaser = AudioSessionReleaser()
     private lazy var voice: AVSpeechSynthesisVoice? = Self.romanianVoice()
+    /// crește la fiecare `speak` / `stop`: o propoziție care încă aștepta sesiunea audio nu mai pornește
+    private var generation = 0
 
     private init() {
         synthesizer.delegate = releaser
@@ -22,16 +24,21 @@ final class Speaker {
         if synthesizer.isSpeaking {
             synthesizer.stopSpeaking(at: .immediate)
         }
-        let session = AVAudioSession.sharedInstance()
-        try? session.setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
-        try? session.setActive(true)
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = voice
-        utterance.rate = Self.rate
-        synthesizer.speak(utterance)
+        generation += 1
+        let token = generation
+        Task {
+            // sesiunea se configurează în afara main-ului; vocea pornește imediat după
+            try? await AudioSessionWork.activate(.playback, mode: .spokenAudio)
+            guard token == generation else { return }
+            let utterance = AVSpeechUtterance(string: text)
+            utterance.voice = voice
+            utterance.rate = Self.rate
+            synthesizer.speak(utterance)
+        }
     }
 
     func stop() {
+        generation += 1
         synthesizer.stopSpeaking(at: .immediate)
     }
 
@@ -50,6 +57,6 @@ final class Speaker {
 /// pentru că sintetizatorul își cheamă delegatul de pe firul lui, nu de pe main.
 private nonisolated final class AudioSessionReleaser: NSObject, AVSpeechSynthesizerDelegate {
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        AudioSessionWork.deactivate()
     }
 }

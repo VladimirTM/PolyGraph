@@ -7,6 +7,8 @@ enum CaregiverTab: Hashable {
 /// Modul aparținător: patru tab-uri, fiecare cu stiva lui și titlu mare.
 /// Butoanele din tab bar se găsesc în testele UI după etichetă („Medicamente”, „Alerte”, „Graf”, „Noutăți”).
 struct CaregiverRoot: View {
+    @Environment(AppStore.self) private var store
+    @Environment(\.scenePhase) private var scenePhase
     @State private var tab: CaregiverTab = .meds
     @State private var graphPath: [CaregiverRoute] = []
     /// sursa tranziției zoom card → detaliu din tab-ul Alerte
@@ -36,26 +38,24 @@ struct CaregiverRoot: View {
                 .accessibilityIdentifier("tab.graph")
             }
             Tab("Noutăți", systemImage: "bell", value: CaregiverTab.feed) {
-                NavigationStack { FeedPlaceholderView() }
-                    .accessibilityIdentifier("tab.feed")
+                NavigationStack {
+                    FeedView()
+                        .caregiverDestinations()
+                }
+                .accessibilityIdentifier("tab.feed")
+            }
+            .badge(store.feed.pendingNew.count)
+        }
+        // haptic pe același trigger cu inserarea cardului grav
+        .sensoryFeedback(.warning, trigger: store.feed.alarmCount)
+        // polling-ul merge pe orice tab, cât timp aplicația e deschisă (fără APNs)
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
+            await FeedAlerts.requestPermissionIfNeeded()
+            while !Task.isCancelled {
+                await store.feed.poll()
+                try? await Task.sleep(for: FeedModel.interval)
             }
         }
-    }
-}
-
-/// Noutățile vin la A5 (polling la 10 s pe /feed).
-struct FeedPlaceholderView: View {
-    @Environment(AppStore.self) private var store
-
-    var body: some View {
-        ContentUnavailableView {
-            Label("Nicio noutate încă", systemImage: "bell")
-        } description: {
-            Text("Aici apar dozele luate sau ratate și ce v-a spus \(store.patient?.name ?? "pacientul").")
-        }
-        .accessibilityIdentifier("feed.placeholder")
-        .navigationTitle("Noutăți")
-        .navigationBarTitleDisplayMode(.large)
-        .pgSettingsToolbar()
     }
 }
