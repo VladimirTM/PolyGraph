@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import os
-import shutil
 import sqlite3
 import sys
 import tempfile
@@ -93,8 +92,8 @@ def build(db_path: Path = DB_PATH, brands: bool = True) -> dict:
     products = catalog + extra
     linked = link(ddinter.drugs, products)
 
-    # Construită într-un director temporar și copiată la final: kb.sqlite nu rămâne niciodată pe jumătate scrisă.
-    tmpdir = tempfile.TemporaryDirectory(prefix="polygraph-kb-")
+    # Același filesystem permite înlocuirea atomică, inclusiv când backend-ul citește catalogul.
+    tmpdir = tempfile.TemporaryDirectory(prefix=".polygraph-kb-", dir=db_path.parent)
     tmp = Path(tmpdir.name) / "kb.sqlite"
     conn = sqlite3.connect(tmp)
     conn.executescript(SCHEMA)
@@ -119,7 +118,7 @@ def build(db_path: Path = DB_PATH, brands: bool = True) -> dict:
     conn.commit()
     conn.execute("VACUUM")
     conn.close()
-    shutil.copyfile(tmp, db_path)
+    tmp.replace(db_path)
     tmpdir.cleanup()
 
     report = coverage(products, linked)

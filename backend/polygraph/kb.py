@@ -63,11 +63,18 @@ class Ddi:
     source_url: str | None
 
 
+def catalog_version(path: Path) -> str:
+    try:
+        stat = path.stat()
+    except FileNotFoundError:
+        raise KbMissing(f"{path} nu există (make kb)") from None
+    return f"{stat.st_dev}:{stat.st_ino}:{stat.st_size}:{stat.st_mtime_ns}"
+
+
 class Kb:
     def __init__(self, path: Path | str | None = None):
         self.path = Path(path or os.environ.get("PG_KB") or DEFAULT_KB)
-        if not self.path.exists():
-            raise KbMissing(f"{self.path} nu există (make kb)")
+        self.version = catalog_version(self.path)
         self._local = threading.local()
         self.meta = dict(self._q("SELECT key, value FROM kb_meta"))
         self.age_min = int(self.meta.get("elderly_age_min", 65))
@@ -102,6 +109,10 @@ class Kb:
         conn = getattr(self._local, "conn", None)
         if conn is None:
             conn = sqlite3.connect(f"file:{self.path}?mode=ro", uri=True, check_same_thread=False)
+            # O conexiune deschisă după înlocuire nu trebuie amestecată cu datele instanței vechi.
+            if catalog_version(self.path) != self.version:
+                conn.close()
+                raise KbMissing("Catalogul a fost reconstruit. Reîncercați cererea.")
             self._local.conn = conn
         return conn
 
@@ -195,54 +206,63 @@ class Kb:
 
     def search(self, q: str, limit: int = 20) -> list[dict[str, Any]]:
         """Produse după brand (prefix) sau după substanță (INN / DCI). Fiecare cu substanțele din kb."""
+        return [hit for hit, _ in self.search_with_keys(q, limit)]
+
+    def search_with_keys(self, q: str, limit: int = 20) -> list[tuple[dict[str, Any], str]]:
         key = norm(q)
         if len(key) < 2:
             return []
         rows = self._q(
-            "SELECT p.id, p.brand, p.strength_text, p.form FROM product p WHERE p.brand_norm LIKE ? || '%'"
+            "SELECT p.id, p.brand, p.strength_text, p.form, p.brand_norm FROM product p WHERE p.brand_norm LIKE ? || '%'"
             " ORDER BY (p.brand_norm = ?) DESC, p.source = 'extra' DESC, length(p.brand_norm), p.brand LIMIT ?",
             (key, key, limit),
         )
         if len(rows) < limit:
             seen = {r[0] for r in rows}
             more = self._q(
-                "SELECT DISTINCT p.id, p.brand, p.strength_text, p.form FROM product p"
+                "SELECT DISTINCT p.id, p.brand, p.strength_text, p.form, p.brand_norm FROM product p"
                 " JOIN product_substance ps ON ps.product_id = p.id JOIN substance s ON s.id = ps.substance_id"
                 " WHERE s.inn LIKE ? || '%' OR lower(s.dci_ro) LIKE ? || '%' ORDER BY length(p.brand), p.brand LIMIT ?",
                 (key, key, limit),
             )
             rows += [r for r in more if r[0] not in seen][: limit - len(rows)]
         out = []
-        for pid, brand, strength, form in rows:
+        for pid, brand, strength, form, brand_norm in rows:
             subs = self._q(
                 "SELECT s.dci_ro, s.inn, s.atc FROM product_substance ps JOIN substance s ON s.id = ps.substance_id"
                 " WHERE ps.product_id = ? ORDER BY s.inn",
                 (pid,),
             )
             out.append(
-                {
-                    "brand": brand,
-                    "strength_text": strength,
-                    "form": form,
-                    "substances": [
-                        {
-                            "dci": d,
-                            "inn": i,
-                            "atc": a if a and re.fullmatch(r"[A-Z]\d\d[A-Z]{2}\d\d", a) else None,
-                            "strength_mg": None,
-                        }
-                        for d, i, a in subs
-                    ],
-                }
+                (
+                    {
+                        "brand": brand,
+                        "strength_text": strength,
+                        "form": form,
+                        "substances": [
+                            {
+                                "dci": d,
+                                "inn": i,
+                                "atc": a if a and re.fullmatch(r"[A-Z]\d\d[A-Z]{2}\d\d", a) else None,
+                                "strength_mg": None,
+                            }
+                            for d, i, a in subs
+                        ],
+                    },
+                    brand_norm,
+                )
             )
         return out
 
 
 _DEFAULT: Kb | None = None
+_DEFAULT_LOCK = threading.Lock()
 
 
 def default_kb() -> Kb:
     global _DEFAULT
-    if _DEFAULT is None:
-        _DEFAULT = Kb()
-    return _DEFAULT
+    path = Path(os.environ.get("PG_KB") or DEFAULT_KB)
+    with _DEFAULT_LOCK:
+        if _DEFAULT is None or _DEFAULT.path != path or _DEFAULT.version != catalog_version(path):
+            _DEFAULT = Kb(path)
+        return _DEFAULT

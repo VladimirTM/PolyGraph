@@ -126,7 +126,7 @@ def test_kb_search(client):
     assert r.status_code == 200
     body = r.json()
     ok("kb_search_result", body)
-    assert any(x["brand"].lower().startswith("sintrom") for x in body["results"])
+    assert any((hit["brand"], hit["strength_text"], hit["form"]) == ("Sintrom", "4 mg", "comprimate") for hit in body["results"])
     assert client.get("/v1/kb/search", params={"q": "sint"}).status_code == 401
 
 

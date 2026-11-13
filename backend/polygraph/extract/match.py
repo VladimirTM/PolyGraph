@@ -4,6 +4,7 @@ import logging
 import re
 import secrets
 
+from polygraph.extract.display import display_brand, display_form, display_specialty, display_strength
 from polygraph.extract.gemini import extract_image
 from polygraph.extract.gs1 import decode_datamatrix, parse_gs1, valid_gtin
 from polygraph.extract.ocr_match import Match, OcrLine, RawExtraction, box_match, catalog, prescription_matches, strengths
@@ -28,7 +29,7 @@ def scan(kb: Kb, store: Store, kind: str, lines: list[OcrLine], image: bytes, mi
         elif image:
             code = decode_datamatrix(image)
 
-    cached_id = store.cached_gtin(code["gtin"]) if code else None
+    cached_id = store.cached_gtin(code["gtin"], kb.version) if code else None
     cached = catalog(kb)[0].get(cached_id) if cached_id is not None else None
     if cached:
         matches, missing, route = [Match(cached, RawExtraction(), "gtin_cache", 1.0)], False, "gtin_cache"
@@ -57,10 +58,10 @@ def scan(kb: Kb, store: Store, kind: str, lines: list[OcrLine], image: bytes, mi
             matches, route = vision[:1] if kind == "box" else vision, "gemini"
             missing = len(vision) != len(raw_rows)
 
-    candidates = [candidate(kb, m, kind, code, route) for m in matches]
+    candidates = [candidate(kb, m, kind, code, route, lines) for m in matches]
     if not candidates:
         warnings.append(MANUAL if kind == "box" else "Nu am putut citi rețeta, completați manual.")
-        route = "manual"
+        route = "gtin_miss" if kind == "box" and code and not image and not lines else "manual"
     elif missing:
         warnings.append("Unele medicamente de pe rețetă trebuie completate manual.")
     if kind == "box" and any(m["match"]["needs_review"] for m in candidates):
@@ -69,7 +70,7 @@ def scan(kb: Kb, store: Store, kind: str, lines: list[OcrLine], image: bytes, mi
     return {"candidates": candidates, "warnings": warnings, "raw_text": "\n".join(line.text for line in lines) or None}
 
 
-def candidate(kb: Kb, match: Match, kind: str, code: dict | None, route: str) -> dict:
+def candidate(kb: Kb, match: Match, kind: str, code: dict | None, route: str, lines: list[OcrLine]) -> dict:
     product, raw = match.product, match.raw
     dosage, dosage_review = parse_posology(raw.posology_text)
     rows = kb.scan_substances(product.id) if route != "gemini" or raw.dci_text else ()
@@ -95,15 +96,17 @@ def candidate(kb: Kb, match: Match, kind: str, code: dict | None, route: str) ->
         "id": f"med_{secrets.token_hex(6)}",
         "source": "datamatrix" if code else "photo_rx" if kind == "prescription" else "photo_box",
         "product": {
-            "brand": product.brand,
-            "strength_text": product.strength,
-            "form": raw.form or product.form,
+            "brand": display_brand(
+                product.brand, product.key if match.method != "exact_dci" else product.brand, (line.text for line in lines)
+            ),
+            "strength_text": display_strength(product.strength),
+            "form": display_form(raw.form or product.form),
             "pack_size": raw.pack_size if raw.pack_size and raw.pack_size > 0 else None,
             **{key: code[key] if code else None for key in ("gtin", "expiry", "batch")},
         },
         "substances": substances,
         "dosage": dosage,
-        "prescriber": {"name": raw.prescriber_text, "specialty": raw.specialty},
+        "prescriber": {"name": raw.prescriber_text, "specialty": display_specialty(raw.specialty)},
         "start_date": None,
         "end_date": None,
         "photo_url": None,
