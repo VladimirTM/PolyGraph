@@ -10,7 +10,7 @@
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e gata** (`feature/b2-engine`): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`; `make check` are 111 teste (în CI: 63 + 48 sărite fără `kb.sqlite`). **A1 e gata:** aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **A2 e scris** pe `feature/a2-scan` (cutie + rețetă + confirmare + camera falsă `PG_FAKE_SCAN`), `make check-ios` verde; urmează T-A2-03 pe iPhone. Dev B: B3 e în `main`. Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e în `main`** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9)), partea de backend: `/scan` real (GTIN cache → potrivire OCR → Gemini cu cache → completare manuală), `make demo-b3` arată fluxul cap-coadă pe date sintetice; rămân T-B3-02 și T-B3-04, care așteaptă OCR-ul și parserul GS1 din A2. `make check` are 170 de teste (în CI: 96 + 74 sărite fără `kb.sqlite`). **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e în `main`** ([PR #13](https://github.com/VladimirTM/PolyGraph/pull/13)): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_pharmacist`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. `make check` are 186 de teste. **A2 e gata** ([PR #15](https://github.com/VladimirTM/PolyGraph/pull/15)): cutie (DataMatrix + poză) și rețetă (camera de documente), OCR pe telefon, `/scan`, sheet-ul de confirmare cu câmpurile „verificați” și avertizări de expirare / duplicat, camera falsă `PG_FAKE_SCAN`; `make check-ios` verde, încercat pe iPhone cu cutiile de test din `demo/datamatrix/`; rămân cutiile fizice în sală (T-A2-03). **Urmează:** Dev B închide B3 cu datele din A2 (OCR real de pe iPhone în `demo/ocr/`, `GS1Tests` pe același `gs1_cases.json`); Dev A pornește A3. Actualizați coloana „Status” la fiecare sync point.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
@@ -22,7 +22,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | **P0** repo, contracte, mock | amândoi | W0–W1.5 | V 18:00–19:30 | ✅ | `contracts/`, mock server, Makefile, CI, proiectul Xcode pe ambele iPhone-uri |
 | **S0** | amândoi | W1.5 | V 19:30 | ✅ | contracte în `main`, mock pornit, Xcode pe ambele telefoane |
 | A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | ✅ | app pe mock, pe ambele iPhone-uri (`make check-ios` verde, 18 teste) |
-| B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | 🔄 | `make kb`, substanțele demo găsite |
+| B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | ✅ | `make kb`, substanțele demo găsite |
 | Q0 infrastructura de review | agent (worktree) | în paralel cu A2 | V seara | ⬜ | `make review Q=…` |
 | A2 scanarea (DataMatrix, poză, rețetă, confirmare) | Dev A | W4–W8 | V 22:00–02:00 | 🟡 | `make check-ios` verde, merge pe iPhone cu cutiile de test; rămân cutiile fizice în sală (T-A2-03) |
 | B2 motorul de interacțiuni + graful | Dev B | W4–W12 | V 22:00–S 13:00 | ✅ | golden test = `expected_alerts.json` |
@@ -32,7 +32,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | B3 extracția (OCR → catalog, GS1, cache) | Dev B | W12–W14 | S 14:00–16:00 | 🔄 | `/scan` real |
 | **S2** + Q2 | amândoi | W14 | S 16:00 | ⬜ | fluxul real cap-coadă |
 | A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | ⬜ | Acum, Ziua de azi, „Am luat”, TTS, notificări |
-| B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | ⬜ | `/schedule`, `/checkins` reale |
+| B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | 🔄 | `/schedule`, `/checkins` reale; B4 gata (`/schedule`, `/doses`), B5 neînceput |
 | **S3** (MVP complet) | amândoi | W19 | S 21:30 | ⬜ | |
 | A5 check-in vocal + Noutăți | Dev A | W19–W23 | S 21:30–D 02:00 | ⬜ | |
 | B6 pagina farmacistului + tipărire | Dev B | W19–W23 | S 21:30–D 02:00 | ⬜ | |
@@ -902,6 +902,8 @@ Criterii de acceptare: scenariul din secțiunea 7 rulează de 3 ori la rând, cu
 
 ### B1 · Ingestia datelor: `kb.sqlite`
 
+**Status:** ✅ Integrat în `main` ([PR #4](https://github.com/VladimirTM/PolyGraph/pull/4)).
+
 **Responsabil:** Dev B · **Depinde de:** P0, datele descărcate la pregătire · **Durată:** 5 h · **Branch:** `feature/b1-kb-ingest`
 
 **Checklist**
@@ -937,6 +939,8 @@ Criterii de acceptare: make kb < 3 min; ≥ 90% din produsele cu o singură subs
 Nu face: motorul de alerte (B2).
 ~~~
 
+> **Abatere asumată (13.11.2026):** criteriul de 90 % nu se poate atinge cu DDInter 2.0 descărcabil (doar grupele ATC A, B, D, H, L, P, R, V; substanțe uzuale ca candesartan, dabigatran, metamizol sau etoricoxib lipsesc complet din cele 1.939). Rezultatul e 81,2 %. Produsele nelegate se găsesc după brand și DCI, doar fără interacțiuni; pacientul demo e acoperit 100 %. Detalii în `kb/README.md`; ținta ar cere altă sursă de interacțiuni, în afara hackathonului.
+
 **Teste**
 - [x] T-B1-01 Toate substanțele demo legate (brand și DCI), inclusiv combinația Calciu + D3.
 - [x] T-B1-02 `ddi` simetric: căutarea (a, b) și (b, a) dă același rând.
@@ -946,6 +950,8 @@ Nu face: motorul de alerte (B2).
 ---
 
 ### B2 · Motorul de interacțiuni și graful
+
+**Status:** ✅ Integrat în `main` ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)).
 
 **Responsabil:** Dev B · **Depinde de:** B1 · **Durată:** 5 h · **Branch:** `feature/b2-engine`
 
@@ -1017,7 +1023,7 @@ Obiectiv: POST /v1/patients/{id}/scan întoarce candidați corecți pentru cutii
 2. polygraph/extract/posology.py (determinist): posology_text → pattern + with_food + as_needed: „1-0-1”, „1-1-1”, „0-0-1”, „1/2 seara”, „1 cp/zi dimineața”, „de 2 ori pe zi”, „la nevoie”, „înainte de masă”, „pe stomacul gol”. Ce nu se parsează → pattern gol și needs_review.
 3. polygraph/extract/match.py: ordinea gtin_cache → ocr_match → (doar dacă confidence < 0.85 sau nu s-a găsit nimic, și există imagine) gemini → nimic (needs_review, substances goale). ATC-ul vine mereu din kb, niciodată din OCR sau din LLM; și rezultatul Gemini trece prin aceeași potrivire în kb.
 3b. Reguli de potrivire, învățate din testul Gemini pe 8 cutii (12.11.2026; vezi secțiunea 10): (a) se potrivește pe **substanță + doză**, nu doar pe brand: pe cutiile de generice „brandul” citit poate fi producătorul (Gemini a citit „Actavis” pentru Amlodipina Actavis, cu substanța și doza corecte), deci brandul citit se caută în `brand_norm` și în numele producătorului, iar substanța (`dci_ro`) și doza decid; (b) unitățile se normalizează înainte de comparație: `µg` = `mcg` = `ug`, `mg`/`miligrame`, virgula zecimală, `UI` = `IU` (Euthyrox a ieșit „100 µg”, catalogul scrie „100 mcg”); (c) un câmp `null` (din OCR sau din Gemini) înseamnă „nu am recunoscut”: `needs_review = true`, mesaj „fotografiați din nou cutia”, niciodată o presupunere, și nu se completează substanța din numele comercial.
-4. polygraph/extract/gemini.py: modelul din variabila GEMINI_MODEL (implicit `gemini-3.1-flash-lite`, testat pe tier-ul gratuit la 12.11.2026; `gemini-2.5-flash` a dat 404, iar modelele noi `gemini-3.5-flash` / `3.8-flash` au dat 503, deci nu se pun pe drumul critic; fără aliasuri de tip `-latest`, ca modelul să nu se schimbe pe sub demo; la 503 / 429 o reîncercare după 4 s, apoi needs_review) (cheia în .env, GEMINI_API_KEY), structured output după schema RawExtraction, temperatura 0, promptul: „copiază doar textul vizibil; dacă un câmp nu e vizibil, null; nu deduce substanța din numele comercial”. Timeout 8 s; la 429 sau timeout → needs_review, nu eroare. Cache: sha256(imagine) → demo/llm_cache/<hash>.json; make demo-warm trimite pozele demo o dată, cu internet.
+4. polygraph/extract/gemini.py: modelul din variabila GEMINI_MODEL (implicit `gemini-3.1-flash-lite`, testat pe tier-ul gratuit la 12.11.2026; `gemini-2.5-flash` a dat 404, iar modelele noi `gemini-3.5-flash` / `3.8-flash` au dat 503, deci nu se pun pe drumul critic; fără aliasuri de tip `-latest`, ca modelul să nu se schimbe pe sub demo; un singur apel, fără reîncercare, decis la 13.11.2026 ca o scanare să aștepte cel mult 8 s; la 503 / 429 → needs_review) (cheia în .env, GEMINI_API_KEY), structured output după schema RawExtraction, temperatura 0, promptul: „copiază doar textul vizibil; dacă un câmp nu e vizibil, null; nu deduce substanța din numele comercial”. Timeout 8 s; la 429 sau timeout → needs_review, nu eroare. Cache: sha256(imagine) → demo/llm_cache/<hash>.json (doar răspunsurile nevide); make demo-warm trimite pozele demo o dată, cu internet.
 5. polygraph/extract/gs1.py: același parser ca în app (A2, Swift), cu aceleași cazuri de test; decode_datamatrix(image) cu zxingcpp.read_barcodes ca fallback.
 6. După confirmare (POST /meds cu gtin), se scrie gtin_cache, ca a doua scanare să fie instantă.
 7. Logul fiecărei scanări spune ce cale a decis (gtin_cache / ocr_match / gemini / manual) și cu ce încredere: e argumentul de la pitch că LLM-ul nu e pe drumul critic.
@@ -1025,7 +1031,9 @@ Obiectiv: POST /v1/patients/{id}/scan întoarce candidați corecți pentru cutii
 Criterii de acceptare: tests/test_extract_demo.py pe textele OCR salvate de pe pozele demo (demo/ocr/*.json, produse la A2 cu telefonul): fiecare cutie → produsul corect pe calea ocr_match, fără Gemini; rețeta tipărită → toate medicamentele, cu pattern-ul corect; fără internet și fără potrivire → warning „nu am putut citi cutia, completați manual”, nu eroare 500.
 ~~~
 
-**Status:** Backend implementat. Testele locale acoperă cutiile pe transcrieri, rețeta fictivă din PDF, parserul Python pe fixture-ul GS1 comun și clientul Gemini cu răspunsuri simulate. Validarea pe OCR-ul și fotografiile A2 și comparația cu parserul Swift rămân de verificat.
+**Status:** 🔄 Backend implementat și integrat în `main` ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9)). Testele locale acoperă cutiile pe transcrieri, rețeta fictivă din PDF, parserul Python pe fixture-ul GS1 comun și clientul Gemini cu răspunsuri simulate. Validarea pe OCR-ul și fotografiile A2 și comparația cu parserul Swift rămân de verificat. Reparat după review (`fix/b3-gemini`): Gemini e apelat o singură dată (maxim 8 s pe scanare), iar un răspuns gol nu mai rămâne în cache.
+
+Rămase deschise (de rezolvat cel târziu la B7): `gtin_cache` ține id-ul produsului din `kb.sqlite`, deci trebuie golit după un `make kb` care schimbă id-urile; `/demo/reset` nu golește `gtin_cache` (după reset, cutia Sintrom scanată cu DataMatrix sare direct pe `gtin_cache`); genericele confirmate nu intră în `gtin_cache` (doar potrivirile exacte pe brand); un DataMatrix trimis, dar invalid, nu mai e căutat în imagine.
 
 **Teste**
 - [x] Gemini live: o imagine sintetică a produs candidatul Sintrom 4 mg (B01AA07). Rescanarea cu cheia dezactivată a întors același candidat din cache, fără apel de rețea.
@@ -1057,9 +1065,9 @@ Criterii de acceptare: tests/test_schedule_golden.py: demo_patient → expected_
 ~~~
 
 **Teste**
-- [ ] T-B4-01 Golden pe pacientul demo.
-- [ ] T-B4-02 Proprietate: pe 200 de regimuri aleatoare din substanțele cu reguli, nicio constrângere dură încălcată când `unsatisfied` e gol.
-- [ ] T-B4-03 Ancore schimbate (trezire 05:30) → programul se mută coerent.
+- [x] T-B4-01 Golden pe pacientul demo.
+- [x] T-B4-02 Proprietate: pe 200 de regimuri aleatoare din substanțele cu reguli, nicio constrângere dură încălcată când `unsatisfied` e gol.
+- [x] T-B4-03 Ancore schimbate (trezire 05:30) → programul se mută coerent.
 
 ---
 
