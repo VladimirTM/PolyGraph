@@ -89,6 +89,18 @@ Doar **tokenii + 3 interacțiuni lucrate**: butonul cu răspuns instant și guar
 
 ## Convenții de implementare (completate la A1 și A6)
 
-- **`accessibilityIdentifier`**: `"<ecran>.<element>"` pe fiecare buton, câmp, card și tab (ex. `now.takenButton`, `alerts.card.<id>`, `scan.shutter`). Lista completă se scrie aici la A1.
-- **Logurile** aplicației: `Logger(subsystem: "ro.polygraph", category: <modul>)`.
+- **`accessibilityIdentifier`**: `"<ecran>.<element>"` pe fiecare buton, câmp, card și tab (ex. `now.takenButton`, `alerts.card.<id>`, `scan.shutter`). Lista de mai jos e completată la fiecare etapă care adaugă un ecran.
+
+  | Ecran | Identificatori (A1) |
+  |---|---|
+  | pornire | `root.loading` |
+  | onboarding | `onboarding.progress`, `onboarding.role.senior`, `onboarding.role.caregiver`, `onboarding.demoButton`, `onboarding.nameField`, `onboarding.birthYearPicker`, `onboarding.wakeTime`, `onboarding.breakfastTime`, `onboarding.lunchTime`, `onboarding.dinnerTime` (fiecare cu `.picker` când e deschis), `onboarding.bedTime`, `onboarding.nextButton`, `onboarding.finishButton`, `onboarding.backButton`, `onboarding.error` |
+  | Acum (senior) | `now.clock`, `now.nextMomentCard`, `now.dayButton` |
+  | Ziua de azi | `day.moment.<HH:MM>` |
+  | tab-uri (aparținător) | conținutul: `tab.meds`, `tab.alerts`, `tab.graph`, `tab.feed`; butoanele din tab bar se caută după etichetă („Medicamente”, „Alerte”, „Graf”, „Noutăți”), SwiftUI nu le poate da identificator |
+  | Medicamente | `meds.list`, `meds.row.<med_id>`, `meds.loading`, `meds.empty`, `meds.error`, `meds.retryButton` |
+  | Alerte / Graf / Noutăți (placeholder) | `alerts.placeholder`, `graph.placeholder`, `feed.placeholder` |
+  | Setări | `settings.openButton` (rotița din bara de navigare), `settings.baseURLField`, `settings.checkConnectionButton`, `settings.connectionStatus`, `settings.rolePicker`, `settings.demoModeToggle`, `settings.useDemoPatientButton`, `settings.signOutButton`, `settings.confirmSignOutButton`, `settings.doneButton` |
+- **Logurile** aplicației: `Logger(subsystem: "ro.polygraph", category: <modul>)`. Categoriile sunt în `App/Log.swift` (`app`, `api`, `onboarding`, `settings`).
+- **Tokenii în cod**: `Animation.pgStandard / pgQuick / pgMove / pgFlick`, `withPgAnimation`, `.pgAnimation(_:value:)` și `PgMotion.transition` (`Design/Motion.swift`); `Spacing`, `Radius`, `ControlHeight`, `PgColor`, `Severity.color / .label` (`Design/Tokens.swift`); `PressableButtonStyle`, `GuardedAction`, `SeniorButton` (`Design/Buttons.swift`). Reduce Motion în view-uri: `@Environment(\.pgReduceMotion)` (sistemul sau `PG_REDUCE_MOTION`).
 - **Trecerea de accesibilitate (A6, punctul 5)**: rezultatele se notează aici.

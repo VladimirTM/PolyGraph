@@ -1,0 +1,16 @@
+// Setările comune ale țintei PolyGraph (Debug și Release).
+// Se leagă o singură dată din Xcode: Project → Info → Configurations → PolyGraph → „PolyGraph”
+// (pașii sunt în app/README.md). Valorile scrise direct în ținta din Xcode au prioritate față de acest fișier.
+
+// Implicit, bundle id-ul vechi; fiecare își pune sufixul lui în Signing.local.xcconfig.
+PG_BUNDLE_SUFFIX = PolyGraph
+#include? "Signing.local.xcconfig"
+
+PRODUCT_BUNDLE_IDENTIFIER = ro.polygraph.$(PG_BUNDLE_SUFFIX)
+
+// Cheile de mai jos se adaugă peste Info.plist-ul generat de Xcode (GENERATE_INFOPLIST_FILE = YES).
+// Fișierul stă în afara folderului sincronizat, ca să nu fie copiat ca resursă.
+INFOPLIST_FILE = Config/Info.plist
+
+// Pozele pentru camera falsă (PG_FAKE_SCAN) intră doar în Debug.
+EXCLUDED_SOURCE_FILE_NAMES[config=Release] = */DebugAssets/*
