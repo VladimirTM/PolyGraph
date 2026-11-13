@@ -171,3 +171,54 @@ struct DeleteUndoQueueTests {
         #expect(DeleteUndoQueue.undoWindow == .seconds(5))
     }
 }
+
+/// Editarea concentrației din „Editează” (A3): substanța trebuie să rămână în acord cu cutia.
+@MainActor
+struct EditStrengthTests {
+    @MainActor
+    private struct DemoPatient: Decodable {
+        let meds: [MedicationItem]
+    }
+
+    private func med(_ id: String) throws -> MedicationItem {
+        let meds = try JSONCoding.decoder.decode(DemoPatient.self, from: ContractFiles.data("fixtures/demo_patient.json"))
+            .meds
+        return try #require(meds.first { $0.id == id })
+    }
+
+    @Test func milligramsAreReadFromTheBoxText() throws {
+        #expect(MedDraft.milligrams(in: "4 mg") == 4)
+        #expect(MedDraft.milligrams(in: "2,5mg") == 2.5)
+        #expect(MedDraft.milligrams(in: "1 g") == 1000)
+        let micro = try #require(MedDraft.milligrams(in: "75 mcg"))
+        #expect(abs(micro - 0.075) < 1e-9)
+        #expect(MedDraft.milligrams(in: "comprimate") == nil)
+        #expect(MedDraft.milligrams(in: "500 mg + 400 mg") == nil)
+    }
+
+    @Test func singleSubstanceFollowsTheNewStrength() throws {
+        let draft = MedDraft(try med("med_01"))
+        draft.strengthText = "5 mg"
+        let saved = draft.item()
+        #expect(saved.product.strengthText == "5 mg")
+        #expect(saved.substances.count == 1)
+        #expect(saved.substances.first?.strengthMg == 5)
+        #expect(saved.substances.first?.atc == "B01AA07")
+        #expect(!draft.strengthNeedsCatalog)
+    }
+
+    @Test func unchangedStrengthKeepsTheCatalogSubstance() throws {
+        let original = try med("med_01")
+        let draft = MedDraft(original)
+        draft.strengthText = " 4 MG "
+        #expect(!draft.strengthEdited)
+        #expect(draft.item().substances.first?.strengthMg == original.substances.first?.strengthMg)
+    }
+
+    @Test func unreadableStrengthAsksForTheCatalog() throws {
+        let draft = MedDraft(try med("med_01"))
+        draft.strengthText = "o tabletă"
+        #expect(draft.strengthNeedsCatalog)
+        #expect(draft.item().substances.first?.strengthMg == 4)
+    }
+}

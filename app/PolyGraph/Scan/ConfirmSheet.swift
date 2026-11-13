@@ -301,6 +301,14 @@ private struct DraftForm: View {
                 .reviewHighlight(draft.needsReview(.product))
                 .accessibilityLabel("Concentrația")
                 .accessibilityIdentifier("confirm.strengthField")
+            if draft.strengthNeedsCatalog {
+                Label(
+                    "Concentrația nu se mai potrivește cu catalogul. Căutați medicamentul în catalog, ca substanțele să aibă doza corectă.",
+                    systemImage: "exclamationmark.triangle.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(.orange)
+                    .accessibilityIdentifier("confirm.strengthWarning")
+            }
 
             if draft.substances.isEmpty {
                 Text("Substanța activă nu a fost găsită")
