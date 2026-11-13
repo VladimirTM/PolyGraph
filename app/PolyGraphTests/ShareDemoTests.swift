@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import UIKit
 @testable import PolyGraph
 
 @MainActor
@@ -28,6 +29,7 @@ struct ShareTests {
     }
 }
 
+@MainActor
 struct DemoDataTests {
     private static let appFolder = URL(fileURLWithPath: #filePath)
         .deletingLastPathComponent()  // PolyGraphTests/
