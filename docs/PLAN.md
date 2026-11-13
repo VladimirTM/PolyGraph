@@ -10,7 +10,7 @@
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e închis** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9) și completarea cu OCR-ul real din A2): toate cele patru capturi din `demo/ocr/` trec prin `ocr_match` fără Gemini. `make demo-b3` verifică fluxul cap-coadă pe date sintetice. **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e în `main`** ([PR #13](https://github.com/VladimirTM/PolyGraph/pull/13)): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_pharmacist`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. **A2 e gata** ([PR #15](https://github.com/VladimirTM/PolyGraph/pull/15)): cutie (DataMatrix + poză) și rețetă (camera de documente), OCR pe telefon, `/scan`, sheet-ul de confirmare cu câmpurile „verificați” și avertizări de expirare / duplicat, camera falsă `PG_FAKE_SCAN`; `make check-ios` verde, încercat pe iPhone cu cutiile de test din `demo/datamatrix/`; rămân cutiile fizice în sală (T-A2-03). **B5 e în `main`** ([PR #16](https://github.com/VladimirTM/PolyGraph/pull/16)) cu rutele reale `/checkins` și `/feed`. `make check` trece cu 247 de teste cu `kb.sqlite` construit. **A3 e gata** (modul aparținător: listă pe medici cu „Anulează”, alerte cu zoom, ACB, graf radial local, detaliu + editare). **Urmează:** Dev A pornește A4. Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e închis** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9) și completarea cu OCR-ul real din A2): toate cele patru capturi din `demo/ocr/` trec prin `ocr_match` fără Gemini. `make demo-b3` verifică fluxul cap-coadă pe date sintetice. **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e în `main`** ([PR #13](https://github.com/VladimirTM/PolyGraph/pull/13)): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_pharmacist`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. **A2 e gata** ([PR #15](https://github.com/VladimirTM/PolyGraph/pull/15)): cutie (DataMatrix + poză) și rețetă (camera de documente), OCR pe telefon, `/scan`, sheet-ul de confirmare cu câmpurile „verificați” și avertizări de expirare / duplicat, camera falsă `PG_FAKE_SCAN`; `make check-ios` verde, încercat pe iPhone cu cutiile de test din `demo/datamatrix/`; rămân cutiile fizice în sală (T-A2-03). **B5 e în `main`** ([PR #16](https://github.com/VladimirTM/PolyGraph/pull/16)) cu rutele reale `/checkins` și `/feed`. `make check` trece cu 247 de teste cu `kb.sqlite` construit. **A3 e gata** (modul aparținător: listă pe medici cu „Anulează”, alerte cu zoom, ACB, graf radial local, detaliu + editare). **A4 e scris** (branch `feature/a4-senior-mode`: „Acum” cu cronologia de puncte, cardurile cu poze, „AM LUAT” / „Mai târziu” / „Am sărit” cu guard de 1 s, bifa care zboară, „Anulează” 5 s, vocea `ro-RO`, notificările locale, cardul calm pentru alertele pacientului, „Ziua de azi” cu momentele deschise la atingere); rămân `make check-ios` pe Mac și testul manual pe iPhone (T-A4-03). **Urmează:** A5. Actualizați coloana „Status” la fiecare sync point.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
@@ -31,7 +31,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | A3 medicamente, alerte, graf | Dev A | W8–W12 (+ integrare W12–W14) | S 09:00–16:00 | ✅ | modul aparținător; `make check-ios` verde, graful pe iPhone fără internet în 427 ms; „Arată farmacistului” rămâne pentru A6 |
 | B3 extracția (OCR → catalog, GS1, cache) | Dev B | W12–W14 | S 14:00–16:00 | ✅ | `/scan` real |
 | **S2** + Q2 | amândoi | W14 | S 16:00 | ⬜ | fluxul real cap-coadă |
-| A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | ⬜ | Acum, Ziua de azi, „Am luat”, TTS, notificări |
+| A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | 🟡 | Acum, Ziua de azi, „Am luat”, TTS, notificări scrise; rămân `make check-ios` și T-A4-03 pe iPhone; „Spuneți-mi cum vă simțiți” vine cu A5 |
 | B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | ✅ | `/schedule`, `/checkins` reale; B4 gata (`/schedule`, `/doses`), B5 gata (`/checkins`, `/feed`); X1 (can_i_take → what-if) și Whisper rămân condiționale |
 | **S3** (MVP complet) | amândoi | W19 | S 21:30 | ⬜ | |
 | A5 check-in vocal + Noutăți | Dev A | W19–W23 | S 21:30–D 02:00 | ⬜ | |
@@ -791,12 +791,15 @@ Nu face: modul senior, vocea.
 **Responsabil:** Dev A · **Depinde de:** A1; B4 pentru programul real (până atunci `expected_schedule.json` din mock) · **Durată:** 5 h · **Branch:** `feature/a4-senior-mode`
 
 **Checklist**
-- [ ] `NowView`: ora mare, momentul, dozele cu pozele cutiilor; suprafețe opace
-- [ ] Trei `SeniorButton`: „Am luat” / „Mai târziu” / „Am sărit”, cu guard de 1 s
-- [ ] **„Am luat” cu bifa care zboară în cronologie** + `.sensoryFeedback(.success)` + anulare 5 s
-- [ ] `DayView`: cronologia momentelor
-- [ ] TTS `AVSpeechSynthesizer` cu vocea `ro-RO`
-- [ ] Notificări locale (`UNCalendarNotificationTrigger`) la fiecare moment
+- [x] `NowView`: ora mare, momentul, dozele cu pozele cutiilor; suprafețe opace *(13.11.2026: `Senior/NowView.swift`, `SeniorComponents.swift`)*
+- [x] Trei `SeniorButton`: „Am luat” / „Mai târziu” / „Am sărit”, cu guard de 1 s *(„Mai târziu” = reamintire peste 15 min, doar pe telefon)*
+- [x] **„Am luat” cu bifa care zboară în cronologie** + `.sensoryFeedback(.success)` + anulare 5 s *(`DoseLog`; cu Reduce Motion doar `.opacity`)*
+- [x] `DayView`: cronologia momentelor *(atingerea unui rând deschide `NowView(pinnedTime:)`)*
+- [x] TTS `AVSpeechSynthesizer` cu vocea `ro-RO` *(`Voice/Speaker.swift`: Enhanced/Premium dacă există, rate 0.45, `.duckOthers`; citire la deschidere dezactivabilă din Setări)*
+- [x] Notificări locale (`UNCalendarNotificationTrigger`) la fiecare moment *(`Senior/Reminders.swift`: azi + mâine, refăcute la orice schimbare a programului sau a confirmărilor; permisiunea cerută din „Acum”, cu motivul pe card)*
+- [x] Card calm pentru alertele cu `route_to` ∋ `patient` („Am înțeles” le ascunde până la o alertă nouă)
+- [x] Previews pentru `NowView` la `.large`, `.xxxLarge`, `.accessibility3`, light și dark *(`Senior/SeniorPreviews.swift`)*
+- [ ] SeniorButton „Spuneți-mi cum vă simțiți” (vine cu A5, odată cu ecranul de check-in)
 
 ~~~text
 [WORKFLOW] Branch: feature/a4-senior-mode.
@@ -830,8 +833,8 @@ Nu face: microfonul (A5), modul aparținător.
 ~~~
 
 **Teste**
-- [ ] T-A4-01 Unit: alegerea „momentului curent” pentru 6 ore ale zilei (înainte de trezire, între momente, după culcare).
-- [ ] T-A4-02 Unit: „Am luat” apelat de două ori în 300 ms → un singur set de `POST /doses`; „Anulează” trimite `pending`.
+- [x] T-A4-01 Unit: alegerea „momentului curent” pentru 6 ore ale zilei (înainte de trezire, între momente, după culcare). *(`PolyGraphTests/SeniorTests.swift`, `CurrentMomentTests`; de confirmat cu `make check-ios`)*
+- [x] T-A4-02 Unit: „Am luat” apelat de două ori în 300 ms → un singur set de `POST /doses`; „Anulează” trimite `pending`. *(`DoseLogTests`; de confirmat cu `make check-ios`)*
 - [ ] T-A4-03 Manual: Previews la `.accessibility3` fără text tăiat; o persoană care nu a văzut aplicația confirmă momentul fără explicații.
 
 ---
