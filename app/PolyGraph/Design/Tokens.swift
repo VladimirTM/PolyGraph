@@ -14,6 +14,8 @@ enum Radius {
     static let card: CGFloat = 12
     /// cardurile mari din modul senior
     static let seniorCard: CGFloat = 20
+    /// poza cutiei din rândul listei de medicamente
+    static let thumbnail: CGFloat = 8
 }
 
 enum ControlHeight {
