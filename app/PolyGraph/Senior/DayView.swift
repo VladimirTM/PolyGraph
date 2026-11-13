@@ -4,11 +4,13 @@ import SwiftUI
 /// Atingerea unui rând deschide momentul acela, cu aceleași detalii și butoane ca „Acum”.
 struct DayView: View {
     @Environment(AppStore.self) private var store
+    @Environment(\.dynamicTypeSize) private var typeSize
     let onOpenMoment: (String) -> Void
 
     @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 28
     @ScaledMetric(relativeTo: .title2) private var textSize: CGFloat = 22
-    @ScaledMetric(relativeTo: .title2) private var thumbnail: CGFloat = 48
+    /// fix: la textul mare, pozele care cresc odată cu textul împing rândul peste marginea ecranului
+    private let thumbnail: CGFloat = 56
 
     var body: some View {
         ScrollView {
@@ -42,24 +44,21 @@ struct DayView: View {
         } label: {
             HStack(alignment: .center, spacing: Spacing.m) {
                 VStack(alignment: .leading, spacing: Spacing.xs) {
-                    HStack(alignment: .firstTextBaseline, spacing: Spacing.s) {
-                        Text(moment.time)
-                            .font(.system(size: titleSize, weight: .semibold))
-                            .monospacedDigit()
-                        Text(moment.label)
-                            .font(.system(size: textSize))
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                    timeAndLabel(moment)
                     photos(moment)
                     Label(state.text, systemImage: state.icon)
                         .font(.system(size: textSize, weight: .semibold))
                         .foregroundStyle(state.isDone ? PgColor.accent : PgColor.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                Spacer(minLength: 0)
-                Image(systemName: "chevron.right")
-                    .font(.system(size: textSize, weight: .semibold))
-                    .foregroundStyle(PgColor.textSecondary)
-                    .accessibilityHidden(true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                // la textul de accesibilitate săgeata fură lățime; tot cardul rămâne apăsabil
+                if !typeSize.isAccessibilitySize {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: textSize, weight: .semibold))
+                        .foregroundStyle(PgColor.textSecondary)
+                        .accessibilityHidden(true)
+                }
             }
             .foregroundStyle(PgColor.textPrimary)
             .padding(Spacing.l)
@@ -75,6 +74,21 @@ struct DayView: View {
             "Ora \(moment.time), \(moment.label). \(medNames(moment)). \(state.text).")
         .accessibilityHint("Deschide pastilele de la ora \(moment.time)")
         .accessibilityIdentifier("day.moment.\(moment.time)")
+    }
+
+    /// Ora și eticheta pe același rând; la textul de accesibilitate, una sub alta.
+    private func timeAndLabel(_ moment: Moment) -> some View {
+        let layout = typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.xxs))
+            : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: Spacing.s))
+        return layout {
+            Text(moment.time)
+                .font(.system(size: titleSize, weight: .semibold))
+                .monospacedDigit()
+            Text(moment.label)
+                .font(.system(size: textSize))
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 
     private func photos(_ moment: Moment) -> some View {
