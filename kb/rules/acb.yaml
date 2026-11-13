@@ -8,6 +8,7 @@
 
 version: 1
 threshold_alert: 3
+source: "ACB Scale, actualizarea 2012 (Aging Brain Care / Regenstrief Institute), lista NHS Derbyshire „Drugs on the ACB scale”"
 scores:
   3: [amitriptyline, clomipramine, imipramine, doxepin, nortriptyline, trimipramine, desipramine,
       chlorphenamine, clemastine, diphenhydramine, hydroxyzine, promethazine, meclozine, mepyramine,

@@ -254,6 +254,64 @@
       "resolution": null
     },
     {
+      "id": "al_ddi_med_02_med_07",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_02",
+        "med_07"
+      ],
+      "title": "Ibuprofen + omeprazol",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Pentru ibuprofen + omeprazol, DDInter nu dă un nivel. Evaluat prin analogie cu naproxenul (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: naproxen + omeprazole = Moderate (ibuprofen + omeprazole = Unknown)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "naproxen",
+        "atc4": "M01AE"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_02_med_08",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_02",
+        "med_08"
+      ],
+      "title": "Ibuprofen + amitriptilină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Pentru ibuprofen + amitriptilină, DDInter nu dă un nivel. Evaluat prin analogie cu clomipramina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: clomipramine + ibuprofen = Moderate (amitriptyline + ibuprofen = Unknown)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "clomipramină",
+        "atc4": "N06AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
       "id": "al_ddi_med_03_med_07",
       "kind": "ddi",
       "severity": "moderate",
@@ -648,6 +706,35 @@
       },
       "basis": "direct",
       "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_04_med_07",
+      "kind": "ddi",
+      "severity": "minor",
+      "med_ids": [
+        "med_04",
+        "med_07"
+      ],
+      "title": "Amlodipină + omeprazol",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Pentru amlodipină + omeprazol, DDInter nu dă un nivel. Evaluat prin analogie cu nifedipina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
+      "action": "monitor",
+      "route_to": [
+        "pharmacist"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: nifedipine + omeprazole = Minor (amlodipine + omeprazole = Unknown)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "nifedipină",
+        "atc4": "C08CA"
+      },
       "status": "open",
       "resolution": null
     }

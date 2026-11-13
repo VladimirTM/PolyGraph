@@ -22,7 +22,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | **P0** repo, contracte, mock | amândoi | W0–W1.5 | V 18:00–19:30 | ✅ | `contracts/`, mock server, Makefile, CI, proiectul Xcode pe ambele iPhone-uri |
 | **S0** | amândoi | W1.5 | V 19:30 | ✅ | contracte în `main`, mock pornit, Xcode pe ambele telefoane |
 | A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | ⬜ | app pe mock |
-| B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | ⬜ | `make kb`, substanțele demo găsite |
+| B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | 🔄 | `make kb`, substanțele demo găsite |
 | Q0 infrastructura de review | agent (worktree) | în paralel cu A2 | V seara | ⬜ | `make review Q=…` |
 | A2 scanarea (DataMatrix, poză, rețetă, confirmare) | Dev A | W4–W8 | V 22:00–02:00 | ⬜ | cutie → listă, pe mock |
 | B2 motorul de interacțiuni + graful | Dev B | W4–W12 | V 22:00–S 13:00 | ⬜ | golden test = `expected_alerts.json` |
@@ -905,12 +905,12 @@ Criterii de acceptare: scenariul din secțiunea 7 rulează de 3 ori la rând, cu
 **Responsabil:** Dev B · **Depinde de:** P0, datele descărcate la pregătire · **Durată:** 5 h · **Branch:** `feature/b1-kb-ingest`
 
 **Checklist**
-- [ ] `kb/ingest_ddinter.py`: CSV-urile DDInter → tabele `drug`, `ddi`, `dfi`, `duplication`
-- [ ] `kb/ingest_ro_catalog.py`: catalogul românesc → `product` (brand, DCI, formă, concentrație, ATC, ambalaj)
-- [ ] `substance` legată pe ATC5; combinațiile despărțite; `kb/overrides.csv`
-- [ ] Reguli YAML încărcate în tabele: `elderly_rule`, `acb`, `timing_rule`, `adverse_effect`, `food_alias`
-- [ ] `kb/build.py` → `kb/kb.sqlite` (comanda `make kb`), cu raport de acoperire
-- [ ] Verificarea pe pacientul demo: toate substanțele găsite, perechile din 5.8 căutate în DDInter și `expected_alerts.json` ajustat la realitate
+- [x] `kb/ingest_ddinter.py`: CSV-urile DDInter → tabele `drug`, `ddi`, `dfi`, `duplication`
+- [x] `kb/ingest_ro_catalog.py`: catalogul românesc → `product` (brand, DCI, formă, concentrație, ATC, ambalaj)
+- [x] `substance` legată pe ATC5; combinațiile despărțite; `kb/overrides.csv`
+- [x] Reguli YAML încărcate în tabele: `elderly_rule`, `acb`, `timing_rule`, `adverse_effect`, `food_alias`
+- [x] `kb/build.py` → `kb/kb.sqlite` (comanda `make kb`), cu raport de acoperire (81,2 % din produsele cu o singură substanță legate la DDInter, sub ținta de 90 %: substanțele lipsesc din DDInter descărcabil, vezi `kb/README.md`)
+- [x] Verificarea pe pacientul demo: toate substanțele găsite, perechile din 5.8 căutate în DDInter (toate nivelurile coincid cu planul), `expected_alerts.json` ajustat la realitate (regula de clasă dă încă 3 alerte: ibuprofen + omeprazol și ibuprofen + amitriptilină `moderate`, amlodipină + omeprazol `minor`; acum 27 / 6)
 
 ~~~text
 [WORKFLOW] Branch: feature/b1-kb-ingest.
@@ -938,10 +938,10 @@ Nu face: motorul de alerte (B2).
 ~~~
 
 **Teste**
-- [ ] T-B1-01 Toate substanțele demo legate (brand și DCI), inclusiv combinația Calciu + D3.
-- [ ] T-B1-02 `ddi` simetric: căutarea (a, b) și (b, a) dă același rând.
-- [ ] T-B1-03 Fiecare YAML validează după un schema pydantic; fiecare regulă are `source`.
-- [ ] T-B1-04 Coduri de simptom din `adverse_effects.yaml` ⊆ `contracts/symptoms.md`.
+- [x] T-B1-01 Toate substanțele demo legate (brand și DCI), inclusiv combinația Calciu + D3.
+- [x] T-B1-02 `ddi` simetric: căutarea (a, b) și (b, a) dă același rând.
+- [x] T-B1-03 Fiecare YAML validează după un schema pydantic; fiecare regulă are `source`.
+- [x] T-B1-04 Coduri de simptom din `adverse_effects.yaml` ⊆ `contracts/symptoms.md`.
 
 ---
 
