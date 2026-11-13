@@ -2,7 +2,7 @@ import Foundation
 
 /// Cum se împart alertele pe ecranul Alerte (A3): sus, câte un card pentru fiecare alertă gravă;
 /// dedesubt, un card restrâns cu cele moderate și unul cu mâncarea și băutura. Cele `minor` nu apar
-/// în aplicație, doar în pagina farmacistului.
+/// în aplicație, doar în portalul medicului de familie.
 struct AlertSections {
     /// `critical` și `major`, fără alertele de mâncare, cele mai grave primele
     let serious: [Alert]
@@ -24,7 +24,7 @@ struct AlertSections {
         serious.isEmpty && moderate.isEmpty && food.isEmpty
     }
 
-    /// „12 interacțiuni moderate, de discutat cu farmacistul la următoarea vizită”
+    /// „12 interacțiuni moderate, de discutat cu medicul de familie la următoarea vizită”
     var moderateSummary: String {
         let allInteractions = moderate.allSatisfy { $0.kind == .ddi }
         let noun: String =
@@ -36,7 +36,7 @@ struct AlertSections {
             case (_, true): "\(moderate.count) de interacțiuni moderate"
             case (_, false): "\(moderate.count) de observații moderate"
             }
-        return "\(noun.prefix(1).uppercased())\(noun.dropFirst()), de discutat cu farmacistul la următoarea vizită"
+        return "\(noun.prefix(1).uppercased())\(noun.dropFirst()), de discutat cu medicul de familie la următoarea vizită"
     }
 }
 
@@ -86,9 +86,19 @@ extension Source {
 extension AlertStatus {
     var label: String {
         switch self {
-        case .statusOpen: "Nediscutată încă cu farmacistul"
+        case .statusOpen: "Nediscutată încă cu medicul de familie"
         case .acknowledged: "Văzută"
-        case .verifiedByPharmacist: "Verificată de farmacist"
+        case .reviewedByDoctor: "Revizuită de medicul de familie"
+        }
+    }
+}
+
+extension DoctorDecision {
+    var label: String {
+        switch self {
+        case .keep: "Menține tratamentul"
+        case .changeAtVisit: "Îl modifică la consultație"
+        case .referSpecialist: "Trimite la specialist"
         }
     }
 }

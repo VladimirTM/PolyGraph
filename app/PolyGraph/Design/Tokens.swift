@@ -40,7 +40,7 @@ enum PgColor {
 }
 
 extension Severity {
-    /// Doar pentru aparținător și farmacist; pacientul nu vede culori de severitate.
+    /// Doar pentru aparținător și medicul de familie; pacientul nu vede culori de severitate.
     var color: Color {
         switch self {
         case .critical, .major: .red

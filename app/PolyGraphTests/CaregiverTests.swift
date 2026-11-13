@@ -64,7 +64,7 @@ struct AlertSectionsTests {
 
     @Test func moderateSummaryUsesRomanianPlurals() throws {
         let sections = AlertSections(try demoAlerts())
-        #expect(sections.moderateSummary == "12 observații moderate, de discutat cu farmacistul la următoarea vizită")
+        #expect(sections.moderateSummary == "12 observații moderate, de discutat cu medicul de familie la următoarea vizită")
         let onlyDDI = AlertSections(try demoAlerts().filter { $0.kind == .ddi && $0.severity == .moderate })
         #expect(onlyDDI.moderateSummary.hasPrefix("10 interacțiuni moderate"))
         let one = AlertSections(Array(try demoAlerts().filter { $0.kind == .ddi && $0.severity == .moderate }.prefix(1)))

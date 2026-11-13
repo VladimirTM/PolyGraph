@@ -21,7 +21,7 @@ final class AppStore {
     var lastError: String?
     /// alertele la care aparținătorul a apăsat „Am înțeles” (doar pe telefon; contractul nu are rută pentru asta)
     private(set) var acknowledgedAlertIDs: Set<String> = []
-    /// creat o singură dată, pentru graf (B6) și „Arată farmacistului” (A6)
+    /// creat o singură dată, pentru graf (B6) și codul QR pentru medicul de familie (A6)
     private(set) var shareToken: String?
     /// ștergerea cu „Anulează” din lista de medicamente
     @ObservationIgnored private(set) var deletions = DeleteUndoQueue()

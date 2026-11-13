@@ -80,6 +80,8 @@ extension Analysis {
 /// O problemă găsită determinist în regimul pacientului. Plan, secțiunea 5.3.
 // MARK: - Alert
 struct Alert: Codable {
+    /// contact_doctor = înainte de următoarea doză; ask_doctor = la următoarea vizită la medicul
+    /// de familie
     let action: Action
     let analogy: Analogy?
     let basis: Basis
@@ -93,6 +95,7 @@ struct Alert: Codable {
     /// nu conține niciodată „opriți”, „nu mai luați” sau doze
     let recommendation: String
     let resolution: Resolution?
+    /// doctor = medicul de familie (portalul)
     let routeTo: [RouteTo]
     let severity: Severity
     let source: Source
@@ -172,8 +175,10 @@ extension Alert {
     }
 }
 
+/// contact_doctor = înainte de următoarea doză; ask_doctor = la următoarea vizită la medicul
+/// de familie
 enum Action: String, Codable {
-    case askPharmacist = "ask_pharmacist"
+    case askDoctor = "ask_doctor"
     case avoidFood = "avoid_food"
     case contactDoctor = "contact_doctor"
     case monitor = "monitor"
@@ -246,6 +251,9 @@ enum Kind: String, Codable {
 struct Resolution: Codable {
     let at: Date
     let by: By
+    /// decizia medicului de familie: menține / modifică la consultație / trimite la specialist;
+    /// null pentru aparținător
+    let decision: DoctorDecision?
     let note: String
 }
 
@@ -270,11 +278,13 @@ extension Resolution {
     func with(
         at: Date? = nil,
         by: By? = nil,
+        decision: DoctorDecision?? = nil,
         note: String? = nil
     ) -> Resolution {
         return Resolution(
             at: at ?? self.at,
             by: by ?? self.by,
+            decision: decision ?? self.decision,
             note: note ?? self.note
         )
     }
@@ -291,13 +301,18 @@ extension Resolution {
 enum By: String, Codable {
     case caregiver = "caregiver"
     case doctor = "doctor"
-    case pharmacist = "pharmacist"
+}
+
+enum DoctorDecision: String, Codable {
+    case changeAtVisit = "change_at_visit"
+    case keep = "keep"
+    case referSpecialist = "refer_specialist"
 }
 
 enum RouteTo: String, Codable {
     case caregiver = "caregiver"
+    case doctor = "doctor"
     case patient = "patient"
-    case pharmacist = "pharmacist"
 }
 
 /// cea mai gravă alertă a nodului, dacă există
@@ -367,8 +382,8 @@ enum DB: String, Codable {
 
 enum AlertStatus: String, Codable {
     case acknowledged = "acknowledged"
+    case reviewedByDoctor = "reviewed_by_doctor"
     case statusOpen = "open"
-    case verifiedByPharmacist = "verified_by_pharmacist"
 }
 
 /// Graful terapeutic al pacientului, în formatul Cytoscape (elements). Plan, secțiunea 5.6.
@@ -1438,8 +1453,8 @@ extension FeedEvent {
 enum FeedEventType: String, Codable {
     case alertNew = "alert_new"
     case checkin = "checkin"
+    case doctorReviewed = "doctor_reviewed"
     case doseMissed = "dose_missed"
-    case pharmacistVerified = "pharmacist_verified"
 }
 
 /// Răspunsul la GET /v1/kb/search (autocomplete la adăugarea manuală).
