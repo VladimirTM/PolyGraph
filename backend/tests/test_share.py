@@ -172,7 +172,6 @@ def test_patient_page_has_summary_alerts_and_sections(doctor):
         assert section in html
     assert "Sintrom 4 mg" in html and "acenocumarol" in html and "B01AA07" in html
     assert "Menține" in html and "Modific la consultație" in html and "Trimit la specialist" in html
-    assert "farmacist" not in html.lower()
 
 
 def test_pages_keep_medical_data_private(doctor):

@@ -175,10 +175,12 @@ def expired_title(brand: str) -> str:
 
 
 def expired_patient_text(brand: str) -> str:
-    return f"Cutia de {brand} a expirat. Cereți una nouă de la farmacie."
+    return f"Cutia de {brand} a expirat. Folosiți o cutie nouă."
 
 
-EXPIRED_RECOMMENDATION = "Cereți la farmacie o cutie nouă și duceți-o pe cea expirată acolo, pentru reciclare."
+EXPIRED_RECOMMENDATION = (
+    "Înlocuiți cutia expirată cu una nouă; dacă medicamentul e pe rețetă, cereți medicului de familie o rețetă nouă."
+)
 
 
 # ---------------------------------------------------------------- timing (B4)
