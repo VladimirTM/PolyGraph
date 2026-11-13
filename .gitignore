@@ -1,0 +1,36 @@
+# macOS / editors
+.DS_Store
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.env
+
+# Node (quicktype)
+node_modules/
+
+# Date brute (mari, licențe proprii): doar README-urile și raportul demo intră în git
+kb/raw/**
+!kb/raw/**/
+!kb/raw/**/README.md
+!kb/raw/ddinter/demo_pairs_report.csv
+
+# Baze generate
+kb/kb.sqlite
+*.sqlite
+*.sqlite-journal
+
+# Xcode
+app/**/xcuserdata/
+app/**/*.xcuserstate
+app/DerivedData/
+app/build/
+app/Signing.local.xcconfig
+
+# Review pe simulator (capturi mari; raportul final merge în docs/reviews/)
+.review/
