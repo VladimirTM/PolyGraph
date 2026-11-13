@@ -75,6 +75,8 @@ final class Listener {
             return
         }
         do {
+            Speaker.shared.stop()
+            try await AudioSessionWork.activate(.record, mode: .measurement)
             try begin(with: recognizer)
         } catch {
             teardown()
@@ -116,12 +118,8 @@ final class Listener {
 
     // MARK: - Intern
 
+    /// Sesiunea audio e deja activă (`AudioSessionWork`), deci aici nu se blochează main-ul.
     private func begin(with recognizer: SFSpeechRecognizer) throws {
-        Speaker.shared.stop()
-        let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.record, mode: .measurement, options: [.duckOthers])
-        try session.setActive(true, options: .notifyOthersOnDeactivation)
-
         let request = SFSpeechAudioBufferRecognitionRequest()
         request.shouldReportPartialResults = true
         request.requiresOnDeviceRecognition = recognizer.supportsOnDeviceRecognition
@@ -216,7 +214,7 @@ final class Listener {
         task?.cancel()
         task = nil
         request = nil
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        AudioSessionWork.deactivate()
     }
 
     /// `PG_FAKE_TRANSCRIPT` (Debug): textul apare cuvânt cu cuvânt, apoi „liniștea” oprește singură.
