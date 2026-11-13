@@ -76,6 +76,9 @@ def extract_image(image: bytes, kind: str, mime_type: str = "image/jpeg") -> lis
         except (OSError, ValueError, KeyError, IndexError, TypeError, AttributeError):
             return []
 
+    # Un răspuns gol nu se păstrează, ca aceeași poză să poată fi trimisă din nou.
+    if not rows:
+        return rows
     try:
         CACHE.mkdir(parents=True, exist_ok=True)
         with NamedTemporaryFile(dir=CACHE, delete=False) as out:

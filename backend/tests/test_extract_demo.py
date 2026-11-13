@@ -225,3 +225,21 @@ def test_gemini_cache_and_timeout(tmp_path, monkeypatch):
 
     monkeypatch.setattr(gemini, "urlopen", fail)
     assert gemini.extract_image(b"other image", "box") == []
+
+
+def test_gemini_empty_answer_is_not_cached(tmp_path, monkeypatch):
+    monkeypatch.setattr(gemini, "CACHE", tmp_path)
+    monkeypatch.setenv("GEMINI_API_KEY", "test")
+    raw = match.RawExtraction(brand="Sintrom", strength_text="4 mg")
+    answers = iter([[], [raw]])
+
+    def reply(*_, timeout):
+        data = gemini.ADAPTER.dump_json(next(answers)).decode()
+        envelope = {"candidates": [{"content": {"parts": [{"text": data}]}}]}
+        return nullcontext(BytesIO(json.dumps(envelope).encode()))
+
+    monkeypatch.setattr(gemini, "urlopen", reply)
+    assert gemini.extract_image(b"image", "box") == []
+    assert not list(tmp_path.iterdir())
+    assert gemini.extract_image(b"image", "box") == [raw]
+    assert len(list(tmp_path.iterdir())) == 1
