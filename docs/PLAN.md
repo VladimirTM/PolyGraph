@@ -10,7 +10,7 @@
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, `make check` cu 45 de teste, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate (card unic pentru mâncare, 5 momente cu regula `alone` pentru levotiroxină, perechile `Unknown` verificate la B1). **Urmează:** Dev A pornește A1 (`feature/a1-app-skeleton`), Dev B pornește B1 (`feature/b1-kb-ingest`). Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, `make check` cu 45 de teste, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate (card unic pentru mâncare, 5 momente cu regula `alone` pentru levotiroxină, perechile `Unknown` verificate la B1). **Urmează:** A1 e gata (aplicația rulează pe mock pe ambele iPhone-uri); Dev A pornește A2 (`feature/a2-scan`), Dev B pornește B1 (`feature/b1-kb-ingest`). Actualizați coloana „Status” la fiecare sync point.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
@@ -21,7 +21,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | Pregătirea (secțiunea 10) | amândoi | înainte de start | până vineri | 🔄 | date, reguli YAML, conturi; rămân cutiile, rețeta tipărită, transcrierile, cablurile |
 | **P0** repo, contracte, mock | amândoi | W0–W1.5 | V 18:00–19:30 | ✅ | `contracts/`, mock server, Makefile, CI, proiectul Xcode pe ambele iPhone-uri |
 | **S0** | amândoi | W1.5 | V 19:30 | ✅ | contracte în `main`, mock pornit, Xcode pe ambele telefoane |
-| A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | 🔄 | app pe mock (`make check-ios` verde, 18 teste; rămâne T-A1-04, verificarea manuală pe ambele iPhone-uri) |
+| A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | ✅ | app pe mock, pe ambele iPhone-uri (`make check-ios` verde, 18 teste) |
 | B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | ⬜ | `make kb`, substanțele demo găsite |
 | Q0 infrastructura de review | agent (worktree) | în paralel cu A2 | V seara | ⬜ | `make review Q=…` |
 | A2 scanarea (DataMatrix, poză, rețetă, confirmare) | Dev A | W4–W8 | V 22:00–02:00 | ⬜ | cutie → listă, pe mock |
@@ -702,7 +702,7 @@ Nu face: camera, audio, TTS, graful, ecranele de alerte (doar placeholder-ele lo
 - [x] T-A1-01 Decodare + encodare pentru fiecare fișier din `contracts/examples/` și `contracts/fixtures/` (citite direct din repo prin `#filePath`, fără folder reference, deci fără `project.pbxproj` atins).
 - [x] T-A1-02 `GuardedAction`: două apeluri la 300 ms → o execuție; la 1.2 s → două.
 - [x] T-A1-03 `withPgAnimation` cu Reduce Motion → animația de rezervă.
-- [ ] T-A1-04 Manual: pe ambele iPhone-uri, onboarding → lista cu 8 medicamente din mock.
+- [x] T-A1-04 Manual: pe ambele iPhone-uri, onboarding → lista cu 8 medicamente din mock. *(13.11.2026: ambele iPhone-uri + simulatorul)*
 
 ---
 
