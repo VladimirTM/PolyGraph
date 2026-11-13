@@ -69,12 +69,13 @@
     "action": {
       "enum": [
         "contact_doctor",
-        "ask_pharmacist",
+        "ask_doctor",
         "separate_times",
         "avoid_food",
         "monitor",
         "replace_box"
-      ]
+      ],
+      "description": "contact_doctor = înainte de următoarea doză; ask_doctor = la următoarea vizită la medicul de familie"
     },
     "route_to": {
       "type": "array",
@@ -82,10 +83,11 @@
         "enum": [
           "patient",
           "caregiver",
-          "pharmacist"
+          "doctor"
         ]
       },
-      "uniqueItems": true
+      "uniqueItems": true,
+      "description": "doctor = medicul de familie (portalul)"
     },
     "source": {
       "type": "object",
@@ -158,7 +160,7 @@
       "enum": [
         "open",
         "acknowledged",
-        "verified_by_pharmacist"
+        "reviewed_by_doctor"
       ]
     },
     "resolution": {
@@ -171,16 +173,32 @@
           "additionalProperties": false,
           "required": [
             "by",
+            "decision",
             "note",
             "at"
           ],
           "properties": {
             "by": {
               "enum": [
-                "pharmacist",
                 "doctor",
                 "caregiver"
               ]
+            },
+            "decision": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "enum": [
+                    "keep",
+                    "change_at_visit",
+                    "refer_specialist"
+                  ],
+                  "title": "DoctorDecision"
+                }
+              ],
+              "description": "decizia medicului de familie: menține / modifică la consultație / trimite la specialist; null pentru aparținător"
             },
             "note": {
               "type": "string"

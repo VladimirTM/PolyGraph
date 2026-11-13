@@ -12,7 +12,7 @@
   "action": "contact_doctor",
   "route_to": [
     "caregiver",
-    "pharmacist"
+    "doctor"
   ],
   "source": {
     "db": "beers",

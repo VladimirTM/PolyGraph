@@ -345,7 +345,7 @@ paths:
     post:
       tags: [share]
       operationId: createShare
-      summary: Link / QR pentru farmacist sau medic (implicit 72 h)
+      summary: Link / QR pentru medicul de familie (valabil 72 h, până îl adaugă în portal)
       responses:
         "201":
           description: Link creat
@@ -360,63 +360,25 @@ paths:
     get:
       tags: [share]
       operationId: sharePage
+      summary: Linkul din QR, deschis de medicul de familie; îl adaugă pe pacient în lista lui din portal
+      description: |
+        Cu sesiunea portalului (cookie după /portal/login): pacientul intră în lista medicului și pagina
+        redirecționează la fișa lui din portal (303). Fără sesiune: pagina de autentificare, care revine aici.
+        Portalul (/portal/...) e interfața web a medicului, servită de backend; nu e folosit de aplicație.
       security: []
       responses:
         "200":
-          description: Pagina HTML pentru farmacist / medic
+          description: Autentificarea medicului (HTML)
           content:
             text/html:
               schema: { type: string }
+        "303":
+          description: Pacientul a fost adăugat; redirecționare la /portal/patients/{id}
         "404":
           description: Link expirat sau inexistent (pagină prietenoasă, fără date)
           content:
             text/html:
               schema: { type: string }
-
-  /share/{token}/alerts/{alert_id}/verify:
-    parameters:
-      - $ref: "#/components/parameters/ShareToken"
-      - name: alert_id
-        in: path
-        required: true
-        schema: { type: string }
-    post:
-      tags: [share]
-      operationId: verifyAlert
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties: false
-              properties:
-                note: { type: string }
-      responses:
-        "200":
-          description: Alerta cu status verified_by_pharmacist
-          content:
-            application/json:
-              schema: { $ref: "../schema/alert.schema.json" }
-        "404":
-          description: Link sau alertă inexistente
-
-  /share/{token}/print:
-    parameters:
-      - $ref: "#/components/parameters/ShareToken"
-    get:
-      tags: [share]
-      operationId: sharePrint
-      security: []
-      responses:
-        "200":
-          description: „Reconcilierea medicației”, pentru tipărire / Salvează ca PDF
-          content:
-            text/html:
-              schema: { type: string }
-        "404":
-          description: Link expirat sau inexistent
 
   /share/{token}/graph:
     parameters:

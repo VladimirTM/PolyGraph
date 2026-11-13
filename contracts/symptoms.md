@@ -27,15 +27,15 @@ Singurele coduri pe care le poate produce `POST /checkins` (`CheckIn.symptoms[].
 | vomiting | vărsături | am vomitat; am dat afară; vărs | nu | Beți apă puțin câte puțin; dacă nu trece, sunați medicul. |
 | stomach_pain | durere de stomac | mă doare stomacul; mă arde la stomac; am arsuri | nu | Spuneți medicului, mai ales dacă luați pastile pentru durere. |
 | diarrhea | diaree | am diaree; merg des la toaletă; scaun moale | nu | Beți multe lichide. |
-| constipation | constipație | sunt constipată; nu pot merge la toaletă; nu am scaun de câteva zile | nu | Beți apă și mâncați fructe; spuneți farmacistului. |
+| constipation | constipație | sunt constipată; nu pot merge la toaletă; nu am scaun de câteva zile | nu | Beți apă și mâncați fructe; spuneți medicului de familie. |
 | dry_mouth | gură uscată | am gura uscată; mi se usucă gura; mi-e sete tot timpul | nu | Beți des câte puțină apă. |
 | palpitations | palpitații | îmi bate inima tare; inima o ia la galop; simt bătăi neregulate; îmi zvâcnește inima | nu | Stați jos și odihniți-vă; dacă nu trece, sunați medicul. |
 | chest_pain | durere în piept | mă doare în piept; mă strânge în piept; apăsare pe piept | da | Sunați la 112. |
 | shortness_of_breath | lipsă de aer | nu am aer; respir greu; mă sufoc; gâfâi | da | Sunați la 112 dacă e brusc sau puternic. |
 | swollen_ankles | glezne umflate | mi s-au umflat gleznele; picioarele umflate; mă strâng pantofii | nu | Țineți picioarele ridicate și spuneți medicului. |
-| rash | erupție pe piele | am bubițe pe piele; mă mănâncă pielea; pete roșii pe piele; mâncărime | nu | Arătați pielea farmacistului sau medicului. |
+| rash | erupție pe piele | am bubițe pe piele; mă mănâncă pielea; pete roșii pe piele; mâncărime | nu | Arătați pielea medicului de familie. |
 | swelling_face | umflare a feței | mi s-a umflat fața; buzele umflate; limba umflată | da | Sunați la 112. |
-| headache | durere de cap | mă doare capul; am dureri de cap; mă apasă capul | nu | Odihniți-vă; întrebați farmacistul înainte să luați ceva pentru durere. |
+| headache | durere de cap | mă doare capul; am dureri de cap; mă apasă capul | nu | Odihniți-vă; întrebați medicul înainte să luați ceva pentru durere. |
 | tremor | tremur | îmi tremură mâinile; tremur; nu pot ține cana | nu | Spuneți medicului la următoarea vizită. |
 | fatigue | oboseală | sunt obosită; nu am putere; sunt fără vlagă; mă simt sleită | nu | Odihniți-vă și spuneți medicului dacă ține mai multe zile. |
 | low_mood | tristețe | sunt tristă; nu am chef de nimic; plâng des | nu | Vorbiți cu cineva drag sau cu medicul de familie. |

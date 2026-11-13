@@ -6,13 +6,13 @@
     "med_03"
   ],
   "title": "Grepfrutul crește mult concentrația de simvastatină",
-  "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+  "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
   "detail": "Grepfrutul crește mult concentrația de simvastatină.",
   "recommendation": "Evitați grepfrutul și sucul de grepfrut.",
   "action": "avoid_food",
   "route_to": [
     "caregiver",
-    "pharmacist"
+    "doctor"
   ],
   "source": {
     "db": "curated",
