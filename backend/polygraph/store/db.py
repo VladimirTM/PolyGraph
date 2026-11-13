@@ -1,5 +1,5 @@
-"""Persistența aplicației: SQLite `app.sqlite` (pacienți, medicamente, doze, check-in-uri, starea alertelor, link-uri
-de partajare, cache GTIN). Obiectele de contract se țin ca JSON; analiza nu se salvează, se recalculează la cerere
+"""Persistența aplicației: SQLite `app.sqlite` (pacienți, medicamente, doze, check-in-uri, Noutăți, starea alertelor,
+link-uri de partajare, cache GTIN). Obiectele de contract se țin ca JSON; analiza nu se salvează, se recalculează la cerere
 și se îmbină cu `alert_state` (status / resolution puse de aparținător sau de farmacist).
 
 Calea: PG_APP_DB (implicit backend/app.sqlite, gitignored); „:memory:” pentru teste.
@@ -41,6 +41,10 @@ CREATE TABLE IF NOT EXISTS alert_state(
 );
 CREATE TABLE IF NOT EXISTS share_tokens(
     token TEXT PRIMARY KEY, patient_id TEXT NOT NULL REFERENCES patients(id) ON DELETE CASCADE, expires_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS feed_events(
+    patient_id TEXT NOT NULL REFERENCES patients(id) ON DELETE CASCADE, id TEXT NOT NULL, at TEXT NOT NULL,
+    data TEXT NOT NULL, PRIMARY KEY (patient_id, id)
 );
 CREATE TABLE IF NOT EXISTS gtin_cache(gtin TEXT PRIMARY KEY, product TEXT NOT NULL);
 """
@@ -156,6 +160,18 @@ class Store:
 
     def list_checkins(self, pid: str) -> list[Json]:
         return [json.loads(r[0]) for r in self._q("SELECT data FROM checkins WHERE patient_id = ? ORDER BY at", (pid,))]
+
+    # ---------------------------------------------------------------- Noutăți (feed-ul aparținătorului)
+
+    def add_event(self, pid: str, event: Json) -> None:
+        self._x(
+            "INSERT OR REPLACE INTO feed_events(patient_id, id, at, data) VALUES (?, ?, ?, ?)",
+            (pid, event["id"], event["at"], _dump(event)),
+        )
+
+    def list_events(self, pid: str) -> list[Json]:
+        rows = self._q("SELECT data FROM feed_events WHERE patient_id = ? ORDER BY at, rowid", (pid,))
+        return [json.loads(r[0]) for r in rows]
 
     # ---------------------------------------------------------------- starea alertelor
 

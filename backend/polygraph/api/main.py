@@ -1,7 +1,7 @@
 """Backend-ul real PolyGraph (FastAPI), din B2: pacienți, medicamente, analiză, what-if, căutare în kb.
 
-Pornire: `make dev` (0.0.0.0:8000). Programul zilei și dozele vin din B4; rutele care vin în etapele
-următoare (checkins B5, share B6) rămân deocamdată pe mock. Variabile de mediu:
+Pornire: `make dev` (0.0.0.0:8000). Programul zilei și dozele vin din B4, check-in-urile și Noutățile din B5;
+partajarea (B6) rămâne deocamdată pe mock. Variabile de mediu:
 - PG_KB: calea către kb.sqlite (implicit kb/kb.sqlite, `make kb`)
 - PG_APP_DB: calea către app.sqlite (implicit backend/app.sqlite)
 - PG_TODAY: data „de azi” (ISO), pentru demo și teste; implicit data din Europe/Bucharest
@@ -31,11 +31,14 @@ sys.path.insert(0, str(ROOT / "contracts"))
 import validate as contracts  # noqa: E402  (contracts/validate.py: schemele JSON)
 
 from polygraph.engine import analyze, new_alerts  # noqa: E402
+from polygraph.engine.analyze import make_ctx  # noqa: E402
 from polygraph.extract.match import confirmed_product, scan  # noqa: E402
 from polygraph.extract.ocr_match import OcrLine  # noqa: E402
 from polygraph.kb import Kb, KbMissing, default_kb  # noqa: E402
 from polygraph.schedule import build_schedule  # noqa: E402
 from polygraph.store import Store  # noqa: E402
+from polygraph.voice.correlate import correlate, feed_event, reply_text  # noqa: E402
+from polygraph.voice.understand import understand  # noqa: E402
 
 FIX = ROOT / "contracts" / "fixtures"
 DEMO = json.loads((FIX / "demo_patient.json").read_text(encoding="utf-8"))
@@ -332,6 +335,62 @@ def record_dose(pid: str, body: dict[str, Any], x_patient_token: str | None = He
     dose = {"med_id": body["med_id"], "scheduled_at": body["scheduled_at"], "status": body["status"], "recorded_at": now_iso()}
     store().record_dose(pid, key, dose)
     return dose
+
+
+# ---------------------------------------------------------------- check-in și Noutăți (B5)
+
+
+@app.post("/v1/patients/{pid}/checkins", status_code=201)
+async def create_checkin(pid: str, request: Request, x_patient_token: str | None = Header(None)) -> dict[str, Any]:
+    patient = auth(pid, x_patient_token)
+    if not request.headers.get("content-type", "").startswith("application/json"):
+        # Rezerva cu Whisper (B5, punctul 6) intră doar dacă recunoașterea vocală iOS pică testul de la pregătire.
+        raise HTTPException(415, "Trimiteți textul transcris pe telefon (JSON: {text}).")
+    try:
+        body = await request.json()
+    except ValueError:
+        raise HTTPException(422, "Corpul nu e JSON valid.") from None
+    text = body.get("text") if isinstance(body, dict) else None
+    if not isinstance(text, str) or not text.strip() or len(text) > 2000:
+        raise HTTPException(422, "Lipsește textul (cel mult 2000 de caractere).")
+    text = text.strip()
+    meds = store().list_meds(pid)
+    u = understand(text, meds, kb())
+    alerts = run_analysis(pid, patient, meds)["alerts"]
+    correlations, escalate = correlate(make_ctx(patient, meds, today(), kb()), alerts, u.symptoms)
+    checkin = {
+        "id": f"ci_{secrets.token_hex(4)}",
+        "at": datetime.now(TZ).replace(microsecond=0).isoformat(),
+        "transcript": text,
+        "intent": u.intent,
+        "symptoms": [{"code": s.code, "label": s.label, "severity": s.severity} for s in u.symptoms],
+        "correlations": correlations,
+        "escalate": escalate,
+        "reply_text": reply_text(u, correlations, escalate, patient.get("caregiver_name")),
+    }
+    store().add_checkin(pid, checkin)
+    if escalate:
+        red = {s.code for s in u.symptoms if s.red_flag}
+        store().add_event(pid, feed_event(patient, checkin, alerts, meds, red))
+    return checkin
+
+
+@app.get("/v1/patients/{pid}/feed")
+def feed(pid: str, since: str | None = None, x_patient_token: str | None = Header(None)) -> list[dict[str, Any]]:
+    auth(pid, x_patient_token)
+    events = store().list_events(pid)
+    if since:
+        try:
+            cut = _instant(since)
+        except ValueError:
+            raise HTTPException(422, "since nu e o dată ISO 8601.") from None
+        events = [e for e in events if _instant(e["at"]) > cut]
+    return list(reversed(events))
+
+
+def _instant(raw: str) -> datetime:
+    at = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    return at if at.tzinfo else at.replace(tzinfo=TZ)
 
 
 # ---------------------------------------------------------------- kb

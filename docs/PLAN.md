@@ -32,7 +32,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | B3 extracția (OCR → catalog, GS1, cache) | Dev B | W12–W14 | S 14:00–16:00 | 🔄 | `/scan` real |
 | **S2** + Q2 | amândoi | W14 | S 16:00 | ⬜ | fluxul real cap-coadă |
 | A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | ⬜ | Acum, Ziua de azi, „Am luat”, TTS, notificări |
-| B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | 🔄 | `/schedule`, `/checkins` reale; B4 gata (`/schedule`, `/doses`), B5 neînceput |
+| B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | ✅ | `/schedule`, `/checkins` reale; B4 gata (`/schedule`, `/doses`), B5 gata (`/checkins`, `/feed`); X1 (can_i_take → what-if) și Whisper rămân condiționale |
 | **S3** (MVP complet) | amândoi | W19 | S 21:30 | ⬜ | |
 | A5 check-in vocal + Noutăți | Dev A | W19–W23 | S 21:30–D 02:00 | ⬜ | |
 | B6 pagina farmacistului + tipărire | Dev B | W19–W23 | S 21:30–D 02:00 | ⬜ | |
@@ -1093,9 +1093,9 @@ Criterii de acceptare: tests/test_voice_demo.py: checkin_demo → simptomele și
 ~~~
 
 **Teste**
-- [ ] T-B5-01 Calea deterministă recunoaște simptomele din 10 propoziții de test (inclusiv fără diacritice), fără niciun apel la Gemini.
-- [ ] T-B5-02 LLM-ul nu poate întoarce un cod din afara enum-ului (test cu un răspuns falsificat → respins).
-- [ ] T-B5-03 `POST /checkins` (text) < 4 s pe laptopul de demo.
+- [x] T-B5-01 Calea deterministă recunoaște simptomele din 10 propoziții de test (inclusiv fără diacritice), fără niciun apel la Gemini.
+- [x] T-B5-02 LLM-ul nu poate întoarce un cod din afara enum-ului (test cu un răspuns falsificat → respins).
+- [x] T-B5-03 `POST /checkins` (text) < 4 s pe laptopul de demo.
 
 ---
 
