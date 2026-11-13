@@ -1,0 +1,5 @@
+# Aceleași reguli ca backend-ul; modulele din kb/ se importă între ele ca first-party.
+extend = "../backend/pyproject.toml"
+
+[lint.isort]
+known-first-party = ["common", "ingest_ddinter", "ingest_ro_catalog", "link_substances", "load_rules"]
