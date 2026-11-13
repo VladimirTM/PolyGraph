@@ -10,7 +10,7 @@
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e gata** (`feature/b2-engine`): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`; `make check` are 111 teste (în CI: 63 + 48 sărite fără `kb.sqlite`). **A1 e gata:** aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **Urmează:** Dev A pornește A2 (`feature/a2-scan`), Dev B pornește B3 (`feature/b3-extract`). Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e în `main`** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9)), partea de backend: `/scan` real (GTIN cache → potrivire OCR → Gemini cu cache → completare manuală), `make demo-b3` arată fluxul cap-coadă pe date sintetice; rămân T-B3-02 și T-B3-04, care așteaptă OCR-ul și parserul GS1 din A2. `make check` are 170 de teste (în CI: 96 + 74 sărite fără `kb.sqlite`). **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **Urmează:** Dev A pornește A2 (`feature/a2-scan`), Dev B închide B3 când vin datele din A2 (`demo/ocr/`, `GS1Tests`). Actualizați coloana „Status” la fiecare sync point.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
@@ -22,7 +22,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | **P0** repo, contracte, mock | amândoi | W0–W1.5 | V 18:00–19:30 | ✅ | `contracts/`, mock server, Makefile, CI, proiectul Xcode pe ambele iPhone-uri |
 | **S0** | amândoi | W1.5 | V 19:30 | ✅ | contracte în `main`, mock pornit, Xcode pe ambele telefoane |
 | A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | ✅ | app pe mock, pe ambele iPhone-uri (`make check-ios` verde, 18 teste) |
-| B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | 🔄 | `make kb`, substanțele demo găsite |
+| B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | ✅ | `make kb`, substanțele demo găsite |
 | Q0 infrastructura de review | agent (worktree) | în paralel cu A2 | V seara | ⬜ | `make review Q=…` |
 | A2 scanarea (DataMatrix, poză, rețetă, confirmare) | Dev A | W4–W8 | V 22:00–02:00 | ⬜ | cutie → listă, pe mock |
 | B2 motorul de interacțiuni + graful | Dev B | W4–W12 | V 22:00–S 13:00 | ✅ | golden test = `expected_alerts.json` |
@@ -902,6 +902,8 @@ Criterii de acceptare: scenariul din secțiunea 7 rulează de 3 ori la rând, cu
 
 ### B1 · Ingestia datelor: `kb.sqlite`
 
+**Status:** ✅ Integrat în `main` ([PR #4](https://github.com/VladimirTM/PolyGraph/pull/4)).
+
 **Responsabil:** Dev B · **Depinde de:** P0, datele descărcate la pregătire · **Durată:** 5 h · **Branch:** `feature/b1-kb-ingest`
 
 **Checklist**
@@ -946,6 +948,8 @@ Nu face: motorul de alerte (B2).
 ---
 
 ### B2 · Motorul de interacțiuni și graful
+
+**Status:** ✅ Integrat în `main` ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)).
 
 **Responsabil:** Dev B · **Depinde de:** B1 · **Durată:** 5 h · **Branch:** `feature/b2-engine`
 
@@ -1025,7 +1029,9 @@ Obiectiv: POST /v1/patients/{id}/scan întoarce candidați corecți pentru cutii
 Criterii de acceptare: tests/test_extract_demo.py pe textele OCR salvate de pe pozele demo (demo/ocr/*.json, produse la A2 cu telefonul): fiecare cutie → produsul corect pe calea ocr_match, fără Gemini; rețeta tipărită → toate medicamentele, cu pattern-ul corect; fără internet și fără potrivire → warning „nu am putut citi cutia, completați manual”, nu eroare 500.
 ~~~
 
-**Status:** Backend implementat. Testele locale acoperă cutiile pe transcrieri, rețeta fictivă din PDF, parserul Python pe fixture-ul GS1 comun și clientul Gemini cu răspunsuri simulate. Validarea pe OCR-ul și fotografiile A2 și comparația cu parserul Swift rămân de verificat.
+**Status:** 🔄 Backend implementat și integrat în `main` ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9)). Testele locale acoperă cutiile pe transcrieri, rețeta fictivă din PDF, parserul Python pe fixture-ul GS1 comun și clientul Gemini cu răspunsuri simulate. Validarea pe OCR-ul și fotografiile A2 și comparația cu parserul Swift rămân de verificat.
+
+Rămase deschise (de rezolvat cel târziu la B7): `gtin_cache` ține id-ul produsului din `kb.sqlite`, deci trebuie golit după un `make kb` care schimbă id-urile; `/demo/reset` nu golește `gtin_cache` (după reset, cutia Sintrom scanată cu DataMatrix sare direct pe `gtin_cache`); cu Gemini, o scanare poate dura ~20 s (timeout 8 s + 4 s + reîncercare 8 s); un răspuns gol de la Gemini rămâne în cache și poza nu mai e retrimisă; genericele confirmate nu intră în `gtin_cache` (doar potrivirile exacte pe brand); un DataMatrix trimis, dar invalid, nu mai e căutat în imagine.
 
 **Teste**
 - [x] Gemini live: o imagine sintetică a produs candidatul Sintrom 4 mg (B01AA07). Rescanarea cu cheia dezactivată a întors același candidat din cache, fără apel de rețea.
