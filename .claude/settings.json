@@ -1,0 +1,10 @@
+{
+  "attribution": { "commit": "", "pr": "" },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": ["Bash(make:*)", "Bash(uv:*)", "Bash(xcodebuild:*)", "Bash(xcrun:*)",
+              "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git add:*)",
+              "Bash(git commit:*)", "Bash(git push:*)", "Bash(gh pr create:*)",
+              "Bash(ffmpeg:*)", "Bash(curl http://localhost:*)", "Bash(curl http://127.0.0.1:*)"]
+  }
+}
