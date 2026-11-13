@@ -1,0 +1,146 @@
+# Medicamente potențial nepotrivite la vârstnici (≥ 65 de ani).
+# Sursa principală: American Geriatrics Society 2023 Updated AGS Beers Criteria®,
+#   J Am Geriatr Soc 2023;71(7):2052–2081, doi:10.1111/jgs.18372 (tabelul 2 și tabelul 5).
+# Sursa secundară: STOPP/START v3, O'Mahony D et al., Eur Geriatr Med 2023;14(4):625–632,
+#   doi:10.1007/s41999-023-00777-y (CC BY 4.0); ID-urile exacte ale criteriilor STOPP sunt de verificat
+#   în materialul suplimentar al articolului, de aceea câmpul stopp_id e gol.
+# Criteriile Beers sunt „potențial” nepotrivite, nu „sigur” nepotrivite: textele spun „discutați”, nu „opriți”.
+# Potrivirea se face pe cod ATC (prefix); exclude_atc scoate subgrupe din prefix.
+# Verificat de: Claude, 12.11.2026, din rezumatele publice ale Beers 2023; de confirmat de echipă.
+
+version: 1
+age_min: 65
+rules:
+  - id: beers-nsaid-chronic
+    atc_prefix: [M01A]
+    exclude_atc: [M01AH]            # coxibii au alt criteriu
+    condition: { duration_days_min: 30 }
+    severity: major
+    title: "Antiinflamator (AINS) luat de mult timp la vârstnic"
+    detail: "La peste 65 de ani, AINS luate pe termen lung cresc riscul de sângerare digestivă, de afectare a rinichilor și de probleme cardiace."
+    recommendation: "Discutați cu medicul de familie dacă există o alternativă pentru durere (de ex. paracetamol) și dacă e nevoie de protecție gastrică."
+    source: "AGS Beers 2023, tabelul 2 (AINS non-selective COX-2)"
+    stopp_id: ""
+
+  - id: beers-nsaid-with-anticoagulant
+    atc_prefix: [M01A]
+    exclude_atc: [M01AH]
+    with_atc_prefix: [B01AA, B01AE, B01AF]   # antivitamine K, dabigatran, xabani
+    severity: major
+    title: "Antiinflamator (AINS) împreună cu un anticoagulant"
+    detail: "Chiar și pe termen scurt, AINS asociate cu un anticoagulant cresc mult riscul de sângerare la vârstnici."
+    recommendation: "Discutați cu medicul care urmărește anticoagulantul înainte de următoarea doză de AINS."
+    source: "AGS Beers 2023: AINS de evitat în combinație cu anticoagulante, chiar pe termen scurt"
+    stopp_id: ""
+
+  - id: beers-benzodiazepines
+    atc_prefix: [N05BA, N05CD, N03AE01]
+    severity: major
+    title: "Benzodiazepină la vârstnic"
+    detail: "La vârstnici, benzodiazepinele cresc riscul de confuzie, căderi, fracturi și accidente."
+    recommendation: "Discutați cu medicul dacă mai e nevoie de ea; nu se oprește brusc, ci doar după planul medicului."
+    source: "AGS Beers 2023, tabelul 2 (benzodiazepine)"
+    stopp_id: ""
+
+  - id: beers-z-drugs
+    atc_prefix: [N05CF]
+    severity: major
+    title: "Somnifer de tip „Z” (zolpidem, zopiclonă) la vârstnic"
+    detail: "Au aceleași riscuri ca benzodiazepinele: confuzie, căderi, fracturi."
+    recommendation: "Discutați cu medicul despre alternative pentru somn."
+    source: "AGS Beers 2023, tabelul 2 (agoniști ai receptorilor benzodiazepinici non-benzodiazepine)"
+    stopp_id: ""
+
+  - id: beers-first-gen-antihistamines
+    atc_prefix: [N05BB01, R06AD02, R06AB, R06AA, R06AX02]
+    # hidroxizină, prometazină, clorfenamină și alte alchilamine (R06AB), difenhidramină / clemastină / dimenhidrinat (R06AA), ciproheptadină
+    severity: major
+    title: "Antihistaminic de generația 1 la vârstnic"
+    detail: "Are efect anticolinergic puternic: confuzie, constipație, gură uscată, retenție urinară, risc de cădere."
+    recommendation: "Discutați cu medicul sau cu farmacistul despre un antihistaminic mai nou."
+    source: "AGS Beers 2023, tabelul 2 (antihistaminice de primă generație)"
+    stopp_id: ""
+
+  - id: beers-tricyclic-antidepressants
+    atc_prefix: [N06AA]
+    severity: major
+    title: "Antidepresiv triciclic la vârstnic"
+    detail: "Amitriptilina și alte triciclice au efect anticolinergic și sedativ puternic: confuzie, amețeală la ridicare, căderi."
+    recommendation: "Discutați cu medicul care l-a prescris dacă există o alternativă mai sigură."
+    source: "AGS Beers 2023, tabelul 2 (antidepresive triciclice: amitriptilină, clomipramină, doxepină > 6 mg, imipramină)"
+    stopp_id: ""
+
+  - id: beers-ppi-long-term
+    atc_prefix: [A02BC]
+    condition: { duration_days_min: 56 }
+    severity: moderate
+    title: "Protector gastric (IPP) luat de mai mult de 8 săptămâni"
+    detail: "Pe termen lung, IPP sunt asociate cu infecții (Clostridioides difficile, pneumonie), pierdere osoasă și fracturi."
+    recommendation: "Întrebați medicul de familie dacă mai e nevoie de el; pentru unele boli e totuși indicat."
+    source: "AGS Beers 2023, tabelul 2 (inhibitori de pompă de protoni > 8 săptămâni)"
+    stopp_id: ""
+
+  - id: beers-sulfonylureas
+    atc_prefix: [A10BB]
+    severity: major
+    title: "Antidiabetic din clasa sulfonilureelor la vârstnic"
+    detail: "Cresc riscul de hipoglicemie, iar la vârstnici și riscul cardiovascular."
+    recommendation: "Discutați cu diabetologul sau medicul de familie despre alternative."
+    source: "AGS Beers 2023, tabelul 2 (sulfoniluree, inclusiv cele cu acțiune scurtă)"
+    stopp_id: ""
+
+  - id: beers-digoxin-high-dose
+    atc: [C01AA05]
+    condition: { strength_mg_gt: 0.125 }
+    severity: moderate
+    title: "Digoxină în doză de peste 0,125 mg pe zi"
+    detail: "Doza mare crește riscul de toxicitate, mai ales cu funcția rinichilor scăzută."
+    recommendation: "Discutați cu cardiologul doza potrivită."
+    source: "AGS Beers 2023, tabelul 2 (digoxină)"
+    stopp_id: ""
+
+  - id: beers-antipsychotics
+    atc_prefix: [N05A]
+    exclude_atc: [N05AN]            # litiu
+    severity: moderate
+    title: "Antipsihotic la vârstnic"
+    detail: "În afara indicațiilor aprobate (ex. schizofrenie, tulburare bipolară), cresc riscul de accident vascular și de deces la vârstnicii cu demență."
+    recommendation: "Discutați cu medicul pentru ce e prescris și cât timp."
+    source: "AGS Beers 2023, tabelul 2 (antipsihotice)"
+    stopp_id: ""
+
+  - id: beers-metoclopramide
+    atc: [A03FA01]
+    severity: moderate
+    title: "Metoclopramid la vârstnic"
+    detail: "Poate produce tulburări de mișcare (efecte extrapiramidale, diskinezie tardivă)."
+    recommendation: "Discutați cu medicul dacă mai e nevoie de el."
+    source: "AGS Beers 2023, tabelul 2 (metoclopramid)"
+    stopp_id: ""
+
+  - id: beers-opioid-plus-benzodiazepine
+    atc_prefix: [N02A]
+    with_atc_prefix: [N05BA, N05CD, N05CF, N03AE01]
+    severity: major
+    title: "Opioid împreună cu un sedativ (benzodiazepină sau somnifer)"
+    detail: "Asocierea crește riscul de supradozaj și de deprimare a respirației."
+    recommendation: "Discutați urgent cu medicul care a prescris opioidul."
+    source: "AGS Beers 2023, tabelul 5 (interacțiuni medicament–medicament de evitat)"
+    stopp_id: ""
+
+  - id: beers-three-cns-active
+    count_classes_min: 3
+    classes:
+      antiepileptics: [N03A]
+      antidepressants: [N06A]
+      antipsychotics: { atc_prefix: [N05A], exclude_atc: [N05AN] }
+      benzodiazepines: [N05BA, N05CD, N03AE01]
+      z_drugs: [N05CF]
+      opioids: [N02A]
+      muscle_relaxants: [M03B]
+    severity: major
+    title: "Trei sau mai multe medicamente care acționează asupra creierului"
+    detail: "Combinația crește mult riscul de căderi și fracturi la vârstnici."
+    recommendation: "Cereți o revizuire a tratamentului la medicul de familie."
+    source: "AGS Beers 2023, tabelul 5 (≥ 3 medicamente active pe SNC)"
+    stopp_id: ""
