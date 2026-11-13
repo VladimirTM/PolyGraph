@@ -4,6 +4,7 @@ enum SeniorRoute: Hashable {
     case day
     /// un moment ales din „Ziua de azi”, după ora lui („07:30”)
     case moment(String)
+    case checkIn
 }
 
 /// Modul senior: o singură stivă de navigare, fără tab-uri. „Acum” e ecranul principal,
@@ -14,13 +15,15 @@ struct SeniorRoot: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            NowView(onShowDay: { path.append(.day) })
+            NowView(onShowDay: { path.append(.day) }, onCheckIn: { path.append(.checkIn) })
                 .navigationDestination(for: SeniorRoute.self) { route in
                     switch route {
                     case .day:
                         DayView(onOpenMoment: { path.append(.moment($0)) })
                     case .moment(let time):
                         NowView(pinnedTime: time)
+                    case .checkIn:
+                        VoiceCheckInView()
                     }
                 }
         }
