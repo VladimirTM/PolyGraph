@@ -68,7 +68,7 @@ def catalog_version(path: Path) -> str:
         stat = path.stat()
     except FileNotFoundError:
         raise KbMissing(f"{path} nu există (make kb)") from None
-    return f"{stat.st_dev}:{stat.st_ino}:{stat.st_size}:{stat.st_mtime_ns}:{stat.st_ctime_ns}"
+    return f"{stat.st_dev}:{stat.st_ino}:{stat.st_size}:{stat.st_mtime_ns}"
 
 
 class Kb:

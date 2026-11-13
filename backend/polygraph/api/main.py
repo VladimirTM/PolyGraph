@@ -443,3 +443,8 @@ def demo_reset(live_scan: int = 0) -> dict[str, Any]:
 @app.exception_handler(HTTPException)
 async def http_error(_: Request, exc: HTTPException) -> JSONResponse:
     return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
+
+
+@app.exception_handler(KbMissing)
+async def kb_missing(_: Request, exc: KbMissing) -> JSONResponse:
+    return JSONResponse({"detail": str(exc)}, status_code=503)

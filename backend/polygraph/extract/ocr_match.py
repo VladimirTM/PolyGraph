@@ -5,7 +5,7 @@ import re
 from collections import defaultdict
 from dataclasses import dataclass, replace
 from decimal import Decimal
-from functools import cache
+from functools import lru_cache
 
 from rapidfuzz import fuzz, process
 
@@ -73,7 +73,8 @@ def strengths(text: str | None) -> tuple:
     return tuple(out)
 
 
-@cache
+# Limitat: după `make kb`, instanța Kb veche (și conexiunile ei) trebuie să poată fi eliberată.
+@lru_cache(maxsize=2)
 def catalog(kb: Kb) -> tuple[dict, dict, dict, dict]:
     products, brands, dcis, confusing = {}, defaultdict(list), defaultdict(list), defaultdict(set)
     for pid, brand, key, strength, form, dci in kb.scan_catalog():

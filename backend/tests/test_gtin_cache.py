@@ -87,3 +87,16 @@ def test_catalog_replacement_invalidates_persisted_cache(mini_kb, tmp_path, monk
             assert probe(client)[0]["product"]["brand"] == "Sintrom"
     finally:
         main.configure()
+
+
+def test_missing_catalog_returns_503(tmp_path, monkeypatch):
+    monkeypatch.setenv("PG_KB", str(tmp_path / "missing.sqlite"))
+    main.configure(Store(":memory:"))
+    main.reset_demo()
+    try:
+        with TestClient(main.app) as client:
+            response = client.get("/v1/kb/search", params={"q": "sintrom"}, headers=HEADERS)
+            assert response.status_code == 503
+            assert "make kb" in response.json()["detail"]
+    finally:
+        main.configure()
