@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Graful terapeutic · {{ patient.name }}{% endblock %}
+{% block body_class %}graph-page{% if embed %} embed{% endif %}{% endblock %}
+{% block body %}
+{% if not embed %}
+<header class="graph-bar">
+  <a href="/share/{{ token }}">← Fișa lui {{ patient.name }}</a>
+</header>
+{% endif %}
+<div id="graph" class="graph fill" role="img" aria-label="Graful terapeutic al pacientului {{ patient.name }}"></div>
+<script id="graph-data" type="application/json">{{ graph | tojson }}</script>
+<script src="/static/share/cytoscape.min.js" defer></script>
+<script src="/static/share/graph.js" defer></script>
+{% endblock %}
