@@ -14,8 +14,8 @@
     { "kind": "folder", "path": "PolyGraph", "target-membership": [ "PolyGraph" ] },
     { "kind": "folder", "path": "PolyGraphTests", "target-membership": [ "PolyGraphTests" ] },
     { "kind": "folder", "path": "PolyGraphUITests", "target-membership": [ "PolyGraphUITests" ] },
-    { "path": "Signing.local.xcconfig", "target-membership": [ "PolyGraph/resources" ] },
-    { "path": "PolyGraph.xcconfig", "target-membership": [ "PolyGraph/resources" ] },
+    { "path": "Signing.local.xcconfig" },
+    { "path": "PolyGraph.xcconfig" },
     {
       "kind": "group",
       "name": "Products",
