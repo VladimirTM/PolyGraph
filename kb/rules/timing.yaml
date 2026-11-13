@@ -1,6 +1,7 @@
 # Reguli de orar pentru solverul de program (B4).
 # with_food: empty_stomach | before_meal | with_meal | after_meal | any
 # preferred_time: morning | evening | bedtime | same_time_daily | none   (preferință, nu constrângere dură)
+# alone: true = se ia singur, la un moment fără alte medicamente (constrângere dură; levotiroxina, decis la S0)
 # min_separation: constrângere dură; other = INN sau prefix ATC; direction = before (acesta înaintea celuilalt) | either
 # verified: true = verificat în RCP-ul românesc (link în source); false = din cunoștințe generale despre RCP, de verificat.
 # Scris de Claude, 12.11.2026; de revizuit de echipă.
@@ -12,6 +13,7 @@ rules:
     with_food: empty_stomach
     minutes_before_breakfast: 30
     preferred_time: morning
+    alone: true
     min_separation:
       - { other: calcium carbonate, hours: 4, direction: before }   # DDInter: „cel puțin 4 ore”; prospectul Euthyrox: minimum 2 ore
       - { other: A12A, hours: 4, direction: before }                # suplimente de calciu
