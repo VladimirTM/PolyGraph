@@ -3,6 +3,7 @@ from contextlib import nullcontext
 from io import BytesIO
 from pathlib import Path
 from time import perf_counter
+from urllib.error import HTTPError
 
 import pytest
 import validate as contracts
@@ -225,3 +226,35 @@ def test_gemini_cache_and_timeout(tmp_path, monkeypatch):
 
     monkeypatch.setattr(gemini, "urlopen", fail)
     assert gemini.extract_image(b"other image", "box") == []
+
+
+def test_gemini_empty_answer_is_not_cached(tmp_path, monkeypatch):
+    monkeypatch.setattr(gemini, "CACHE", tmp_path)
+    monkeypatch.setenv("GEMINI_API_KEY", "test")
+    raw = match.RawExtraction(brand="Sintrom", strength_text="4 mg")
+    answers = iter([[], [raw]])
+
+    def reply(*_, timeout):
+        data = gemini.ADAPTER.dump_json(next(answers)).decode()
+        envelope = {"candidates": [{"content": {"parts": [{"text": data}]}}]}
+        return nullcontext(BytesIO(json.dumps(envelope).encode()))
+
+    monkeypatch.setattr(gemini, "urlopen", reply)
+    assert gemini.extract_image(b"image", "box") == []
+    assert not list(tmp_path.iterdir())
+    assert gemini.extract_image(b"image", "box") == [raw]
+    assert len(list(tmp_path.iterdir())) == 1
+
+
+def test_gemini_does_not_retry(tmp_path, monkeypatch):
+    monkeypatch.setattr(gemini, "CACHE", tmp_path)
+    monkeypatch.setenv("GEMINI_API_KEY", "test")
+    calls = []
+
+    def busy(request, timeout):
+        calls.append(timeout)
+        raise HTTPError(request.full_url, 503, "Service Unavailable", {}, None)
+
+    monkeypatch.setattr(gemini, "urlopen", busy)
+    assert gemini.extract_image(b"image", "box") == []
+    assert calls == [8]
