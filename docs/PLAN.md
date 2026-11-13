@@ -910,7 +910,7 @@ Criterii de acceptare: scenariul din secțiunea 7 rulează de 3 ori la rând, cu
 - [x] `substance` legată pe ATC5; combinațiile despărțite; `kb/overrides.csv`
 - [x] Reguli YAML încărcate în tabele: `elderly_rule`, `acb`, `timing_rule`, `adverse_effect`, `food_alias`
 - [x] `kb/build.py` → `kb/kb.sqlite` (comanda `make kb`), cu raport de acoperire (81,2 % din produsele cu o singură substanță legate la DDInter, sub ținta de 90 %: substanțele lipsesc din DDInter descărcabil, vezi `kb/README.md`)
-- [ ] Verificarea pe pacientul demo: toate substanțele găsite ✅, perechile din 5.8 căutate în DDInter ✅ (toate nivelurile coincid cu planul), `expected_alerts.json` ajustat la realitate ⬜ (regula de clasă dă încă 3 alerte: ibuprofen + omeprazol și ibuprofen + amitriptilină `moderate`, amlodipină + omeprazol `minor`; de decis cu Dev A, schimbare în `contracts/`)
+- [x] Verificarea pe pacientul demo: toate substanțele găsite, perechile din 5.8 căutate în DDInter (toate nivelurile coincid cu planul), `expected_alerts.json` ajustat la realitate (regula de clasă dă încă 3 alerte: ibuprofen + omeprazol și ibuprofen + amitriptilină `moderate`, amlodipină + omeprazol `minor`; acum 27 / 6)
 
 ~~~text
 [WORKFLOW] Branch: feature/b1-kb-ingest.
