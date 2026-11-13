@@ -10,7 +10,7 @@
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem (13.11.2026):** P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), CI verde, `make check` cu 45 de teste); proiectul Xcode și `.claude/` sunt adăugate, iar aplicația goală rulează pe iPhone-ul lui Vladimir. Deciziile din `contracts/fixtures/README.md` sunt luate (card unic pentru mâncare, 5 momente cu regula `alone` pentru levotiroxină, perechile `Unknown` verificate la B1). **Singurul lucru rămas pentru S0:** Mihnea face clone, `make setup`, copiază `kb/raw/` și rulează aplicația pe iPhone-ul lui. Apoi A1 și B1 pornesc. Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, `make check` cu 45 de teste, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate (card unic pentru mâncare, 5 momente cu regula `alone` pentru levotiroxină, perechile `Unknown` verificate la B1). **Urmează:** Dev A pornește A1 (`feature/a1-app-skeleton`), Dev B pornește B1 (`feature/b1-kb-ingest`). Actualizați coloana „Status” la fiecare sync point.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
@@ -20,7 +20,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 |---|---|---|---|---|---|
 | Pregătirea (secțiunea 10) | amândoi | înainte de start | până vineri | 🔄 | date, reguli YAML, conturi; rămân cutiile, rețeta tipărită, transcrierile, cablurile |
 | **P0** repo, contracte, mock | amândoi | W0–W1.5 | V 18:00–19:30 | ✅ | `contracts/`, mock server, Makefile, CI, proiectul Xcode pe ambele iPhone-uri |
-| **S0** | amândoi | W1.5 | V 19:30 | 🔄 | contracte în `main`, mock pornit, Xcode pe ambele telefoane |
+| **S0** | amândoi | W1.5 | V 19:30 | ✅ | contracte în `main`, mock pornit, Xcode pe ambele telefoane |
 | A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | ⬜ | app pe mock |
 | B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | ⬜ | `make kb`, substanțele demo găsite |
 | Q0 infrastructura de review | agent (worktree) | în paralel cu A2 | V seara | ⬜ | `make review Q=…` |
@@ -46,7 +46,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
 | Sync point | Când | Condiție de trecere | Dacă pică | Status |
 |---|---|---|---|---|
-| **S0** | W1.5 | contractele în `main`, `validate.py` verde, mock-ul răspunde la toate rutele, proiectul Xcode rulează pe ambele iPhone-uri | nimeni nu începe A1 / B1 până nu e gata | 🔄 (lipsește iPhone-ul lui Mihnea) |
+| **S0** | W1.5 | contractele în `main`, `validate.py` verde, mock-ul răspunde la toate rutele, proiectul Xcode rulează pe ambele iPhone-uri | nimeni nu începe A1 / B1 până nu e gata | ✅ (13.11.2026) |
 | **S1** | W8 | app-ul pe iPhone, pe mock: lista, alertele, citirea unui DataMatrix; `kb.sqlite` construit, toate substanțele demo găsite cu ATC | B scoate catalogul RO și lucrează doar cu lista curată a pacientului demo + DDInter | ⬜ |
 | **S2** | W14 | fluxul real: poză cutie → confirmare → salvat → alertele pacientului demo = `expected_alerts.json` (R4) | extracția rămâne pe cache pentru cutiile demo | ⬜ |
 | **S3** | W19 | programul real pe telefon, „Am luat” salvat, un check-in transcris pe telefon cu simptomele corelate | se taie bonusurile; A5 se reduce la check-in prin text + Noutăți | ⬜ |
@@ -479,7 +479,7 @@ Reguli:
     }
   ],
   "unsatisfied": [],
-  "solver": { "moments_count": 4, "version": "1.0.0" }
+  "solver": { "moments_count": 5, "version": "1.0.0" }
 }
 ```
 
@@ -631,7 +631,7 @@ Fiecare prompt începe cu aceeași linie de workflow (prescurtată mai jos ca `[
 - [x] `Makefile` (`setup`, `check`, `mock`, `dev`, `kb`, `demo-check`), `.githooks/commit-msg`, `CONTRIBUTING.md`, `AGENTS.md`, `CLAUDE.md`
 - [x] *(adăugat de mână: agentul nu are voie să scrie în `.claude/`)* `.claude/skills/apple-design/SKILL.md` + `LICENSE` (MIT, Emil Kowalski), copiate neschimbat din `emilkowalski/skills` (commit `4061b67`); `docs/PLAN.md` = acest plan
 - [x] `.github/workflows/ci.yml` (contracts, python; iOS rulează local prin `make check-ios`)
-- [x] Proiectul Xcode gol creat **de om, din Xcode** (New Project → iOS App, SwiftUI, în `app/`, cu folderele sincronizate) și rulat pe ambele iPhone-uri (Vladimir ✅, Mihnea de făcut după clone); agenții nu creează proiectul, doar adaugă fișiere în el
+- [x] Proiectul Xcode gol creat **de om, din Xcode** (New Project → iOS App, SwiftUI, în `app/`, cu folderele sincronizate) și rulat pe ambele iPhone-uri (Vladimir ✅, Mihnea ✅); agenții nu creează proiectul, doar adaugă fișiere în el
 
 ~~~text
 [WORKFLOW] Branch: chore/p0-repo-contracts.
