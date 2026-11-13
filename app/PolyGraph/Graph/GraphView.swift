@@ -15,6 +15,9 @@ struct GraphView: View {
 
     @Environment(AppStore.self) private var store
     @State private var remoteURL: URL?
+    /// crește la fiecare „Recentrează”; pagina revine la tot graful, centrat
+    @State private var resetCount = 0
+    @Environment(\.pgReduceMotion) private var reduceMotion
 
     var body: some View {
         content
@@ -26,11 +29,12 @@ struct GraphView: View {
     @ViewBuilder
     private var content: some View {
         if let graph = store.analysis?.graph {
-            GraphWebView(source: source(graph), onMessage: handle)
-                .ignoresSafeArea(edges: .bottom)
+            GraphWebView(
+                source: source(graph), resetCount: resetCount, animateReset: !reduceMotion, onMessage: handle
+            )
                 .background(PgColor.background)
-                .overlay(alignment: .bottomLeading) { legend }
                 .accessibilityIdentifier("graph.web")
+                .safeAreaInset(edge: .bottom, spacing: 0) { bottomBar }
                 .task(id: Self.usesSharePage) {
                     guard Self.usesSharePage, remoteURL == nil else { return }
                     do {
@@ -69,21 +73,39 @@ struct GraphView: View {
         }
     }
 
-    /// Severitatea e spusă în cuvinte și în graf, nu doar prin culoare.
-    private var legend: some View {
-        VStack(alignment: .leading, spacing: Spacing.xxs) {
-            legendRow(.major, "Gravă")
-            legendRow(.moderate, "Moderată")
-            legendRow(.minor, "Fără nivel cunoscut")
-            Text("Atingeți o legătură colorată")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+    /// Legenda (severitatea spusă în cuvinte, nu doar prin culoare) și „Recentrează”, sub graf, ca să nu-l acopere.
+    private var bottomBar: some View {
+        HStack(alignment: .center, spacing: Spacing.s) {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: Spacing.s) { legendRows }
+                VStack(alignment: .leading, spacing: Spacing.xxs) { legendRows }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("graph.legend")
+            Spacer(minLength: 0)
+            Button {
+                resetCount += 1
+            } label: {
+                Label("Recentrează", systemImage: "arrow.up.left.and.down.right.and.arrow.up.right.and.down.left")
+                    .labelStyle(.iconOnly)
+                    .font(.body.weight(.semibold))
+                    .frame(width: 44, height: 44)
+            }
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
+            .accessibilityLabel("Recentrează graful")
+            .accessibilityIdentifier("graph.resetButton")
         }
-        .padding(Spacing.s)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
-        .padding(Spacing.m)
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("graph.legend")
+        .padding(.horizontal, Spacing.m)
+        .padding(.vertical, Spacing.xs)
+        .background(.bar)
+    }
+
+    @ViewBuilder
+    private var legendRows: some View {
+        legendRow(.major, "Gravă")
+        legendRow(.moderate, "Moderată")
+        legendRow(.minor, "Fără nivel cunoscut")
     }
 
     private func legendRow(_ severity: Severity, _ text: String) -> some View {
@@ -122,6 +144,8 @@ struct GraphWebView: UIViewRepresentable {
     static let handlerNames = ["alert", "med", "ready"]
 
     let source: Source
+    var resetCount = 0
+    var animateReset = true
     let onMessage: (Message) -> Void
 
     func makeCoordinator() -> Coordinator {
@@ -149,6 +173,7 @@ struct GraphWebView: UIViewRepresentable {
     func updateUIView(_ webView: WKWebView, context: Context) {
         context.coordinator.onMessage = onMessage
         context.coordinator.load(source)
+        context.coordinator.reset(to: resetCount, animated: animateReset)
     }
 
     static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
@@ -168,6 +193,7 @@ struct GraphWebView: UIViewRepresentable {
         private var pageReady = false
         private var pendingJSON: String?
         private var startedAt = Date()
+        private var lastReset = 0
 
         init(onMessage: @escaping (Message) -> Void) {
             self.onMessage = onMessage
@@ -196,6 +222,12 @@ struct GraphWebView: UIViewRepresentable {
                 startedAt = Date()
                 webView.load(URLRequest(url: url))
             }
+        }
+
+        func reset(to count: Int, animated: Bool) {
+            guard count != lastReset else { return }
+            lastReset = count
+            webView?.evaluateJavaScript("window.pgResetView && window.pgResetView(\(animated))")
         }
 
         private func render(_ json: String) {
