@@ -184,6 +184,16 @@ class Store:
         rows = self._q("SELECT data FROM feed_events WHERE patient_id = ? ORDER BY at, rowid", (pid,))
         return [json.loads(r[0]) for r in rows]
 
+    # ---------------------------------------------------------------- link-uri de partajare (B6)
+
+    def create_share(self, token: str, pid: str, expires_at: str) -> None:
+        self._x("INSERT INTO share_tokens(token, patient_id, expires_at) VALUES (?, ?, ?)", (token, pid, expires_at))
+
+    def share(self, token: str) -> tuple[str, str] | None:
+        """(patient_id, expires_at) pentru token, fără verificarea expirării (o face apelantul)."""
+        row = self._q("SELECT patient_id, expires_at FROM share_tokens WHERE token = ?", (token,))
+        return (row[0][0], row[0][1]) if row else None
+
     # ---------------------------------------------------------------- starea alertelor
 
     def alert_states(self, pid: str) -> dict[str, Json]:
