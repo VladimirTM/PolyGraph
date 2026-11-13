@@ -118,13 +118,13 @@ Doar **tokenii + 3 interacțiuni lucrate**: butonul cu răspuns instant și guar
 
   | Verificare | Rezultat |
   |---|---|
-  | Reduce Motion: nicio mișcare spațială în fluxul demo | ⬜ |
-  | Increase Contrast | ⬜ |
-  | Reduce Transparency | ⬜ |
-  | Bold Text | ⬜ |
-  | Dynamic Type `.accessibility3` în modul senior (Acum, Ziua de azi, codul pentru medic) | ⬜ |
-  | VoiceOver: Acum → Am luat → Spuneți-mi cum vă simțiți | ⬜ |
-  | Dark mode (inclusiv QR-ul, care rămâne pe alb) | ⬜ |
+  | Reduce Motion: nicio mișcare spațială în fluxul demo | ✅ pe iPhone (13.11) |
+  | Increase Contrast | ✅ pe iPhone (13.11) |
+  | Reduce Transparency | ✅ pe iPhone (13.11) |
+  | Bold Text | ✅ pe iPhone (13.11) |
+  | Dynamic Type `.accessibility3` în modul senior (Acum, Ziua de azi, codul pentru medic) | ✅ pe iPhone (13.11) |
+  | VoiceOver: Acum → Am luat → Spuneți-mi cum vă simțiți | ✅ pe iPhone (13.11) |
+  | Dark mode (inclusiv QR-ul, care rămâne pe alb) | ✅ pe iPhone (13.11) |
   | Nicio animație / culoare scrisă de mână în afara `Design/` | ✅ test automat (T-A6-01, `ShareDemoTests`) |
 - **Scanarea (A2)**: `PG_FAKE_SCAN` acceptă `sintrom`, `nurofen`, `expired`, `klacid_rx` (sau `fromilid_rx`), `unreadable`; orice alt nume = cutie fără cod. Poza vine din `DebugAssets/<nume>.jpg` dacă există, altfel e textul cutiei randat pe alb (ca OCR-ul de pe simulator să citească ceva). Regula „verificați” e în `Scan/MedDraft.swift` (`reviewFields`): doar cu `needs_review`, plus posologia goală, marcată mereu.
 - **Aparținătorul (A3)**: navigarea din toate tab-urile trece prin `CaregiverRoute` (`Caregiver/CaregiverRoutes.swift`), cu destinațiile puse o singură dată pe rădăcina fiecărei stive (`.caregiverDestinations(zoom:)`); doar cardurile din tab-ul Alerte deschid detaliul cu zoom. Ștergerea cu „Anulează” e în `Meds/DeleteUndoQueue.swift` (5 s, apoi DELETE). La „Editează”, o concentrație schimbată de mână devine doza substanței când produsul are una singură; altfel sheet-ul trimite în catalog (`MedDraft.adjustedSubstances` / `strengthNeedsCatalog`). Împărțirea alertelor (grave / moderate / mâncare, fără `minor`) e în `Alerts/AlertSections.swift`. Graful: `Graph/graph.html` + `Graph/cytoscape.min.js` (3.35.0, MIT) din bundle, cu graful din `/analysis` trimis prin `window.pgRender(...)` și așezat de un layout radial determinist (`pgRadialPositions`: medicamentele pe primul inel, ordonate ca perechile care interacționează să fie vecine; substanțele pe raza medicamentului; clasele și alimentele în afară; etichetele claselor doar la zoom); „Recentrează” cheamă `window.pgResetView(animated)`; atingerile vin prin `messageHandlers.alert` (id-ul alertei) și `messageHandlers.med` (id-ul medicamentului). Pagina lui B6 cu `?embed=1` trebuie să trimită aceleași mesaje; după B6 se pune `GraphView.usesSharePage = true`.
