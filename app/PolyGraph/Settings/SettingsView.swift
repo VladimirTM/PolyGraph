@@ -202,9 +202,6 @@ struct SettingsView: View {
                 try await store.simulateMissedDose()
                 demoStatus = "Am trimis o doză ratată. Apare în Noutăți în câteva secunde."
             }
-        } catch APIError.http(404, _) where action == .missedDose {
-            // backend-ul real primește ruta la B7; mock-ul o are deja
-            demoStatus = "Serverul nu poate simula încă o doză ratată (vine cu B7)."
         } catch {
             demoStatus = (error as? LocalizedError)?.errorDescription ?? "Nu a mers. Verificați serverul."
         }
