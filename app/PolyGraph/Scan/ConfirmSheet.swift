@@ -5,6 +5,8 @@ import UIKit
 /// devine pași („1 din 3”) în același sheet. Nimic nu se salvează fără „Salvează”.
 struct ConfirmSheet: View {
     let confirmation: ScanConfirmation
+    /// setat când se editează un medicament deja salvat (A3): „Salvează” trimite PATCH, nu POST
+    let editingID: String?
     /// `nil` = închis fără să se salveze nimic
     let onFinish: (ScanOutcome?) -> Void
 
@@ -21,8 +23,9 @@ struct ConfirmSheet: View {
     @State private var confirmDiscard = false
 
     @MainActor
-    init(confirmation: ScanConfirmation, onFinish: @escaping (ScanOutcome?) -> Void) {
+    init(confirmation: ScanConfirmation, editingID: String? = nil, onFinish: @escaping (ScanOutcome?) -> Void) {
         self.confirmation = confirmation
+        self.editingID = editingID
         self.onFinish = onFinish
         _drafts = State(initialValue: confirmation.result.candidates.map(MedDraft.init))
     }
@@ -58,6 +61,7 @@ struct ConfirmSheet: View {
 
     private var title: String {
         if isMultiStep { return "\(page + 1) din \(drafts.count)" }
+        if editingID != nil { return "Editează" }
         return current?.displayName ?? "Medicament nou"
     }
 
@@ -117,7 +121,7 @@ struct ConfirmSheet: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .accessibilityIdentifier("confirm.expiredWarning")
                 }
-                if let existing = draft.duplicate(in: store.meds) {
+                if let existing = draft.duplicate(in: store.meds, excluding: editingID) {
                     Label(
                         "\(existing.displayName) e deja în listă. Verificați să nu-l adăugați de două ori.",
                         systemImage: "exclamationmark.triangle.fill")
@@ -180,7 +184,16 @@ struct ConfirmSheet: View {
         saveError = nil
         defer { isSaving = false }
         do {
-            newAlerts += try await store.addMed(draft.item())
+            if let editingID {
+                let item = draft.item()
+                try await store.updateMed(
+                    id: editingID,
+                    MedicationUpdate(
+                        product: item.product, substances: item.substances, dosage: item.dosage,
+                        prescriber: item.prescriber))
+            } else {
+                newAlerts += try await store.addMed(draft.item())
+            }
             savedCount += 1
             done.insert(draft.id)
             advance()

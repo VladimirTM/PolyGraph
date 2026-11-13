@@ -8,20 +8,32 @@ enum CaregiverTab: Hashable {
 /// Butoanele din tab bar se găsesc în testele UI după etichetă („Medicamente”, „Alerte”, „Graf”, „Noutăți”).
 struct CaregiverRoot: View {
     @State private var tab: CaregiverTab = .meds
+    @State private var graphPath: [CaregiverRoute] = []
+    /// sursa tranziției zoom card → detaliu din tab-ul Alerte
+    @Namespace private var alertsZoom
 
     var body: some View {
         TabView(selection: $tab) {
             Tab("Medicamente", systemImage: "pills", value: CaregiverTab.meds) {
-                NavigationStack { MedsListView(showAlerts: { tab = .alerts }) }
-                    .accessibilityIdentifier("tab.meds")
+                NavigationStack {
+                    MedsListView(showAlerts: { tab = .alerts })
+                        .caregiverDestinations()
+                }
+                .accessibilityIdentifier("tab.meds")
             }
             Tab("Alerte", systemImage: "exclamationmark.triangle", value: CaregiverTab.alerts) {
-                NavigationStack { AlertsPlaceholderView() }
-                    .accessibilityIdentifier("tab.alerts")
+                NavigationStack {
+                    AlertsView(zoom: alertsZoom)
+                        .caregiverDestinations(zoom: alertsZoom)
+                }
+                .accessibilityIdentifier("tab.alerts")
             }
             Tab("Graf", systemImage: "point.3.connected.trianglepath.dotted", value: CaregiverTab.graph) {
-                NavigationStack { GraphPlaceholderView() }
-                    .accessibilityIdentifier("tab.graph")
+                NavigationStack(path: $graphPath) {
+                    GraphView(open: { graphPath.append($0) })
+                        .caregiverDestinations()
+                }
+                .accessibilityIdentifier("tab.graph")
             }
             Tab("Noutăți", systemImage: "bell", value: CaregiverTab.feed) {
                 NavigationStack { FeedPlaceholderView() }
