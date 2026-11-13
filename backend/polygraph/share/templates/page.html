@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Fișa de medicație · {{ patient.name }}{% endblock %}
+{% block body_class %}page{% endblock %}
+
+{% macro alert_card(a) %}
+<article class="alert sev-{{ a.severity }}{% if a.verified %} is-verified{% endif %}" id="alert-{{ a.id }}" data-alert-id="{{ a.id }}">
+  <header class="alert-head">
+    <span class="badge sev-{{ a.severity }}">{{ a.severity_label }}</span>
+    <span class="kind">{{ a.kind_label }}</span>
+  </header>
+  <h3 class="alert-title">{{ a.title }}</h3>
+  <p class="alert-meds">{{ a.meds | join(" · ") }}</p>
+  <p class="alert-rec">{{ a.recommendation }}</p>
+  <p class="alert-source">
+    Sursa: {% if a.source.url %}<a href="{{ a.source.url }}" rel="noopener noreferrer" target="_blank">{{ a.source_label }}</a>{% else %}{{ a.source_label }}{% endif %}
+    {% if a.basis == "class_analogy" %}<span class="tag">prin analogie de clasă{% if a.analogy %} ({{ a.analogy.via }}, {{ a.analogy.atc4 }}){% endif %}: de confirmat</span>{% endif %}
+  </p>
+  <details class="alert-details">
+    <summary>Mecanism și referință</summary>
+    <p>{{ a.detail }}</p>
+    {% if a.source.ref %}<p class="small">{{ a.source.ref }}</p>{% endif %}
+    <p class="small">Cod alertă: {{ a.id }}</p>
+  </details>
+  <div class="verify" data-verify>
+    {% if a.verified %}
+    <p class="verified-state" role="status">Verificat de farmacist · {{ a.resolution_at }}{% if a.resolution.note %}<br><span class="note">„{{ a.resolution.note }}”</span>{% endif %}</p>
+    {% else %}
+    <form class="verify-form" method="post" action="/share/{{ token }}/alerts/{{ a.id }}/verify" novalidate>
+      <label class="visually-hidden" for="note-{{ a.id }}">Notă pentru familie (opțional)</label>
+      <input class="note-input" id="note-{{ a.id }}" name="note" type="text" maxlength="1000" autocomplete="off" placeholder="Notă (opțional)">
+      <button class="btn" type="submit">Am verificat</button>
+      <p class="verify-error" role="alert" hidden></p>
+    </form>
+    {% endif %}
+  </div>
+</article>
+{% endmacro %}
+
+{% block body %}
+<div class="scroll-sentinel" aria-hidden="true"></div>
+<header class="topbar" data-topbar>
+  <div class="topbar-inner">
+    <div>
+      <h1 class="page-title">{{ patient.name }}{% if age %}, {{ age }} de ani{% endif %}</h1>
+      <p class="disclaimer">Fișă generată de PolyGraph, nu înlocuiește evaluarea profesională.</p>
+    </div>
+    <a class="btn btn-secondary" href="/share/{{ token }}/print"><span class="label-long">Versiunea de tipărit</span><span class="label-short">Tipărire</span></a>
+  </div>
+</header>
+
+<main class="content">
+  <section class="summary" aria-labelledby="h-summary">
+    <h2 id="h-summary" class="visually-hidden">Rezumat</h2>
+    <p class="summary-line">{% for s in summary %}<span>{{ s }}</span>{% if not loop.last %}<span class="dot" aria-hidden="true"> · </span>{% endif %}{% endfor %}</p>
+    <p class="small muted">Generată la {{ generated }}. Datele sunt introduse de familie din cutii și rețete; verificați-le cu pacientul.</p>
+  </section>
+
+  <section aria-labelledby="h-grave">
+    <h2 id="h-grave">Alerte grave</h2>
+    {% for a in grave %}{{ alert_card(a) }}{% else %}<p class="muted">Nicio alertă gravă.</p>{% endfor %}
+  </section>
+
+  <section aria-labelledby="h-meds">
+    <h2 id="h-meds">Medicamente</h2>
+    <div class="table-wrap">
+      <table class="meds">
+        <thead><tr><th scope="col">Medicament</th><th scope="col">DCI</th><th scope="col">ATC</th><th scope="col">Posologie</th><th scope="col">Prescriptor</th><th scope="col">De când</th></tr></thead>
+        <tbody>
+        {% for m in meds %}
+          <tr><th scope="row">{{ m.name }}</th><td>{{ m.dci }}</td><td class="mono">{{ m.atc }}</td><td>{{ m.posology }}</td><td>{{ m.prescriber }}</td><td class="nowrap">{{ m.since }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {% if other %}
+  <section aria-labelledby="h-other">
+    <h2 id="h-other">Celelalte alerte <span class="count">{{ other | length }}</span></h2>
+    {% for a in other %}{{ alert_card(a) }}{% endfor %}
+  </section>
+  {% endif %}
+
+  <section aria-labelledby="h-graph" class="no-print">
+    <h2 id="h-graph">Graful terapeutic</h2>
+    <p class="small muted">Medicamente, substanțe și clase ATC; muchiile colorate sunt interacțiuni. Atingeți o muchie ca să ajungeți la alertă.</p>
+    <div class="graph-frame">
+      <div id="graph" class="graph" role="img" aria-label="Graful terapeutic: {{ meds | length }} medicamente și interacțiunile dintre ele; lista alertelor de mai sus conține aceleași informații."></div>
+    </div>
+    <p><a href="/share/{{ token }}/graph">Deschideți graful pe tot ecranul</a></p>
+  </section>
+
+  <section aria-labelledby="h-checkins">
+    <h2 id="h-checkins">Cum s-a simțit în ultimele 7 zile</h2>
+    {% for ci in checkins %}
+    <div class="checkin{% if ci.escalate %} is-escalated{% endif %}">
+      <p class="checkin-when">{{ ci.when }}{% if ci.escalate %} · <strong>semnalat familiei</strong>{% endif %}</p>
+      <p class="checkin-text">„{{ ci.transcript }}”</p>
+      {% if ci.symptoms %}<p class="small">Simptome: {% for s in ci.symptoms %}{{ s.label }}{% if not loop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+    </div>
+    {% else %}
+    <p class="muted">Niciun check-in în ultimele 7 zile.</p>
+    {% endfor %}
+  </section>
+
+  <section aria-labelledby="h-schedule">
+    <h2 id="h-schedule">Programul de azi <span class="count">{{ schedule.date }}</span></h2>
+    <ol class="schedule">
+      {% for m in schedule.moments %}
+      <li>
+        <p class="moment"><span class="time">{{ m.time }}</span> {{ m.label }}</p>
+        <ul>{% for d in m.doses %}<li>{{ d.qty }} × {{ d.name }}<span class="muted"> · {{ d.instruction }}</span></li>{% endfor %}</ul>
+      </li>
+      {% endfor %}
+    </ol>
+    {% for u in schedule.unsatisfied %}<p class="small">Nu s-a putut respecta: {{ u.meds | join(" + ") }}: {{ u.reason }}</p>{% endfor %}
+  </section>
+</main>
+
+<script id="graph-data" type="application/json">{{ graph | tojson }}</script>
+<script src="/static/share/cytoscape.min.js" defer></script>
+<script src="/static/share/graph.js" defer></script>
+<script src="/static/share/share.js" defer></script>
+{% endblock %}

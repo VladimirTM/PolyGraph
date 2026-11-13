@@ -1,7 +1,7 @@
 """Backend-ul real PolyGraph (FastAPI), din B2: pacienți, medicamente, analiză, what-if, căutare în kb.
 
 Pornire: `make dev` (0.0.0.0:8000). Programul zilei și dozele vin din B4, check-in-urile și Noutățile din B5;
-partajarea (B6) rămâne deocamdată pe mock. Variabile de mediu:
+partajarea (pagina farmacistului, tipărirea, graful) din B6. Variabile de mediu:
 - PG_KB: calea către kb.sqlite (implicit kb/kb.sqlite, `make kb`)
 - PG_APP_DB: calea către app.sqlite (implicit backend/app.sqlite)
 - PG_MEDIA_DIR: folderul fotografiilor scanate (implicit backend/media/)
@@ -17,13 +17,14 @@ import os
 import secrets
 import sys
 from contextlib import asynccontextmanager
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Annotated, Any, Literal
 from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Request, Response, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -39,6 +40,8 @@ from polygraph.extract.match import confirmed_product, scan  # noqa: E402
 from polygraph.extract.ocr_match import OcrLine  # noqa: E402
 from polygraph.kb import Kb, KbMissing, default_kb  # noqa: E402
 from polygraph.schedule import build_schedule  # noqa: E402
+from polygraph.share import STATIC_DIR, render  # noqa: E402
+from polygraph.share.view import page_context, verify_event  # noqa: E402
 from polygraph.store import Store  # noqa: E402
 from polygraph.voice.correlate import correlate, feed_event, reply_text  # noqa: E402
 from polygraph.voice.understand import understand  # noqa: E402
@@ -103,6 +106,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="PolyGraph", version="1.0.0", lifespan=lifespan)
+app.mount("/static/share", StaticFiles(directory=STATIC_DIR), name="share-static")
 
 
 def invalid(schema: str, body: Any) -> None:
@@ -404,6 +408,113 @@ def feed(pid: str, since: str | None = None, x_patient_token: str | None = Heade
 def _instant(raw: str) -> datetime:
     at = datetime.fromisoformat(raw.replace("Z", "+00:00"))
     return at if at.tzinfo else at.replace(tzinfo=TZ)
+
+
+# ---------------------------------------------------------------- partajare (B6)
+
+SHARE_TTL = timedelta(hours=72)
+# tokenul e în URL: pagina nu se indexează, nu se cache-uiește și nu trimite Referer mai departe
+SHARE_HEADERS = {
+    "Cache-Control": "no-store",
+    "Referrer-Policy": "no-referrer",
+    "X-Robots-Tag": "noindex, nofollow",
+    "X-Content-Type-Options": "nosniff",
+    "Content-Security-Policy": "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; "
+    "connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'",
+}
+
+
+@app.post("/v1/patients/{pid}/share", status_code=201)
+def create_share(pid: str, request: Request, x_patient_token: str | None = Header(None)) -> dict[str, Any]:
+    auth(pid, x_patient_token)
+    token = secrets.token_urlsafe(16)
+    expires = (datetime.now(UTC) + SHARE_TTL).replace(microsecond=0)
+    expires_at = expires.isoformat().replace("+00:00", "Z")
+    store().create_share(token, pid, expires_at)
+    base = str(request.base_url).rstrip("/")
+    return {"share_token": token, "url": f"{base}/share/{token}", "expires_at": expires_at}
+
+
+def share_patient(token: str) -> str | None:
+    entry = store().share(token)
+    if entry is None or _instant(entry[1]) <= datetime.now(UTC):
+        return None
+    return entry[0]
+
+
+def share_html(template: str, status: int = 200, **ctx: Any) -> HTMLResponse:
+    return HTMLResponse(render(template, **ctx), status_code=status, headers=SHARE_HEADERS)
+
+
+def share_context(pid: str) -> dict[str, Any]:
+    s = store()
+    patient = s.get_patient(pid)
+    meds = s.list_meds(pid)
+    catalog = kb()
+    return page_context(
+        patient,
+        meds,
+        run_analysis(pid, patient, meds),
+        s.list_checkins(pid),
+        s.list_doses(pid),
+        lambda day: build_schedule(patient, meds, day, catalog),
+        today(),
+        datetime.now(TZ),
+    )
+
+
+def expired_page() -> HTMLResponse:
+    return share_html("expired.html", status=404)
+
+
+@app.get("/share/{token}", response_class=HTMLResponse)
+def share_page(token: str) -> HTMLResponse:
+    pid = share_patient(token)
+    if pid is None:
+        return expired_page()
+    return share_html("page.html", token=token, **share_context(pid))
+
+
+@app.get("/share/{token}/print", response_class=HTMLResponse)
+def share_print(token: str) -> HTMLResponse:
+    pid = share_patient(token)
+    if pid is None:
+        return expired_page()
+    return share_html("print.html", token=token, **share_context(pid))
+
+
+@app.get("/share/{token}/graph", response_class=HTMLResponse)
+def share_graph(token: str, embed: Annotated[int, Query(ge=0, le=1)] = 0) -> HTMLResponse:
+    pid = share_patient(token)
+    if pid is None:
+        return expired_page()
+    patient = store().get_patient(pid)
+    graph = run_analysis(pid, patient, store().list_meds(pid))["graph"]
+    return share_html("graph.html", token=token, patient=patient, graph=graph, embed=bool(embed))
+
+
+class VerifyBody(BaseModel):
+    model_config = {"extra": "forbid"}
+    note: str = Field(default="", max_length=1000)
+
+
+@app.post("/share/{token}/alerts/{alert_id}/verify")
+def verify_alert(token: str, alert_id: str, body: VerifyBody) -> dict[str, Any]:
+    pid = share_patient(token)
+    if pid is None:
+        raise HTTPException(404, "Linkul a expirat sau nu există.")
+    patient = store().get_patient(pid)
+    alerts = run_analysis(pid, patient, store().list_meds(pid))["alerts"]
+    alert = next((a for a in alerts if a["id"] == alert_id), None)
+    if alert is None:
+        raise HTTPException(404, "Alerta nu există.")
+    # ora locală, ca în check-in-uri: Noutățile se ordonează după acest câmp
+    at = datetime.now(TZ).replace(microsecond=0).isoformat()
+    note = body.note.strip()
+    resolution = {"by": "pharmacist", "note": note, "at": at}
+    store().set_alert_state(pid, alert_id, "verified_by_pharmacist", resolution)
+    store().add_event(pid, verify_event(alert, note, at, secrets.token_hex(4)))
+    return {**alert, "status": "verified_by_pharmacist", "resolution": resolution}
 
 
 # ---------------------------------------------------------------- kb
