@@ -42,6 +42,20 @@ struct DemoDataTests {
         #expect(med.product.brand == "Fromilid")
     }
 
+    /// Backend-ul real validează schema: câmpurile obligatorii trebuie trimise și când sunt null.
+    @Test(arguments: ["fixtures/med_09_fromilid.json", "fixtures/demo_patient.json"])
+    func medicationBodySendsEveryNullTheSchemaRequires(_ path: String) throws {
+        let root = try #require(try JSONSerialization.jsonObject(with: ContractFiles.data(path)) as? [String: Any])
+        let originals = (root["meds"] as? [[String: Any]]) ?? [root]
+        #expect(!originals.isEmpty)
+        for original in originals {
+            let raw = try JSONSerialization.data(withJSONObject: original)
+            let med = try JSONCoding.decoder.decode(MedicationItem.self, from: raw)
+            let sent = try JSONSerialization.jsonObject(with: JSONCoding.medicationBody(med)) as? NSDictionary
+            #expect(sent == original as NSDictionary, "\(med.id)")
+        }
+    }
+
     // T-A6-01: animațiile și culorile vin doar din Design/
     @Test func noHandWrittenMotionOrColorOutsideDesign() throws {
         let sources = Self.appFolder.appending(path: "PolyGraph")

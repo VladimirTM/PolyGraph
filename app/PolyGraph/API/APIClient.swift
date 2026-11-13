@@ -124,7 +124,7 @@ struct APIClient {
     }
 
     func addMed(patientID: String, _ med: MedicationItem) async throws -> MedicationItem {
-        try await send(request("POST", "v1/patients/\(patientID)/meds", body: med))
+        try await send(request("POST", "v1/patients/\(patientID)/meds", json: JSONCoding.medicationBody(med)))
     }
 
     func updateMed(patientID: String, medID: String, _ changes: MedicationUpdate) async throws -> MedicationItem {
@@ -250,6 +250,20 @@ struct APIClient {
         var req = try request(method, path, authorized: authorized, timeout: timeout)
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.httpBody = try JSONCoding.encoder.encode(body)
+        return req
+    }
+
+    /// Corp JSON deja pregătit (ex. `JSONCoding.medicationBody`, cu `null`-urile cerute de schemă).
+    private func request(
+        _ method: String,
+        _ path: String,
+        json: Data,
+        authorized: Bool = true,
+        timeout: TimeInterval = APIClient.defaultTimeout
+    ) throws -> URLRequest {
+        var req = try request(method, path, authorized: authorized, timeout: timeout)
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        req.httpBody = json
         return req
     }
 
