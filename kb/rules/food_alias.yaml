@@ -1,0 +1,42 @@
+# Alimentele: cheia folosită în dfi.food → eticheta în română (ce vede utilizatorul) + sinonime.
+# synonyms: formulările din kb/curated_dfi.csv (coloana food_ro) și cuvintele pe care le poate spune un vârstnic.
+# ddinter: denumirea alimentului pe site-ul DDInter (secțiunea „Drug–food interactions”), pentru trasabilitate.
+# Scris de Claude, 13.11.2026 (fișierul lipsea din pregătire); de revizuit de echipă.
+
+version: 1
+foods:
+  - key: grapefruit
+    label_ro: grepfrut
+    synonyms: ["grepfrut și suc de grepfrut", "suc de grepfrut", "grapefruit"]
+    ddinter: ["Grapefruit", "Grapefruit juice"]
+    source: "DDInter 2.0 (pagina simvastatinei, DDInter1675); kb/curated_dfi.csv"
+
+  - key: alcohol
+    label_ro: alcool
+    synonyms: ["alcool (cantități mari)", "băuturi alcoolice", "vin", "bere", "țuică"]
+    ddinter: ["Alcohol", "Ethanol"]
+    source: "DDInter 2.0; kb/curated_dfi.csv"
+
+  - key: vitamin_k
+    label_ro: alimente bogate în vitamina K
+    synonyms: ["alimente bogate în vitamina K (legume cu frunze verzi)", "legume cu frunze verzi", "spanac", "varză", "broccoli", "salată verde"]
+    ddinter: ["Vitamin K"]
+    source: "DDInter 2.0 (pagina warfarinei, DDInter1951); RCP Sintrom 4.5; kb/curated_dfi.csv"
+
+  - key: soy
+    label_ro: soia
+    synonyms: ["produse din soia", "lapte de soia"]
+    ddinter: ["Soy"]
+    source: "DDInter 2.0 (pagina levotiroxinei, DDInter1064); RCP Euthyrox 4.5; kb/curated_dfi.csv"
+
+  - key: fiber
+    label_ro: fibre alimentare
+    synonyms: ["alimente bogate în fibre", "tărâțe"]
+    ddinter: ["Dietary fiber"]
+    source: "DDInter 2.0 (pagina levotiroxinei, DDInter1064); kb/curated_dfi.csv"
+
+  - key: dairy_calcium
+    label_ro: lactate și calciu
+    synonyms: ["lactate / calciu", "lapte", "iaurt", "brânză"]
+    ddinter: ["Dairy products"]
+    source: "kb/curated_dfi.csv (acoperit de interacțiunea levotiroxină + carbonat de calciu)"

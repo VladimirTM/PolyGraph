@@ -22,8 +22,8 @@ check-contracts: ## R1: scheme, openapi.yaml, exemple, fixture-uri
 	$(UV) python contracts/validate.py
 
 lint: ## R2: ruff
-	$(UV) ruff check backend contracts
-	$(UV) ruff format --check backend contracts
+	$(UV) ruff check backend contracts kb
+	$(UV) ruff format --check backend contracts kb
 
 test: ## R3: pytest
 	cd backend && uv run pytest -q

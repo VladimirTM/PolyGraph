@@ -1,0 +1,13 @@
+dci_ro,inn,atc,ddinter_id,motiv
+ACENOCUMAROLUM,acenocoumarol,B01AA07,DDInter13,pacientul demo (med_01)
+IBUPROFENUM,ibuprofen,M01AE01,DDInter900,pacientul demo (med_02); în catalog apare și C01EB16 (forma injectabilă)
+SIMVASTATINUM,simvastatin,C10AA01,DDInter1675,pacientul demo (med_03)
+AMLODIPINUM,amlodipine,C08CA01,DDInter79,pacientul demo (med_04)
+LEVOTHYROXINUM,levothyroxine,H03AA01,DDInter1064,pacientul demo (med_05)
+LEVOTHYROXINUM NATRIUM,levothyroxine,H03AA01,DDInter1064,pacientul demo (med_05): DCI-ul de pe cutia Euthyrox
+CALCII CARBONAS,calcium carbonate,A12AA04,DDInter271,pacientul demo (med_06); componentă a combinației Calciu + D3
+COLECALCIFEROLUM,cholecalciferol,A11CC05,DDInter367,pacientul demo (med_06); ortografia românească (fără h)
+OMEPRAZOLUM,omeprazole,A02BC01,DDInter1340,pacientul demo (med_07)
+AMITRIPTYLINUM,amitriptyline,N06AA09,DDInter78,pacientul demo (med_08)
+CLARITHROMYCINUM,clarithromycin,J01FA09,DDInter393,pacientul demo (med_09)
+WARFARINUM,warfarin,B01AA03,DDInter1951,sora de clasă a acenocumarolului (regula de clasă din B2); nu e în catalog

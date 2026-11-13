@@ -1,0 +1,87 @@
+# Efectele adverse frecvente, ca simptome din vocabularul fix (contracts/symptoms.md), pentru corelarea din B5.
+# Doar efectele pe care un vârstnic le poate spune în cuvintele lui; nu e lista completă din RCP.
+# Sursa: RCP-urile produselor, secțiunea 4.8 (reacții adverse frecvente / foarte frecvente) și 4.4 (semne de
+#   supradozaj sau de sângerare la anticoagulante).
+# verified: false = din cunoștințe generale despre RCP, de verificat pe RCP-ul românesc al produsului demo.
+# Scris de Claude, 13.11.2026 (fișierul lipsea din pregătire); de revizuit de echipă.
+# Validat de build.py: fiecare cod trebuie să existe în contracts/symptoms.md (T-B1-04).
+
+version: 1
+substances:
+  - inn: acenocoumarol
+    atc: B01AA07
+    effects: [bruising, bleeding_gums, nosebleed, black_stool, blood_in_urine, vomiting_blood]
+    source: "RCP Sintrom, 4.4 și 4.8 (hemoragii): de verificat"
+    verified: false
+
+  - inn: ibuprofen
+    atc: M01AE01
+    effects: [stomach_pain, nausea, black_stool, vomiting_blood, swollen_ankles, dizziness, headache, rash]
+    source: "RCP ibuprofen, 4.8: de verificat"
+    verified: false
+
+  - inn: simvastatin
+    atc: C10AA01
+    effects: [muscle_pain, muscle_weakness, dark_urine, constipation, stomach_pain, nausea, headache]
+    source: "RCP simvastatină, 4.4 (miopatie / rabdomioliză) și 4.8: de verificat"
+    verified: false
+
+  - inn: amlodipine
+    atc: C08CA01
+    effects: [swollen_ankles, dizziness_orthostatic, dizziness, headache, fatigue, palpitations]
+    source: "RCP amlodipină, 4.8: de verificat"
+    verified: false
+
+  - inn: levothyroxine
+    atc: H03AA01
+    effects: [palpitations, tremor, insomnia, headache]
+    source: "RCP Euthyrox, 4.8 (semne de doză prea mare): de verificat"
+    verified: false
+
+  - inn: calcium carbonate
+    atc: A12AA04
+    effects: [constipation, nausea, stomach_pain]
+    source: "RCP-uri pentru carbonat de calciu + colecalciferol, 4.8: de verificat"
+    verified: false
+
+  - inn: cholecalciferol
+    atc: A11CC05
+    effects: [nausea, constipation]
+    source: "RCP colecalciferol, 4.8 (hipercalcemie): de verificat"
+    verified: false
+
+  - inn: omeprazole
+    atc: A02BC01
+    effects: [headache, diarrhea, nausea, stomach_pain, constipation]
+    source: "RCP omeprazol, 4.8: de verificat"
+    verified: false
+
+  - inn: amitriptyline
+    atc: N06AA09
+    effects: [drowsiness, dry_mouth, constipation, dizziness_orthostatic, confusion, urinary_retention, palpitations]
+    source: "RCP amitriptilină, 4.8: de verificat"
+    verified: false
+
+  - inn: clarithromycin
+    atc: J01FA09
+    effects: [nausea, diarrhea, stomach_pain, headache, rash, insomnia]
+    source: "RCP claritromicină, 4.8: de verificat"
+    verified: false
+
+  - inn: warfarin
+    atc: B01AA03
+    effects: [bruising, bleeding_gums, nosebleed, black_stool, blood_in_urine, vomiting_blood]
+    source: "RCP warfarină, 4.4 și 4.8 (hemoragii): de verificat"
+    verified: false
+
+  - inn: metformin
+    atc: A10BA02
+    effects: [diarrhea, nausea, stomach_pain]
+    source: "RCP metformin, 4.8: de verificat"
+    verified: false
+
+  - inn: furosemide
+    atc: C03CA01
+    effects: [dizziness_orthostatic, dizziness, fatigue]
+    source: "RCP furosemid, 4.8: de verificat"
+    verified: false
