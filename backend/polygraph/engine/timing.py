@@ -1,5 +1,5 @@
 """Regulile de orar care nu se pot respecta (B4): fiecare intrare din `Schedule.unsatisfied` → o alertă `timing`
-cu `action: ask_pharmacist` (plan 5.4). Programul se calculează pentru ziua analizei, cu ancorele pacientului."""
+cu `action: ask_doctor` (plan 5.4). Programul se calculează pentru ziua analizei, cu ancorele pacientului."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def check(ctx: Ctx) -> list[dict]:
                 patient_text=T.timing_patient_text(ctx.caregiver),
                 detail=u["reason"],
                 recommendation=T.timing_recommendation(brands),
-                action="ask_pharmacist",
+                action="ask_doctor",
                 source={"db": "schedule", "ref": f"kb/rules/timing.yaml: {u['rule']}", "url": None},
                 suffix=u["rule"],
             )

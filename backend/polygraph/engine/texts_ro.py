@@ -13,7 +13,7 @@ import re
 from polygraph.kb import norm
 
 FORBIDDEN = re.compile(r"opri|nu mai lua|\bmg\b|\bmcg\b|\bml\b|\bui\b|\d\s*(?:cp|comprimat|capsul|pastil)", re.IGNORECASE)
-GENERIC_RECOMMENDATION = "Discutați cu medicul sau cu farmacistul; arătați-le lista completă de medicamente."
+GENERIC_RECOMMENDATION = "Discutați cu medicul de familie; arătați-i lista completă de medicamente."
 
 SEVERITY_RO = {"critical": "de evitat", "major": "importantă", "moderate": "moderată", "minor": "minoră", "info": "informativă"}
 
@@ -79,11 +79,11 @@ def articulated(name: str) -> str:
 
 
 def notify(caregiver: str | None) -> str:
-    return f"Am trimis un mesaj către {caregiver}." if caregiver else "Am pregătit lista pentru farmacist."
+    return f"Am trimis un mesaj către {caregiver}." if caregiver else "Am pregătit lista pentru medicul de familie."
 
 
 def analogy_note(via_ro: str) -> str:
-    return f"Evaluat prin analogie cu {articulated(via_ro)} (aceeași clasă); de confirmat de farmacist."
+    return f"Evaluat prin analogie cu {articulated(via_ro)} (aceeași clasă); de confirmat de medicul de familie."
 
 
 # ---------------------------------------------------------------- ddi
@@ -101,23 +101,23 @@ def ddi_patient_text(severity: str, caregiver: str | None) -> str:
     if severity in ("critical", "major"):
         return f"Două dintre pastile, luate împreună, trebuie verificate de medic. {notify(caregiver)}"
     if severity == "moderate":
-        return "Două dintre pastile se influențează puțin una pe alta. Farmacistul vă poate spune mai multe."
-    return "O mică observație pentru farmacist, nimic de schimbat acum."
+        return "Două dintre pastile se influențează puțin una pe alta. Medicul de familie vă poate spune mai multe."
+    return "O mică observație pentru medicul de familie, nimic de schimbat acum."
 
 
 def ddi_recommendation(severity: str, action: str, newer_brand: str, other_specialty: str | None) -> str:
     if severity == "critical":
         return (
             f"Discutați cu medicul care a prescris {newer_brand} înainte de următoarea doză; "
-            "arătați-i și farmacistului lista completă."
+            "arătați-i și medicului de familie lista completă."
         )
     if severity == "major":
-        return f"Discutați cu {doctor(other_specialty)} sau cu farmacistul înainte de următoarea doză de {newer_brand}."
+        return f"Discutați cu {doctor(other_specialty)} înainte de următoarea doză de {newer_brand}."
     if action == "separate_times":
         return "Luați-le la ore diferite; programul zilnic din aplicație le separă deja."
     if severity == "moderate":
-        return "Discutați cu farmacistul la următoarea vizită; arătați-i lista de medicamente."
-    return "De verificat de farmacist la următoarea revizuire a listei."
+        return "Discutați cu medicul de familie la următoarea vizită; arătați-i lista de medicamente."
+    return "De verificat de medicul de familie la următoarea revizuire a listei."
 
 
 # ---------------------------------------------------------------- food
@@ -143,7 +143,7 @@ def duplicate_patient_text(brands: list[str], caregiver: str | None) -> str:
 
 
 def duplicate_recommendation() -> str:
-    return "Arătați ambele cutii farmacistului sau medicului înainte de următoarea doză, ca să vă spună pe care o păstrați."
+    return "Arătați ambele cutii medicului de familie înainte de următoarea doză, ca să vă spună pe care o păstrați."
 
 
 # ---------------------------------------------------------------- elderly / ACB / expirare
@@ -167,7 +167,7 @@ def acb_detail(total: int, names: list[str]) -> str:
 
 
 ACB_PATIENT = "Unele pastile pot da gură uscată, constipație sau amețeală. Spuneți-ne dacă le simțiți."
-ACB_RECOMMENDATION = "Întrebați farmacistul sau medicul de familie dacă se poate reduce efectul anticolinergic al tratamentului."
+ACB_RECOMMENDATION = "Întrebați medicul de familie dacă se poate reduce efectul anticolinergic al tratamentului."
 
 
 def expired_title(brand: str) -> str:
@@ -175,10 +175,12 @@ def expired_title(brand: str) -> str:
 
 
 def expired_patient_text(brand: str) -> str:
-    return f"Cutia de {brand} a expirat. Cereți una nouă de la farmacie."
+    return f"Cutia de {brand} a expirat. Folosiți o cutie nouă."
 
 
-EXPIRED_RECOMMENDATION = "Cereți la farmacie o cutie nouă și duceți-o pe cea expirată acolo, pentru reciclare."
+EXPIRED_RECOMMENDATION = (
+    "Înlocuiți cutia expirată cu una nouă; dacă medicamentul e pe rețetă, cereți medicului de familie o rețetă nouă."
+)
 
 
 # ---------------------------------------------------------------- timing (B4)
@@ -189,9 +191,9 @@ def timing_title(brands: list[str]) -> str:
 
 
 def timing_patient_text(caregiver: str | None) -> str:
-    who = f"{caregiver} și farmacistul vor" if caregiver else "Farmacistul va"
+    who = f"{caregiver} și medicul de familie vor" if caregiver else "Medicul de familie va"
     return f"{who} verifica orele la care luați pastilele. Până atunci, luați-le ca de obicei."
 
 
 def timing_recommendation(brands: list[str]) -> str:
-    return f"Arătați programul farmacistului și întrebați-l cum se pot împărți orele pentru {' și '.join(brands)}."
+    return f"Arătați programul medicului de familie și întrebați-l cum se pot împărți orele pentru {' și '.join(brands)}."

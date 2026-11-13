@@ -55,12 +55,12 @@
       "title": "Antibioticul nou nu se asociază cu simvastatina",
       "patient_text": "Antibioticul nou trebuie verificat de medic înainte de prima pastilă. Am anunțat-o pe Ana.",
       "detail": "Claritromicina (Fromilid) crește mult concentrația de simvastatină: risc de miopatie și rabdomioliză. Asocierea este contraindicată în RCP-ul simvastatinei și al claritromicinei.",
-      "recommendation": "Discutați cu medicul ORL care a prescris antibioticul sau cu farmacistul înainte de prima doză.",
+      "recommendation": "Discutați cu medicul ORL care a prescris antibioticul înainte de prima doză.",
       "action": "contact_doctor",
       "route_to": [
         "patient",
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -81,13 +81,13 @@
         "med_09"
       ],
       "title": "Antibioticul nou poate crește efectul Sintrom-ului",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
-      "detail": "Claritromicina poate crește mult efectul anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
-      "recommendation": "Discutați cu medicul cardiolog sau cu farmacistul dacă e nevoie de un INR în timpul curei de antibiotic.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
+      "detail": "Claritromicina poate crește mult efectul anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de medicul de familie.",
+      "recommendation": "Discutați cu medicul cardiolog dacă e nevoie de un INR în timpul curei de antibiotic.",
       "action": "contact_doctor",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -111,9 +111,9 @@
         "med_09"
       ],
       "title": "Amlodipină + claritromicină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Claritromicina poate crește concentrația de amlodipină (amețeală, glezne umflate).",
-      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "recommendation": "Discutați cu medicul de familie la următoarea vizită.",
       "action": "monitor",
       "route_to": [
         "caregiver"
@@ -137,9 +137,9 @@
         "med_09"
       ],
       "title": "Amitriptilină + claritromicină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Asocierea poate crește concentrația de amitriptilină și riscul de tulburări de ritm.",
-      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "recommendation": "Discutați cu medicul de familie la următoarea vizită.",
       "action": "monitor",
       "route_to": [
         "caregiver"
@@ -163,12 +163,12 @@
         "med_09"
       ],
       "title": "Omeprazol + claritromicină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Interacțiune minoră.",
       "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
       "action": "monitor",
       "route_to": [
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "ddinter",
@@ -188,12 +188,12 @@
         "med_09"
       ],
       "title": "Grepfrutul cu claritromicină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Grepfrutul poate modifica concentrația de claritromicină.",
       "recommendation": "În general, evitați grepfrutul și sucul de grepfrut.",
       "action": "avoid_food",
       "route_to": [
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",

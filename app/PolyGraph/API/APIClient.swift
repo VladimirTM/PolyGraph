@@ -60,7 +60,7 @@ private struct VerifyNote: Encodable {
 
 // MARK: - Clientul
 
-/// O metodă per rută din `contracts/api/openapi.yaml`. Rutele care întorc HTML (pagina farmacistului)
+/// O metodă per rută din `contracts/api/openapi.yaml`. Rutele care întorc HTML (portalul medicului de familie)
 /// au doar un constructor de URL, pentru că se deschid în browser / WKWebView.
 struct APIClient {
     static let defaultTimeout: TimeInterval = 10

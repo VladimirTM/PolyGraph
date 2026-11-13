@@ -1,4 +1,4 @@
-// PolyGraph · pagina farmacistului (B6): antetul la derulare și „Am verificat” fără reîncărcare.
+// PolyGraph · portalul medicului de familie (B6): antetul la derulare și decizia pe alertă fără reîncărcare.
 (function () {
   "use strict";
 
@@ -17,32 +17,37 @@
     return p(d.getHours()) + ":" + p(d.getMinutes());
   }
 
+  var LABEL = { keep: "Menține", change_at_visit: "Modific la consultație", refer_specialist: "Trimit la specialist" };
+
   document.addEventListener("submit", function (event) {
-    var form = event.target.closest(".verify-form");
+    var form = event.target.closest(".review-form");
     if (!form) return;
     event.preventDefault();
-    var button = form.querySelector("button");
-    var error = form.querySelector(".verify-error");
-    if (button.disabled) return; // a doua apăsare cât timp prima e în curs
+    var buttons = form.querySelectorAll("button");
+    var error = form.querySelector(".review-error");
+    var decision = event.submitter && event.submitter.value;
+    if (!decision || form.dataset.busy) return; // a doua apăsare cât timp prima e în curs
     var note = form.querySelector("input[name=note]").value.trim();
-    button.disabled = true;
+    form.dataset.busy = "1";
+    buttons.forEach(function (b) { b.disabled = true; });
     error.hidden = true;
 
     fetch(form.action, {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ note: note }),
-      credentials: "omit",
+      body: JSON.stringify({ decision: decision, note: note }),
+      credentials: "same-origin",
     })
       .then(function (response) {
-        if (!response.ok) throw new Error(response.status === 404 ? "expired" : "server");
+        if (response.status === 401) throw new Error("session");
+        if (!response.ok) throw new Error("server");
         return response.json();
       })
       .then(function () {
         var state = document.createElement("p");
-        state.className = "verified-state";
+        state.className = "reviewed-state";
         state.setAttribute("role", "status");
-        state.textContent = "Verificat de dumneavoastră acum (" + formatNow() + ")";
+        state.textContent = LABEL[decision] + " · acum (" + formatNow() + ")";
         if (note) {
           var noteEl = document.createElement("span");
           noteEl.className = "note";
@@ -51,15 +56,16 @@
           state.appendChild(noteEl);
         }
         var card = form.closest(".alert");
-        if (card) card.classList.add("is-verified");
+        if (card) card.classList.add("is-reviewed");
         form.replaceWith(state);
       })
       .catch(function (err) {
-        error.textContent = err.message === "expired"
-          ? "Linkul a expirat. Cereți familiei un cod QR nou."
+        error.textContent = err.message === "session"
+          ? "Sesiunea a expirat. Reîncărcați pagina și autentificați-vă din nou."
           : "Nu s-a putut salva. Verificați conexiunea și încercați din nou.";
         error.hidden = false;
-        button.disabled = false;
+        delete form.dataset.busy;
+        buttons.forEach(function (b) { b.disabled = false; });
       });
   });
 

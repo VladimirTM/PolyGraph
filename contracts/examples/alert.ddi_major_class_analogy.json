@@ -8,13 +8,13 @@
   ],
   "title": "Risc crescut de sângerare",
   "patient_text": "Două dintre pastile, luate împreună, pot crește riscul de sângerare. Am anunțat-o pe Ana.",
-  "detail": "Acenocumarol (Sintrom) + ibuprofen (Nurofen): antiinflamatoarele cresc efectul anticoagulant și riscul de sângerare. Și criteriul Beers 2023: AINS de evitat împreună cu un anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
-  "recommendation": "Discutați cu medicul cardiolog sau cu farmacistul înainte de următoarea doză de Nurofen. Anunțați medicul la vânătăi sau sângerări neobișnuite.",
+  "detail": "Acenocumarol (Sintrom) + ibuprofen (Nurofen): antiinflamatoarele cresc efectul anticoagulant și riscul de sângerare. Și criteriul Beers 2023: AINS de evitat împreună cu un anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de medicul de familie.",
+  "recommendation": "Discutați cu medicul cardiolog înainte de următoarea doză de Nurofen. Anunțați medicul la vânătăi sau sângerări neobișnuite.",
   "action": "contact_doctor",
   "route_to": [
     "patient",
     "caregiver",
-    "pharmacist"
+    "doctor"
   ],
   "source": {
     "db": "curated",

@@ -60,7 +60,7 @@ struct AlertDetailView: View {
 
             if let analogy = alert.analogy {
                 Section {
-                    Text("Pentru perechea aceasta nu există date directe. Am evaluat-o prin analogie cu \(analogy.via), din aceeași clasă (ATC \(analogy.atc4)). De confirmat de farmacist.")
+                    Text("Pentru perechea aceasta nu există date directe. Am evaluat-o prin analogie cu \(analogy.via), din aceeași clasă (ATC \(analogy.atc4)). De confirmat de medicul de familie.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
@@ -88,17 +88,22 @@ struct AlertDetailView: View {
             Section {
                 LabeledContent("Status", value: statusText(alert))
                     .accessibilityIdentifier("alertDetail.status")
-                if let resolution = alert.resolution, !resolution.note.isEmpty {
+                if let resolution = alert.resolution, resolution.decision != nil || !resolution.note.isEmpty {
                     VStack(alignment: .leading, spacing: Spacing.xxs) {
-                        Text("Nota farmacistului")
+                        Text(resolution.by == .doctor ? "Decizia medicului de familie" : "Nota")
                             .font(.subheadline.weight(.semibold))
-                        Text(resolution.note)
+                        if let decision = resolution.decision {
+                            Text(decision.label)
+                        }
+                        if !resolution.note.isEmpty {
+                            Text(resolution.note)
+                        }
                         Text(resolution.at.formatted(.dateTime.day().month(.wide).hour().minute().locale(PgFormat.romanian)))
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
                     .accessibilityElement(children: .combine)
-                    .accessibilityIdentifier("alertDetail.pharmacistNote")
+                    .accessibilityIdentifier("alertDetail.doctorNote")
                 }
             } footer: {
                 sourceFooter(alert.source)

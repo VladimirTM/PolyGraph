@@ -4,7 +4,7 @@
 {% block body %}
 <main class="sheet">
   <p class="screen-only print-bar">
-    <a href="/share/{{ token }}">← Înapoi la fișă</a>
+    <a href="{{ base }}">← Înapoi la fișă</a>
     <span class="muted">Din meniul browserului: Tipărire → Salvează ca PDF.</span>
   </p>
 
@@ -34,10 +34,10 @@
     <h2>Probleme găsite</h2>
     {% for a in grave %}
     <div class="problem sev-{{ a.severity }}">
-      <p class="problem-title"><span class="badge sev-{{ a.severity }}">{{ a.severity_label }}</span> {{ a.title }}{% if a.verified %} <span class="tag">verificat de farmacist</span>{% endif %}</p>
+      <p class="problem-title"><span class="badge sev-{{ a.severity }}">{{ a.severity_label }}</span> {{ a.title }}{% if a.reviewed %} <span class="tag">{{ a.decision_label or "revizuit" }}</span>{% endif %}</p>
       <p>{{ a.detail }}</p>
       <p><em>{{ a.recommendation }}</em></p>
-      <p class="small">Sursa: {{ a.source_label }}{% if a.source.ref %}: {{ a.source.ref }}{% endif %}{% if a.basis == "class_analogy" %} (prin analogie de clasă, de confirmat){% endif %}{% if a.verified and a.resolution.note %} · Nota farmacistului: „{{ a.resolution.note }}”{% endif %}</p>
+      <p class="small">Sursa: {{ a.source_label }}{% if a.source.ref %}: {{ a.source.ref }}{% endif %}{% if a.basis == "class_analogy" %} (prin analogie de clasă, de confirmat){% endif %}{% if a.reviewed and a.resolution.note %} · Notă: „{{ a.resolution.note }}”{% endif %}</p>
     </div>
     {% else %}
     <p>Nicio problemă gravă.</p>
@@ -48,7 +48,7 @@
       <caption>Moderate ({{ rest | length }})</caption>
       <tbody>
       {% for a in rest %}
-        <tr><td>{{ a.title }}{% if a.verified %} <span class="tag">verificat</span>{% endif %}</td><td class="small">{{ a.source_label }}</td></tr>
+        <tr><td>{{ a.title }}{% if a.reviewed %} <span class="tag">{{ a.decision_label or "revizuit" }}</span>{% endif %}</td><td class="small">{{ a.source_label }}</td></tr>
       {% endfor %}
       </tbody>
     </table>

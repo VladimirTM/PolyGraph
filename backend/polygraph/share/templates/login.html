@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Autentificare · Portalul medicului de familie{% endblock %}
+{% block body_class %}login{% endblock %}
+{% block body %}
+<main class="center">
+  <h1 class="page-title">Portalul medicului de familie</h1>
+  {% if adding %}<p>Autentificați-vă ca să adăugați pacientul în lista dumneavoastră.</p>
+  {% else %}<p class="muted">Lista pacienților care v-au partajat tratamentul prin PolyGraph.</p>{% endif %}
+  <form class="login-form" method="post" action="/portal/login">
+    <label for="code">Codul de acces</label>
+    <input class="note-input" id="code" name="code" type="password" autocomplete="current-password" required autofocus>
+    <input type="hidden" name="next" value="{{ next }}">
+    {% if error %}<p class="review-error" role="alert">{{ error }}</p>{% endif %}
+    <button class="btn" type="submit">Intrați</button>
+  </form>
+</main>
+{% endblock %}

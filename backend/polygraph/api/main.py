@@ -1,12 +1,14 @@
 """Backend-ul real PolyGraph (FastAPI), din B2: pacienți, medicamente, analiză, what-if, căutare în kb.
 
 Pornire: `make dev` (0.0.0.0:8000). Programul zilei și dozele vin din B4, check-in-urile și Noutățile din B5;
-partajarea (pagina farmacistului, tipărirea, graful) din B6. Variabile de mediu:
+portalul medicului de familie (lista de pacienți, fișa, tipărirea, graful) din B6. Variabile de mediu:
 - PG_KB: calea către kb.sqlite (implicit kb/kb.sqlite, `make kb`)
 - PG_APP_DB: calea către app.sqlite (implicit backend/app.sqlite)
 - PG_MEDIA_DIR: folderul fotografiilor scanate (implicit backend/media/)
 - PG_TODAY: data „de azi” (ISO), pentru demo și teste; implicit data din Europe/Bucharest
-- DEMO_MODE=1: creează pacientul demo (pat_demo, token demo-token) și activează POST /demo/reset
+- DEMO_MODE=1: creează pacientul demo (pat_demo, token demo-token), medicul demo din portal (cu doi pacienți în plus)
+  și activează POST /demo/reset
+- PG_DOCTOR_CODE: codul de acces al medicului demo în /portal (implicit medic-demo)
 """
 
 from __future__ import annotations
@@ -23,7 +25,7 @@ from typing import Annotated, Any, Literal
 from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Request, Response, UploadFile
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
@@ -41,7 +43,7 @@ from polygraph.extract.ocr_match import OcrLine  # noqa: E402
 from polygraph.kb import Kb, KbMissing, default_kb  # noqa: E402
 from polygraph.schedule import build_schedule  # noqa: E402
 from polygraph.share import STATIC_DIR, render  # noqa: E402
-from polygraph.share.view import page_context, verify_event  # noqa: E402
+from polygraph.share.view import page_context, patient_card, review_event  # noqa: E402
 from polygraph.store import Store  # noqa: E402
 from polygraph.voice.correlate import correlate, feed_event, reply_text  # noqa: E402
 from polygraph.voice.understand import understand  # noqa: E402
@@ -90,12 +92,31 @@ def demo_mode() -> bool:
     return os.environ.get("DEMO_MODE") == "1"
 
 
+DEMO_DOCTOR = ("doc_demo", "dr. Elena Popa")
+# ceilalți doi pacienți din lista medicului demo, ca portalul să arate ca o listă reală (subseturi din regimul Mariei)
+DEMO_EXTRA = (
+    (
+        {"id": "pat_demo_ion", "name": "Ion", "birth_year": 1944, "caregiver_name": "Mihai"},
+        ("med_03", "med_04", "med_05", "med_07"),
+    ),
+    ({"id": "pat_demo_ana", "name": "Ana", "birth_year": 1952, "caregiver_name": None}, ("med_05", "med_06")),
+)
+
+
 def reset_demo(live_scan: bool = False) -> None:
     s = store()
     s.delete_patient(DEMO_ID)
     s.create_patient(copy.deepcopy(DEMO["patient"]), DEMO_TOKEN)
     meds = [m for m in DEMO["meds"] if not (live_scan and m["id"] in ("med_01", "med_02"))]
     s.replace_meds(DEMO_ID, copy.deepcopy(meds))
+    doctor_id, doctor_name = DEMO_DOCTOR
+    s.upsert_doctor(doctor_id, doctor_name, os.environ.get("PG_DOCTOR_CODE") or "medic-demo")
+    s.link_patient(doctor_id, DEMO_ID)
+    for extra, med_ids in DEMO_EXTRA:
+        s.delete_patient(extra["id"])
+        s.create_patient({**extra, "anchors": DEMO["patient"]["anchors"]})
+        s.replace_meds(extra["id"], [copy.deepcopy(m) for m in DEMO["meds"] if m["id"] in med_ids])
+        s.link_patient(doctor_id, extra["id"])
 
 
 @asynccontextmanager
@@ -410,11 +431,13 @@ def _instant(raw: str) -> datetime:
     return at if at.tzinfo else at.replace(tzinfo=TZ)
 
 
-# ---------------------------------------------------------------- partajare (B6)
+# ---------------------------------------------------------------- portalul medicului de familie (B6)
 
 SHARE_TTL = timedelta(hours=72)
-# tokenul e în URL: pagina nu se indexează, nu se cache-uiește și nu trimite Referer mai departe
-SHARE_HEADERS = {
+SESSION_TTL = timedelta(hours=12)
+SESSION_COOKIE = "pg_doctor"
+# paginile au date medicale: nu se indexează, nu se cache-uiesc, nu trimit Referer mai departe (tokenul e în URL)
+PAGE_HEADERS = {
     "Cache-Control": "no-store",
     "Referrer-Policy": "no-referrer",
     "X-Robots-Tag": "noindex, nofollow",
@@ -442,11 +465,40 @@ def share_patient(token: str) -> str | None:
     return entry[0]
 
 
-def share_html(template: str, status: int = 200, **ctx: Any) -> HTMLResponse:
-    return HTMLResponse(render(template, **ctx), status_code=status, headers=SHARE_HEADERS)
+def page(template: str, status: int = 200, **ctx: Any) -> HTMLResponse:
+    return HTMLResponse(render(template, **ctx), status_code=status, headers=PAGE_HEADERS)
 
 
-def share_context(pid: str) -> dict[str, Any]:
+def expired_page() -> HTMLResponse:
+    return page("expired.html", status=404)
+
+
+def current_doctor(request: Request) -> dict[str, Any] | None:
+    token = request.cookies.get(SESSION_COOKIE)
+    entry = store().session_doctor(token) if token else None
+    if entry is None or _instant(entry[1]) <= datetime.now(UTC):
+        return None
+    return entry[0]
+
+
+def doctor_patient(request: Request, pid: str) -> dict[str, Any] | None:
+    """Medicul autentificat, doar dacă pacientul e în lista lui; altfel None (rutele răspund 404, fără să spună de ce)."""
+    doctor = current_doctor(request)
+    return doctor if doctor and store().doctor_has_patient(doctor["id"], pid) else None
+
+
+def login_page(next_url: str, error: str | None = None, status: int = 200) -> HTMLResponse:
+    return page("login.html", status=status, next=next_url, error=error, adding=next_url.startswith("/share/"))
+
+
+def safe_next(raw: str | None) -> str:
+    # doar căi locale, ca formularul de autentificare să nu poată trimite medicul pe alt site
+    if raw and raw.startswith(("/portal", "/share/")) and "//" not in raw and "\\" not in raw:
+        return raw
+    return "/portal"
+
+
+def patient_context(pid: str) -> dict[str, Any]:
     s = store()
     patient = s.get_patient(pid)
     meds = s.list_meds(pid)
@@ -463,24 +515,16 @@ def share_context(pid: str) -> dict[str, Any]:
     )
 
 
-def expired_page() -> HTMLResponse:
-    return share_html("expired.html", status=404)
-
-
 @app.get("/share/{token}", response_class=HTMLResponse)
-def share_page(token: str) -> HTMLResponse:
+def share_link(token: str, request: Request) -> Response:
     pid = share_patient(token)
     if pid is None:
         return expired_page()
-    return share_html("page.html", token=token, **share_context(pid))
-
-
-@app.get("/share/{token}/print", response_class=HTMLResponse)
-def share_print(token: str) -> HTMLResponse:
-    pid = share_patient(token)
-    if pid is None:
-        return expired_page()
-    return share_html("print.html", token=token, **share_context(pid))
+    doctor = current_doctor(request)
+    if doctor is None:
+        return login_page(f"/share/{token}")
+    store().link_patient(doctor["id"], pid)
+    return RedirectResponse(f"/portal/patients/{pid}", status_code=303)
 
 
 @app.get("/share/{token}/graph", response_class=HTMLResponse)
@@ -490,19 +534,83 @@ def share_graph(token: str, embed: Annotated[int, Query(ge=0, le=1)] = 0) -> HTM
         return expired_page()
     patient = store().get_patient(pid)
     graph = run_analysis(pid, patient, store().list_meds(pid))["graph"]
-    return share_html("graph.html", token=token, patient=patient, graph=graph, embed=bool(embed))
+    return page("graph.html", patient=patient, graph=graph, embed=bool(embed), back=None)
 
 
-class VerifyBody(BaseModel):
+@app.get("/portal", response_class=HTMLResponse)
+def portal(request: Request) -> HTMLResponse:
+    doctor = current_doctor(request)
+    if doctor is None:
+        return login_page("/portal")
+    s = store()
+    cards = []
+    for pid in s.doctor_patient_ids(doctor["id"]):
+        patient = s.get_patient(pid)
+        meds = s.list_meds(pid)
+        checkins = s.list_checkins(pid)
+        cards.append(patient_card(patient, meds, run_analysis(pid, patient, meds), checkins, today()))
+    cards.sort(key=lambda c: c["sort"])
+    return page("portal.html", doctor=doctor, cards=cards)
+
+
+@app.post("/portal/login", response_class=HTMLResponse)
+def portal_login(code: Annotated[str, Form(max_length=200)] = "", next: Annotated[str, Form()] = "/portal") -> Response:
+    target = safe_next(next)
+    doctor = store().doctor_by_code(code) if code.strip() else None
+    if doctor is None:
+        return login_page(target, "Codul de acces nu e corect.", status=401)
+    expires = (datetime.now(UTC) + SESSION_TTL).replace(microsecond=0)
+    token = store().create_session(doctor["id"], expires.isoformat().replace("+00:00", "Z"))
+    response = RedirectResponse(target, status_code=303)
+    response.set_cookie(SESSION_COOKIE, token, max_age=int(SESSION_TTL.total_seconds()), httponly=True, samesite="lax", path="/")
+    return response
+
+
+@app.post("/portal/logout")
+def portal_logout(request: Request) -> Response:
+    token = request.cookies.get(SESSION_COOKIE)
+    if token:
+        store().delete_session(token)
+    response = RedirectResponse("/portal", status_code=303)
+    response.delete_cookie(SESSION_COOKIE, path="/")
+    return response
+
+
+@app.get("/portal/patients/{pid}", response_class=HTMLResponse)
+def portal_patient(pid: str, request: Request) -> HTMLResponse:
+    if doctor_patient(request, pid) is None:
+        return expired_page() if current_doctor(request) else login_page(f"/portal/patients/{pid}")
+    return page("page.html", base=f"/portal/patients/{pid}", **patient_context(pid))
+
+
+@app.get("/portal/patients/{pid}/print", response_class=HTMLResponse)
+def portal_print(pid: str, request: Request) -> HTMLResponse:
+    if doctor_patient(request, pid) is None:
+        return expired_page() if current_doctor(request) else login_page(f"/portal/patients/{pid}/print")
+    return page("print.html", base=f"/portal/patients/{pid}", **patient_context(pid))
+
+
+@app.get("/portal/patients/{pid}/graph", response_class=HTMLResponse)
+def portal_graph(pid: str, request: Request) -> HTMLResponse:
+    if doctor_patient(request, pid) is None:
+        return expired_page() if current_doctor(request) else login_page(f"/portal/patients/{pid}/graph")
+    patient = store().get_patient(pid)
+    graph = run_analysis(pid, patient, store().list_meds(pid))["graph"]
+    return page("graph.html", patient=patient, graph=graph, embed=False, back=f"/portal/patients/{pid}")
+
+
+class ReviewBody(BaseModel):
     model_config = {"extra": "forbid"}
+    decision: Literal["keep", "change_at_visit", "refer_specialist"]
     note: str = Field(default="", max_length=1000)
 
 
-@app.post("/share/{token}/alerts/{alert_id}/verify")
-def verify_alert(token: str, alert_id: str, body: VerifyBody) -> dict[str, Any]:
-    pid = share_patient(token)
-    if pid is None:
-        raise HTTPException(404, "Linkul a expirat sau nu există.")
+@app.post("/portal/patients/{pid}/alerts/{alert_id}/review")
+def review_alert(pid: str, alert_id: str, body: ReviewBody, request: Request) -> dict[str, Any]:
+    if current_doctor(request) is None:
+        raise HTTPException(401, "Autentificați-vă în portal.")
+    if doctor_patient(request, pid) is None:
+        raise HTTPException(404, "Pacientul nu e în lista dumneavoastră.")
     patient = store().get_patient(pid)
     alerts = run_analysis(pid, patient, store().list_meds(pid))["alerts"]
     alert = next((a for a in alerts if a["id"] == alert_id), None)
@@ -511,10 +619,10 @@ def verify_alert(token: str, alert_id: str, body: VerifyBody) -> dict[str, Any]:
     # ora locală, ca în check-in-uri: Noutățile se ordonează după acest câmp
     at = datetime.now(TZ).replace(microsecond=0).isoformat()
     note = body.note.strip()
-    resolution = {"by": "pharmacist", "note": note, "at": at}
-    store().set_alert_state(pid, alert_id, "verified_by_pharmacist", resolution)
-    store().add_event(pid, verify_event(alert, note, at, secrets.token_hex(4)))
-    return {**alert, "status": "verified_by_pharmacist", "resolution": resolution}
+    resolution = {"by": "doctor", "decision": body.decision, "note": note, "at": at}
+    store().set_alert_state(pid, alert_id, "reviewed_by_doctor", resolution)
+    store().add_event(pid, review_event(alert, body.decision, note, at, secrets.token_hex(4)))
+    return {**alert, "status": "reviewed_by_doctor", "resolution": resolution}
 
 
 # ---------------------------------------------------------------- kb

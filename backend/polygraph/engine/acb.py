@@ -39,7 +39,7 @@ def check(ctx: Ctx) -> tuple[int, list[dict]]:
         patient_text=T.ACB_PATIENT,
         detail=T.acb_detail(acb_total, names),
         recommendation=T.ACB_RECOMMENDATION,
-        action="ask_pharmacist",
+        action="ask_doctor",
         source={"db": "acb", "ref": "ACB Scale 2012 (Aging Brain Care / Regenstrief), kb/rules/acb.yaml", "url": None},
     )
     return acb_total, [alert]

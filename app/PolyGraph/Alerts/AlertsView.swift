@@ -58,7 +58,7 @@ struct AlertsView: View {
                         )
                         .accessibilityIdentifier("alerts.foodGroup")
                     }
-                    Text("Alertele minore apar doar în fișa pentru farmacist.")
+                    Text("Alertele minore apar doar în portalul medicului de familie.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .padding(.top, Spacing.xs)
@@ -113,11 +113,11 @@ struct AlertCard: View {
                         .overlay(Capsule().strokeBorder(Color.secondary.opacity(0.5)))
                 }
                 Spacer(minLength: 0)
-                if alert.status == .verifiedByPharmacist {
-                    Label("Verificată", systemImage: "checkmark.seal.fill")
+                if alert.status == .reviewedByDoctor {
+                    Label("Revizuită", systemImage: "checkmark.seal.fill")
                         .labelStyle(.iconOnly)
                         .foregroundStyle(PgColor.accent)
-                        .accessibilityLabel("Verificată de farmacist")
+                        .accessibilityLabel("Revizuită de medicul de familie")
                 }
                 Image(systemName: "chevron.right")
                     .font(.footnote.weight(.semibold))

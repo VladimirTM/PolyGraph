@@ -95,12 +95,12 @@ def test_alert_state_is_merged(client):
     main.store().set_alert_state(
         "pat_demo",
         "al_ddi_med_01_med_02",
-        "verified_by_pharmacist",
-        {"by": "pharmacist", "note": "ok", "at": "2026-11-14T10:00:00Z"},
+        "reviewed_by_doctor",
+        {"by": "doctor", "decision": "keep", "note": "ok", "at": "2026-11-14T10:00:00Z"},
     )
     alerts = client.get(f"{P}/analysis", headers=H).json()["alerts"]
     a = next(x for x in alerts if x["id"] == "al_ddi_med_01_med_02")
-    assert a["status"] == "verified_by_pharmacist" and a["resolution"]["by"] == "pharmacist"
+    assert a["status"] == "reviewed_by_doctor" and a["resolution"]["decision"] == "keep"
 
 
 def test_what_if_with_med(client):

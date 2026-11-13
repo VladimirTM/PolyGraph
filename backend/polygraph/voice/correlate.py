@@ -115,7 +115,7 @@ def reply_text(u: Understanding, correlations: list[Json], escalate: bool, careg
             parts.append(f"{dq['brand']} e pe lista dumneavoastră: uitați-vă pe ecranul „Acum” când îi vine ora.")
         else:
             what = f" {dq['brand']}" if dq else " un medicament nou"
-            parts.append(f"Înainte să luați{what}, întrebați farmacistul sau medicul.")
+            parts.append(f"Înainte să luați{what}, întrebați medicul de familie.")
     elif u.intent == "which_pill_now":
         parts.append("Pe ecranul „Acum” scrie ce pastilă urmează.")
     elif not u.symptoms:

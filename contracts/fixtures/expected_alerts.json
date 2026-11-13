@@ -17,13 +17,13 @@
       ],
       "title": "Risc crescut de sângerare",
       "patient_text": "Două dintre pastile, luate împreună, pot crește riscul de sângerare. Am anunțat-o pe Ana.",
-      "detail": "Acenocumarol (Sintrom) + ibuprofen (Nurofen): antiinflamatoarele cresc efectul anticoagulant și riscul de sângerare. Și criteriul Beers 2023: AINS de evitat împreună cu un anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
-      "recommendation": "Discutați cu medicul cardiolog sau cu farmacistul înainte de următoarea doză de Nurofen. Anunțați medicul la vânătăi sau sângerări neobișnuite.",
+      "detail": "Acenocumarol (Sintrom) + ibuprofen (Nurofen): antiinflamatoarele cresc efectul anticoagulant și riscul de sângerare. Și criteriul Beers 2023: AINS de evitat împreună cu un anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de medicul de familie.",
+      "recommendation": "Discutați cu medicul cardiolog înainte de următoarea doză de Nurofen. Anunțați medicul la vânătăi sau sângerări neobișnuite.",
       "action": "contact_doctor",
       "route_to": [
         "patient",
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -54,7 +54,7 @@
       "route_to": [
         "patient",
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "ddinter",
@@ -80,7 +80,7 @@
       "action": "contact_doctor",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "beers",
@@ -100,13 +100,13 @@
         "med_08"
       ],
       "title": "Antidepresiv triciclic la vârstnic",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Amitriptilina are efect anticolinergic și sedativ puternic: confuzie, amețeală la ridicare, căderi.",
       "recommendation": "Discutați cu medicul neurolog dacă există o alternativă mai sigură.",
       "action": "contact_doctor",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "beers",
@@ -126,13 +126,13 @@
         "med_03"
       ],
       "title": "Grepfrutul crește mult concentrația de simvastatină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Grepfrutul crește mult concentrația de simvastatină.",
       "recommendation": "Evitați grepfrutul și sucul de grepfrut.",
       "action": "avoid_food",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -152,10 +152,10 @@
         "med_08"
       ],
       "title": "Încărcare anticolinergică: scor 3",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Scorul ACB total este 3 (amitriptilină). Un scor de 3 sau mai mare crește riscul de confuzie, căderi și declin cognitiv.",
       "recommendation": "Discutați la revizuirea tratamentului dacă se poate reduce încărcarea anticolinergică.",
-      "action": "ask_pharmacist",
+      "action": "ask_doctor",
       "route_to": [
         "caregiver"
       ],
@@ -178,8 +178,8 @@
         "med_05"
       ],
       "title": "Euthyrox-ul poate crește efectul Sintrom-ului",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
-      "detail": "Hormonii tiroidieni pot crește efectul anticoagulant, mai ales la schimbarea dozei. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
+      "detail": "Hormonii tiroidieni pot crește efectul anticoagulant, mai ales la schimbarea dozei. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de medicul de familie.",
       "recommendation": "La orice schimbare a dozei de Euthyrox, întrebați medicul dacă e nevoie de un INR.",
       "action": "monitor",
       "route_to": [
@@ -207,8 +207,8 @@
         "med_07"
       ],
       "title": "Omeprazolul poate crește efectul Sintrom-ului",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
-      "detail": "Inhibitorii de pompă de protoni au fost asociați ocazional cu creșterea efectului anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
+      "detail": "Inhibitorii de pompă de protoni au fost asociați ocazional cu creșterea efectului anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de medicul de familie.",
       "recommendation": "La începerea sau la renunțarea la omeprazol, întrebați medicul dacă e nevoie de un INR.",
       "action": "monitor",
       "route_to": [
@@ -236,9 +236,9 @@
         "med_04"
       ],
       "title": "Ibuprofenul poate slăbi efectul amlodipinei",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Antiinflamatoarele pot crește tensiunea arterială și scad efectul unor medicamente pentru tensiune.",
-      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "recommendation": "Discutați cu medicul de familie la următoarea vizită.",
       "action": "monitor",
       "route_to": [
         "caregiver"
@@ -262,9 +262,9 @@
         "med_07"
       ],
       "title": "Ibuprofen + omeprazol",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
-      "detail": "Pentru ibuprofen + omeprazol, DDInter nu dă un nivel. Evaluat prin analogie cu naproxenul (aceeași clasă); de confirmat de farmacist.",
-      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
+      "detail": "Pentru ibuprofen + omeprazol, DDInter nu dă un nivel. Evaluat prin analogie cu naproxenul (aceeași clasă); de confirmat de medicul de familie.",
+      "recommendation": "Discutați cu medicul de familie la următoarea vizită.",
       "action": "monitor",
       "route_to": [
         "caregiver"
@@ -291,9 +291,9 @@
         "med_08"
       ],
       "title": "Ibuprofen + amitriptilină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
-      "detail": "Pentru ibuprofen + amitriptilină, DDInter nu dă un nivel. Evaluat prin analogie cu clomipramina (aceeași clasă); de confirmat de farmacist.",
-      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
+      "detail": "Pentru ibuprofen + amitriptilină, DDInter nu dă un nivel. Evaluat prin analogie cu clomipramina (aceeași clasă); de confirmat de medicul de familie.",
+      "recommendation": "Discutați cu medicul de familie la următoarea vizită.",
       "action": "monitor",
       "route_to": [
         "caregiver"
@@ -320,9 +320,9 @@
         "med_07"
       ],
       "title": "Simvastatină + omeprazol",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Omeprazolul poate crește ușor concentrația de simvastatină.",
-      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "recommendation": "Discutați cu medicul de familie la următoarea vizită.",
       "action": "monitor",
       "route_to": [
         "caregiver"
@@ -346,9 +346,9 @@
         "med_06"
       ],
       "title": "Calciul poate scădea efectul amlodipinei",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Suplimentele de calciu pot reduce efectul blocantelor canalelor de calciu.",
-      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "recommendation": "Discutați cu medicul de familie la următoarea vizită.",
       "action": "monitor",
       "route_to": [
         "caregiver"
@@ -398,7 +398,7 @@
         "med_07"
       ],
       "title": "Omeprazolul poate scădea absorbția Euthyrox-ului",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Omeprazolul modifică aciditatea gastrică și poate scădea absorbția levotiroxinei.",
       "recommendation": "Întrebați medicul endocrinolog dacă e nevoie de un control al hormonilor tiroidieni (TSH).",
       "action": "monitor",
@@ -424,7 +424,7 @@
         "med_08"
       ],
       "title": "Euthyrox + amitriptilină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Asocierea poate crește riscul de aritmii și de stimulare a sistemului nervos.",
       "recommendation": "Anunțați medicul la palpitații sau agitație.",
       "action": "monitor",
@@ -449,10 +449,10 @@
         "med_07"
       ],
       "title": "Protector gastric (IPP) luat de mai mult de 8 săptămâni",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Pe termen lung, IPP sunt asociate cu infecții, pierdere osoasă și fracturi.",
       "recommendation": "Întrebați medicul de familie dacă mai e nevoie de el; pentru unele boli e totuși indicat.",
-      "action": "ask_pharmacist",
+      "action": "ask_doctor",
       "route_to": [
         "caregiver"
       ],
@@ -474,13 +474,13 @@
         "med_01"
       ],
       "title": "Alcoolul în exces poate crește efectul Sintrom-ului",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Alcoolul în exces poate crește efectul Sintrom-ului.",
       "recommendation": "Evitați cantitățile mari de alcool.",
       "action": "avoid_food",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -503,13 +503,13 @@
         "med_01"
       ],
       "title": "Alimentele bogate în vitamina K (legume cu frunze verzi) scad efectul Sintrom-ului",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Alimentele bogate în vitamina K (legume cu frunze verzi) scad efectul Sintrom-ului.",
       "recommendation": "Mâncați constant, fără schimbări bruște de dietă; anunțați medicul la schimbări mari.",
       "action": "avoid_food",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -532,13 +532,13 @@
         "med_02"
       ],
       "title": "Alcoolul cu ibuprofen crește riscul de sângerare digestivă",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Alcoolul cu ibuprofen crește riscul de sângerare digestivă.",
       "recommendation": "Evitați alcoolul cât luați Nurofen.",
       "action": "avoid_food",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -558,13 +558,13 @@
         "med_03"
       ],
       "title": "Alcoolul în cantități mari, cu simvastatină, crește riscul de afectare a ficatului",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Alcoolul în cantități mari, cu simvastatină, crește riscul de afectare a ficatului.",
       "recommendation": "Evitați cantitățile mari de alcool.",
       "action": "avoid_food",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -584,13 +584,13 @@
         "med_05"
       ],
       "title": "Fibrele alimentare pot scădea absorbția Euthyrox-ului",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Fibrele alimentare pot scădea absorbția Euthyrox-ului.",
       "recommendation": "Luați Euthyrox-ul mereu la aceeași oră și în aceeași relație cu masa.",
       "action": "avoid_food",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -610,13 +610,13 @@
         "med_05"
       ],
       "title": "Produsele din soia pot scădea absorbția Euthyrox-ului",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Produsele din soia pot scădea absorbția Euthyrox-ului.",
       "recommendation": "Luați Euthyrox-ul mereu la aceeași oră și în aceeași relație cu masa.",
       "action": "avoid_food",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -636,13 +636,13 @@
         "med_08"
       ],
       "title": "Alcoolul accentuează somnolența dată de amitriptilină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Alcoolul accentuează somnolența dată de amitriptilină.",
       "recommendation": "Evitați alcoolul.",
       "action": "avoid_food",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -663,12 +663,12 @@
         "med_03"
       ],
       "title": "Simvastatina poate crește ușor efectul Sintrom-ului",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
-      "detail": "Simvastatina poate crește ușor răspunsul anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
+      "detail": "Simvastatina poate crește ușor răspunsul anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de medicul de familie.",
       "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
       "action": "monitor",
       "route_to": [
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -692,12 +692,12 @@
         "med_05"
       ],
       "title": "Simvastatină + Euthyrox",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Interacțiune minoră.",
       "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
       "action": "monitor",
       "route_to": [
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "ddinter",
@@ -718,12 +718,12 @@
         "med_07"
       ],
       "title": "Amlodipină + omeprazol",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
-      "detail": "Pentru amlodipină + omeprazol, DDInter nu dă un nivel. Evaluat prin analogie cu nifedipina (aceeași clasă); de confirmat de farmacist.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
+      "detail": "Pentru amlodipină + omeprazol, DDInter nu dă un nivel. Evaluat prin analogie cu nifedipina (aceeași clasă); de confirmat de medicul de familie.",
       "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
       "action": "monitor",
       "route_to": [
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "ddinter",
@@ -751,12 +751,12 @@
       "title": "Antibioticul nou nu se asociază cu simvastatina",
       "patient_text": "Antibioticul nou trebuie verificat de medic înainte de prima pastilă. Am anunțat-o pe Ana.",
       "detail": "Claritromicina (Fromilid) crește mult concentrația de simvastatină: risc de miopatie și rabdomioliză. Asocierea este contraindicată în RCP-ul simvastatinei și al claritromicinei.",
-      "recommendation": "Discutați cu medicul ORL care a prescris antibioticul sau cu farmacistul înainte de prima doză.",
+      "recommendation": "Discutați cu medicul ORL care a prescris antibioticul înainte de prima doză.",
       "action": "contact_doctor",
       "route_to": [
         "patient",
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -777,13 +777,13 @@
         "med_09"
       ],
       "title": "Antibioticul nou poate crește efectul Sintrom-ului",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
-      "detail": "Claritromicina poate crește mult efectul anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
-      "recommendation": "Discutați cu medicul cardiolog sau cu farmacistul dacă e nevoie de un INR în timpul curei de antibiotic.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
+      "detail": "Claritromicina poate crește mult efectul anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de medicul de familie.",
+      "recommendation": "Discutați cu medicul cardiolog dacă e nevoie de un INR în timpul curei de antibiotic.",
       "action": "contact_doctor",
       "route_to": [
         "caregiver",
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",
@@ -807,9 +807,9 @@
         "med_09"
       ],
       "title": "Amlodipină + claritromicină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Claritromicina poate crește concentrația de amlodipină (amețeală, glezne umflate).",
-      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "recommendation": "Discutați cu medicul de familie la următoarea vizită.",
       "action": "monitor",
       "route_to": [
         "caregiver"
@@ -833,9 +833,9 @@
         "med_09"
       ],
       "title": "Amitriptilină + claritromicină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Asocierea poate crește concentrația de amitriptilină și riscul de tulburări de ritm.",
-      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "recommendation": "Discutați cu medicul de familie la următoarea vizită.",
       "action": "monitor",
       "route_to": [
         "caregiver"
@@ -859,12 +859,12 @@
         "med_09"
       ],
       "title": "Omeprazol + claritromicină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Interacțiune minoră.",
       "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
       "action": "monitor",
       "route_to": [
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "ddinter",
@@ -884,12 +884,12 @@
         "med_09"
       ],
       "title": "Grepfrutul cu claritromicină",
-      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "patient_text": "Am notat ceva de discutat cu medicul de familie. Nu e nimic urgent.",
       "detail": "Grepfrutul poate modifica concentrația de claritromicină.",
       "recommendation": "În general, evitați grepfrutul și sucul de grepfrut.",
       "action": "avoid_food",
       "route_to": [
-        "pharmacist"
+        "doctor"
       ],
       "source": {
         "db": "curated",

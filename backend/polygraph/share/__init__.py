@@ -1,4 +1,4 @@
-"""B6: pagina farmacistului / medicului, versiunea de tipărit și graful pentru WKWebView (Jinja2 + un singur CSS)."""
+"""B6: portalul medicului de familie (lista de pacienți, fișa, fișa de tipărit) și graful pentru WKWebView (Jinja2 + un CSS)."""
 
 from __future__ import annotations
 

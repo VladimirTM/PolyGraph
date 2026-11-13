@@ -141,7 +141,7 @@ extension FeedEventType {
         case .alertNew: "Alertă nouă"
         case .doseMissed: "Doză ratată"
         case .checkin: "Check-in"
-        case .pharmacistVerified: "Verificat de farmacist"
+        case .doctorReviewed: "Decizia medicului de familie"
         }
     }
 
@@ -150,7 +150,7 @@ extension FeedEventType {
         case .alertNew: "exclamationmark.triangle"
         case .doseMissed: "clock.badge.exclamationmark"
         case .checkin: "waveform"
-        case .pharmacistVerified: "checkmark.seal"
+        case .doctorReviewed: "checkmark.seal"
         }
     }
 }

@@ -41,7 +41,7 @@ def _alert(ctx: Ctx, comps: list[Component], same: bool, why: str) -> dict:
         patient_text=T.duplicate_patient_text(brands, ctx.caregiver),
         detail=detail,
         recommendation=T.duplicate_recommendation(),
-        action="ask_pharmacist",
+        action="ask_doctor",
         source={"db": "app", "ref": "dublură terapeutică (aceeași substanță / aceeași clasă ATC)", "url": None},
     )
 

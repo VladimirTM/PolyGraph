@@ -208,7 +208,7 @@ struct CheckInEventView: View {
                         }
                     }
                     Section {
-                        Text("Nu schimbați singuri tratamentul. Întrebați medicul sau farmacistul.")
+                        Text("Nu schimbați singuri tratamentul. Întrebați medicul de familie.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }

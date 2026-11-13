@@ -253,7 +253,7 @@ def test_impossible_separation_is_reported_and_alerted(rules_kb):
 
     alerts = analyze(patient, [levo, calcium], TODAY, kb=rules_kb)["alerts"]
     timing = [a for a in alerts if a["kind"] == "timing"]
-    assert len(timing) == 1 and timing[0]["action"] == "ask_pharmacist"
+    assert len(timing) == 1 and timing[0]["action"] == "ask_doctor"
     assert timing[0]["id"] == "al_timing_med_01_med_02_min_separation"
     assert not contracts.schema_errors("alert", timing[0])
 

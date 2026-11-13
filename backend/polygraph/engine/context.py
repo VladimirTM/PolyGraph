@@ -78,19 +78,19 @@ def specialty(med: Json) -> str | None:
 
 
 def route_to(kind: str, severity: str) -> list[str]:
-    """Plan 5.3: critical / major (în afară de food) → aparținător + farmacist; moderate → aparținător; minor → farmacist.
+    """Plan 5.3: critical / major (în afară de food) → aparținător + medic; moderate → aparținător; minor → medicul de familie.
 
-    Alertele de mâncare stau în cardul lor („Mâncare și băutură”): moderate și peste → aparținător + farmacist.
+    Alertele de mâncare stau în cardul lor („Mâncare și băutură”): moderate și peste → aparținător + medicul de familie.
     Pacientul primește direct doar interacțiunile grave (vede `patient_text`).
     """
     if kind == "food":
-        return ["pharmacist"] if SEV_RANK[severity] >= SEV_RANK["minor"] else ["caregiver", "pharmacist"]
+        return ["doctor"] if SEV_RANK[severity] >= SEV_RANK["minor"] else ["caregiver", "doctor"]
     if severity in ("critical", "major"):
-        return (["patient"] if kind in ("ddi", "duplicate", "expired") else []) + ["caregiver", "pharmacist"]
+        return (["patient"] if kind in ("ddi", "duplicate", "expired") else []) + ["caregiver", "doctor"]
     if severity == "moderate":
         return ["caregiver"]
     if severity == "minor":
-        return ["pharmacist"]
+        return ["doctor"]
     return ["patient"]
 
 

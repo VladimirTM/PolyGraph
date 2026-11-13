@@ -2,9 +2,9 @@
 {% block title %}Graful terapeutic · {{ patient.name }}{% endblock %}
 {% block body_class %}graph-page{% if embed %} embed{% endif %}{% endblock %}
 {% block body %}
-{% if not embed %}
+{% if back %}
 <header class="graph-bar">
-  <a href="/share/{{ token }}">← Fișa lui {{ patient.name }}</a>
+  <a href="{{ back }}">← Fișa lui {{ patient.name }}</a>
 </header>
 {% endif %}
 <div id="graph" class="graph fill" role="img" aria-label="Graful terapeutic al pacientului {{ patient.name }}"></div>

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Fișa de medicație · {{ patient.name }}{% endblock %}
+{% block title %}{{ patient.name }} · Portalul medicului de familie{% endblock %}
 {% block body_class %}page{% endblock %}
 
 {% macro alert_card(a) %}
-<article class="alert sev-{{ a.severity }}{% if a.verified %} is-verified{% endif %}" id="alert-{{ a.id }}" data-alert-id="{{ a.id }}">
+<article class="alert sev-{{ a.severity }}{% if a.reviewed %} is-reviewed{% endif %}" id="alert-{{ a.id }}" data-alert-id="{{ a.id }}">
   <header class="alert-head">
     <span class="badge sev-{{ a.severity }}">{{ a.severity_label }}</span>
     <span class="kind">{{ a.kind_label }}</span>
@@ -21,15 +21,19 @@
     {% if a.source.ref %}<p class="small">{{ a.source.ref }}</p>{% endif %}
     <p class="small">Cod alertă: {{ a.id }}</p>
   </details>
-  <div class="verify" data-verify>
-    {% if a.verified %}
-    <p class="verified-state" role="status">Verificat de farmacist · {{ a.resolution_at }}{% if a.resolution.note %}<br><span class="note">„{{ a.resolution.note }}”</span>{% endif %}</p>
+  <div class="review">
+    {% if a.reviewed %}
+    <p class="reviewed-state" role="status">{{ a.decision_label or "Revizuit" }} · {{ a.resolution_at }}{% if a.resolution.note %}<br><span class="note">„{{ a.resolution.note }}”</span>{% endif %}</p>
     {% else %}
-    <form class="verify-form" method="post" action="/share/{{ token }}/alerts/{{ a.id }}/verify" novalidate>
+    <form class="review-form" method="post" action="{{ base }}/alerts/{{ a.id }}/review" novalidate>
       <label class="visually-hidden" for="note-{{ a.id }}">Notă pentru familie (opțional)</label>
-      <input class="note-input" id="note-{{ a.id }}" name="note" type="text" maxlength="1000" autocomplete="off" placeholder="Notă (opțional)">
-      <button class="btn" type="submit">Am verificat</button>
-      <p class="verify-error" role="alert" hidden></p>
+      <input class="note-input" id="note-{{ a.id }}" name="note" type="text" maxlength="1000" autocomplete="off" placeholder="Notă pentru familie (opțional)">
+      <div class="decisions" role="group" aria-label="Decizia dumneavoastră">
+        <button class="btn" type="submit" name="decision" value="keep">Menține</button>
+        <button class="btn btn-secondary" type="submit" name="decision" value="change_at_visit">Modific la consultație</button>
+        <button class="btn btn-secondary" type="submit" name="decision" value="refer_specialist">Trimit la specialist</button>
+      </div>
+      <p class="review-error" role="alert" hidden></p>
     </form>
     {% endif %}
   </div>
@@ -41,10 +45,11 @@
 <header class="topbar" data-topbar>
   <div class="topbar-inner">
     <div>
+      <p class="crumb"><a href="/portal">← Pacienții mei</a></p>
       <h1 class="page-title">{{ patient.name }}{% if age %}, {{ age }} de ani{% endif %}</h1>
-      <p class="disclaimer">Fișă generată de PolyGraph, nu înlocuiește evaluarea profesională.</p>
+      <p class="disclaimer">Fișă generată de PolyGraph; nu înlocuiește evaluarea clinică.</p>
     </div>
-    <a class="btn btn-secondary" href="/share/{{ token }}/print"><span class="label-long">Versiunea de tipărit</span><span class="label-short">Tipărire</span></a>
+    <a class="btn btn-secondary" href="{{ base }}/print"><span class="label-long">Reconcilierea de tipărit</span><span class="label-short">Tipărire</span></a>
   </div>
 </header>
 
@@ -52,7 +57,7 @@
   <section class="summary" aria-labelledby="h-summary">
     <h2 id="h-summary" class="visually-hidden">Rezumat</h2>
     <p class="summary-line">{% for s in summary %}<span>{{ s }}</span>{% if not loop.last %}<span class="dot" aria-hidden="true"> · </span>{% endif %}{% endfor %}</p>
-    <p class="small muted">Generată la {{ generated }}. Datele sunt introduse de familie din cutii și rețete; verificați-le cu pacientul.</p>
+    <p class="small muted">Actualizată la {{ generated }}. Medicamentele sunt introduse de familie din cutii și rețete; verificați-le cu pacientul la consultație.</p>
   </section>
 
   <section aria-labelledby="h-grave">
@@ -83,11 +88,11 @@
 
   <section aria-labelledby="h-graph" class="no-print">
     <h2 id="h-graph">Graful terapeutic</h2>
-    <p class="small muted">Medicamente, substanțe și clase ATC; muchiile colorate sunt interacțiuni. Atingeți o muchie ca să ajungeți la alertă.</p>
+    <p class="small muted">Medicamentele și interacțiunile dintre ele; muchiile colorate sunt alerte. Atingeți o muchie ca să ajungeți la alertă.</p>
     <div class="graph-frame">
       <div id="graph" class="graph" role="img" aria-label="Graful terapeutic: {{ meds | length }} medicamente și interacțiunile dintre ele; lista alertelor de mai sus conține aceleași informații."></div>
     </div>
-    <p><a href="/share/{{ token }}/graph">Deschideți graful pe tot ecranul</a></p>
+    <p><a href="{{ base }}/graph">Deschideți graful pe tot ecranul</a></p>
   </section>
 
   <section aria-labelledby="h-checkins">
