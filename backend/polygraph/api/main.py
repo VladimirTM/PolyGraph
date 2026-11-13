@@ -4,6 +4,7 @@ Pornire: `make dev` (0.0.0.0:8000). Programul zilei și dozele vin din B4, check
 partajarea (B6) rămâne deocamdată pe mock. Variabile de mediu:
 - PG_KB: calea către kb.sqlite (implicit kb/kb.sqlite, `make kb`)
 - PG_APP_DB: calea către app.sqlite (implicit backend/app.sqlite)
+- PG_MEDIA_DIR: folderul fotografiilor scanate (implicit backend/media/)
 - PG_TODAY: data „de azi” (ISO), pentru demo și teste; implicit data din Europe/Bucharest
 - DEMO_MODE=1: creează pacientul demo (pat_demo, token demo-token) și activează POST /demo/reset
 """
@@ -30,8 +31,10 @@ sys.path.insert(0, str(ROOT / "contracts"))
 
 import validate as contracts  # noqa: E402  (contracts/validate.py: schemele JSON)
 
+from polygraph.api.media import get_photo, save_photo  # noqa: E402
 from polygraph.engine import analyze, new_alerts  # noqa: E402
 from polygraph.engine.analyze import make_ctx  # noqa: E402
+from polygraph.extract.display import display_brand, display_form, display_strength  # noqa: E402
 from polygraph.extract.match import confirmed_product, scan  # noqa: E402
 from polygraph.extract.ocr_match import OcrLine  # noqa: E402
 from polygraph.kb import Kb, KbMissing, default_kb  # noqa: E402
@@ -193,7 +196,16 @@ def scan_med(
     if len(picture) > MAX_SCAN_IMAGE:
         raise HTTPException(413, "Imaginea depășește 5 MB.")
     mime = (image.content_type or "image/jpeg") if image else "image/jpeg"
-    return scan(kb(), store(), kind, [OcrLine(line.text, line.height) for line in data], picture, mime, datamatrix)
+    photo_url = save_photo(picture) if picture else None
+    result = scan(kb(), store(), kind, [OcrLine(line.text, line.height) for line in data], picture, mime, datamatrix)
+    for candidate in result["candidates"]:
+        candidate["photo_url"] = photo_url
+    return result
+
+
+@app.get("/media/{name}")
+def media(name: str) -> Response:
+    return get_photo(name)
 
 
 @app.get("/v1/patients/{pid}/meds")
@@ -402,7 +414,17 @@ def kb_search(q: str, x_patient_token: str | None = Header(None)) -> dict[str, A
         raise HTTPException(401, "Lipsește sau e greșit X-Patient-Token.")
     if len(q.strip()) < 2:
         raise HTTPException(422, "Căutarea are nevoie de cel puțin 2 caractere.")
-    return {"results": kb().search(q)}
+    return {
+        "results": [
+            {
+                **hit,
+                "brand": display_brand(hit["brand"], brand_norm),
+                "strength_text": display_strength(hit["strength_text"]),
+                "form": display_form(hit["form"]),
+            }
+            for hit, brand_norm in kb().search_with_keys(q)
+        ]
+    }
 
 
 # ---------------------------------------------------------------- demo

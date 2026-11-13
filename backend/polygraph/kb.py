@@ -195,45 +195,51 @@ class Kb:
 
     def search(self, q: str, limit: int = 20) -> list[dict[str, Any]]:
         """Produse după brand (prefix) sau după substanță (INN / DCI). Fiecare cu substanțele din kb."""
+        return [hit for hit, _ in self.search_with_keys(q, limit)]
+
+    def search_with_keys(self, q: str, limit: int = 20) -> list[tuple[dict[str, Any], str]]:
         key = norm(q)
         if len(key) < 2:
             return []
         rows = self._q(
-            "SELECT p.id, p.brand, p.strength_text, p.form FROM product p WHERE p.brand_norm LIKE ? || '%'"
+            "SELECT p.id, p.brand, p.strength_text, p.form, p.brand_norm FROM product p WHERE p.brand_norm LIKE ? || '%'"
             " ORDER BY (p.brand_norm = ?) DESC, p.source = 'extra' DESC, length(p.brand_norm), p.brand LIMIT ?",
             (key, key, limit),
         )
         if len(rows) < limit:
             seen = {r[0] for r in rows}
             more = self._q(
-                "SELECT DISTINCT p.id, p.brand, p.strength_text, p.form FROM product p"
+                "SELECT DISTINCT p.id, p.brand, p.strength_text, p.form, p.brand_norm FROM product p"
                 " JOIN product_substance ps ON ps.product_id = p.id JOIN substance s ON s.id = ps.substance_id"
                 " WHERE s.inn LIKE ? || '%' OR lower(s.dci_ro) LIKE ? || '%' ORDER BY length(p.brand), p.brand LIMIT ?",
                 (key, key, limit),
             )
             rows += [r for r in more if r[0] not in seen][: limit - len(rows)]
         out = []
-        for pid, brand, strength, form in rows:
+        for pid, brand, strength, form, brand_norm in rows:
             subs = self._q(
                 "SELECT s.dci_ro, s.inn, s.atc FROM product_substance ps JOIN substance s ON s.id = ps.substance_id"
                 " WHERE ps.product_id = ? ORDER BY s.inn",
                 (pid,),
             )
             out.append(
-                {
-                    "brand": brand,
-                    "strength_text": strength,
-                    "form": form,
-                    "substances": [
-                        {
-                            "dci": d,
-                            "inn": i,
-                            "atc": a if a and re.fullmatch(r"[A-Z]\d\d[A-Z]{2}\d\d", a) else None,
-                            "strength_mg": None,
-                        }
-                        for d, i, a in subs
-                    ],
-                }
+                (
+                    {
+                        "brand": brand,
+                        "strength_text": strength,
+                        "form": form,
+                        "substances": [
+                            {
+                                "dci": d,
+                                "inn": i,
+                                "atc": a if a and re.fullmatch(r"[A-Z]\d\d[A-Z]{2}\d\d", a) else None,
+                                "strength_mg": None,
+                            }
+                            for d, i, a in subs
+                        ],
+                    },
+                    brand_norm,
+                )
             )
         return out
 
