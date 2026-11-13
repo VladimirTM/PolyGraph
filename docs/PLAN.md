@@ -28,7 +28,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | B2 motorul de interacțiuni + graful | Dev B | W4–W12 | V 22:00–S 13:00 | ✅ | golden test = `expected_alerts.json` |
 | **S1** | amândoi | W8 | S 02:00 | ⬜ | |
 | Q1 review (noaptea) | agent | somn | S 02:00–09:00 | ⬜ | `docs/reviews/Q1.md`, triere 10 min |
-| A3 medicamente, alerte, graf | Dev A | W8–W12 (+ integrare W12–W14) | S 09:00–16:00 | 🟡 | modul aparținător; codul e pe `feature/a3-meds-alerts-graph`, de verificat cu `make check-ios` și pe iPhone (T-A3-03) |
+| A3 medicamente, alerte, graf | Dev A | W8–W12 (+ integrare W12–W14) | S 09:00–16:00 | 🟡 | modul aparținător; `make check-ios` verde pe `feature/a3-meds-alerts-graph`; rămâne T-A3-03 pe iPhone |
 | B3 extracția (OCR → catalog, GS1, cache) | Dev B | W12–W14 | S 14:00–16:00 | 🔄 | `/scan` real |
 | **S2** + Q2 | amândoi | W14 | S 16:00 | ⬜ | fluxul real cap-coadă |
 | A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | ⬜ | Acum, Ziua de azi, „Am luat”, TTS, notificări |
@@ -780,8 +780,8 @@ Nu face: modul senior, vocea.
 ~~~
 
 **Teste**
-- [x] T-A3-01 Unit: sortarea alertelor critical → minor și gruparea pe specialitate pe fixture-ul demo (6 grupuri). *(13.11.2026: scrise în `PolyGraphTests/CaregiverTests.swift`; de confirmat cu `make check-ios`)*
-- [x] T-A3-02 Unit: ștergerea + „Anulează” în 5 s nu trimite DELETE. *(13.11.2026: `DeleteUndoQueueTests`; de confirmat cu `make check-ios`)*
+- [x] T-A3-01 Unit: sortarea alertelor critical → minor și gruparea pe specialitate pe fixture-ul demo (6 grupuri). *(13.11.2026: `PolyGraphTests/CaregiverTests.swift`, `make check-ios` verde)*
+- [x] T-A3-02 Unit: ștergerea + „Anulează” în 5 s nu trimite DELETE. *(13.11.2026: `DeleteUndoQueueTests`, `make check-ios` verde)*
 - [ ] T-A3-03 Manual: graful pe iPhone, fără internet (doar rețeaua locală), se încarcă în < 2 s.
 
 ---
