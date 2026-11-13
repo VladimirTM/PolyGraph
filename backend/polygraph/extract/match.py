@@ -25,9 +25,12 @@ def scan(kb: Kb, store: Store, kind: str, lines: list[OcrLine], image: bytes, mi
             try:
                 code = parse_gs1(datamatrix)
             except ValueError:
-                warnings.append("Codul DataMatrix nu a putut fi citit.")
-        elif image:
+                pass
+        # un cod citit greșit de telefon (reflexie, cutie curbată) se mai caută o dată în poză
+        if code is None and image:
             code = decode_datamatrix(image)
+        if datamatrix and code is None:
+            warnings.append("Codul DataMatrix nu a putut fi citit.")
 
     cached_id = store.cached_gtin(code["gtin"], kb.version) if code else None
     cached = catalog(kb)[0].get(cached_id) if cached_id is not None else None
@@ -66,7 +69,13 @@ def scan(kb: Kb, store: Store, kind: str, lines: list[OcrLine], image: bytes, mi
         warnings.append("Unele medicamente de pe rețetă trebuie completate manual.")
     if kind == "box" and any(m["match"]["needs_review"] for m in candidates):
         warnings.append(PHOTO)
-    LOG.info("scan route=%s confidence=%.2f", route, max((m.confidence for m in matches), default=0))
+    names = ", ".join(f"{c['product']['brand']} {c['product']['strength_text'] or ''}".strip() for c in candidates)
+    LOG.info(
+        "SCAN      route=%-11s încredere %.2f → %s",
+        route,
+        max((m.confidence for m in matches), default=0),
+        names or "nimic (completare manuală)",
+    )
     return {"candidates": candidates, "warnings": warnings, "raw_text": "\n".join(line.text for line in lines) or None}
 
 

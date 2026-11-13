@@ -7,7 +7,7 @@ portalul medicului de familie (lista de pacienți, fișa, tipărirea, graful) di
 - PG_MEDIA_DIR: folderul fotografiilor scanate (implicit backend/media/)
 - PG_TODAY: data „de azi” (ISO), pentru demo și teste; implicit data din Europe/Bucharest
 - DEMO_MODE=1: creează pacientul demo (pat_demo, token demo-token), medicul demo din portal (cu doi pacienți în plus)
-  și activează POST /demo/reset
+  și activează POST /demo/reset și POST /demo/missed-dose (B7)
 - PG_DOCTOR_CODE: codul de acces al medicului demo în /portal (implicit medic-demo)
 """
 
@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import copy
 import json
+import logging
 import os
 import secrets
 import sys
@@ -35,6 +36,7 @@ sys.path.insert(0, str(ROOT / "contracts"))
 import validate as contracts  # noqa: E402  (contracts/validate.py: schemele JSON)
 
 from polygraph.api.media import get_photo, save_photo  # noqa: E402
+from polygraph.demo.seed import seed_history, simulate_missed_dose  # noqa: E402
 from polygraph.engine import analyze, new_alerts  # noqa: E402
 from polygraph.engine.analyze import make_ctx  # noqa: E402
 from polygraph.extract.display import display_brand, display_form, display_strength  # noqa: E402
@@ -52,6 +54,7 @@ FIX = ROOT / "contracts" / "fixtures"
 DEMO = json.loads((FIX / "demo_patient.json").read_text(encoding="utf-8"))
 DEMO_ID, DEMO_TOKEN = "pat_demo", "demo-token"
 TZ = ZoneInfo("Europe/Bucharest")
+LOG = logging.getLogger("uvicorn.error")
 MED_FIELDS = ("product", "substances", "dosage", "prescriber", "start_date", "end_date", "photo_url", "match", "source")
 
 
@@ -106,9 +109,15 @@ DEMO_EXTRA = (
 def reset_demo(live_scan: bool = False) -> None:
     s = store()
     s.delete_patient(DEMO_ID)
-    s.create_patient(copy.deepcopy(DEMO["patient"]), DEMO_TOKEN)
+    patient = copy.deepcopy(DEMO["patient"])
+    s.create_patient(patient, DEMO_TOKEN)
     meds = [m for m in DEMO["meds"] if not (live_scan and m["id"] in ("med_01", "med_02"))]
     s.replace_meds(DEMO_ID, copy.deepcopy(meds))
+    try:
+        catalog = kb()
+        seed_history(s, DEMO_ID, patient, meds, lambda day: build_schedule(patient, meds, day, catalog), today())
+    except KbMissing:
+        LOG.warning("DEMO      kb.sqlite lipsește (make kb): pacientul demo pornește fără istoric de doze")
     doctor_id, doctor_name = DEMO_DOCTOR
     s.upsert_doctor(doctor_id, doctor_name, os.environ.get("PG_DOCTOR_CODE") or "medic-demo")
     s.link_patient(doctor_id, DEMO_ID)
@@ -239,7 +248,7 @@ def list_meds(pid: str, x_patient_token: str | None = Header(None)) -> list[dict
 
 @app.post("/v1/patients/{pid}/meds", status_code=201)
 def add_med(pid: str, body: dict[str, Any], x_patient_token: str | None = Header(None)) -> dict[str, Any]:
-    auth(pid, x_patient_token)
+    patient = auth(pid, x_patient_token)
     invalid("medication_item", body)
     med = copy.deepcopy(body)
     med["id"] = store().free_med_id(pid, med.get("id"))
@@ -252,8 +261,45 @@ def add_med(pid: str, body: dict[str, Any], x_patient_token: str | None = Header
                 catalog_product = (catalog.version, catalog_id)
         except KbMissing:
             pass
+    before = alerts_or_none(pid, patient)
     store().add_med(pid, med, catalog_product)
+    announce_new_alerts(pid, patient, before, med)
     return med
+
+
+def alerts_or_none(pid: str, patient: dict[str, Any]) -> list[dict[str, Any]] | None:
+    try:
+        return run_analysis(pid, patient, store().list_meds(pid))["alerts"]
+    except KbMissing:
+        return None
+
+
+def announce_new_alerts(pid: str, patient: dict[str, Any], before: list[dict[str, Any]] | None, med: dict[str, Any]) -> None:
+    """Alertele grave apărute la un medicament nou ajung în Noutăți (pe telefonul aparținătorului) și în log."""
+    after = alerts_or_none(pid, patient)
+    if before is None or after is None:
+        return
+    brands = {m["id"]: m["product"]["brand"] for m in store().list_meds(pid)}
+    at = datetime.now(TZ).replace(microsecond=0).isoformat()
+    for alert in new_alerts(before, after):
+        if alert["severity"] not in ("critical", "major") or alert["kind"] == "food":
+            continue
+        names = " + ".join(brands.get(m, m) for m in alert["med_ids"])
+        LOG.info("ALERTĂ    nouă %-8s %s (%s) · sursa: %s", alert["severity"], alert["title"], names, alert["source"]["db"])
+        store().add_event(
+            pid,
+            {
+                "id": f"ev_alert_{secrets.token_hex(4)}",
+                "at": at,
+                "type": "alert_new",
+                "severity": alert["severity"],
+                "title": f"Alertă nouă: {alert['title']}",
+                "body": f"{names}, după ce s-a adăugat {med['product']['brand']}. {alert['recommendation']}",
+                "med_ids": alert["med_ids"],
+                "alert_id": alert["id"],
+                "checkin_id": None,
+            },
+        )
 
 
 @app.patch("/v1/patients/{pid}/meds/{mid}")
@@ -407,9 +453,15 @@ async def create_checkin(pid: str, request: Request, x_patient_token: str | None
         "reply_text": reply_text(u, correlations, escalate, patient.get("caregiver_name")),
     }
     store().add_checkin(pid, checkin)
+    labels = ", ".join(s.label for s in u.symptoms) or "fără simptome"
+    via = "gemini" if u.used_llm else "sinonime"
     if escalate:
         red = {s.code for s in u.symptoms if s.red_flag}
-        store().add_event(pid, feed_event(patient, checkin, alerts, meds, red))
+        event = feed_event(patient, checkin, alerts, meds, red)
+        store().add_event(pid, event)
+        LOG.info("CHECK-IN  escaladat (%s): %s → %s", via, labels, event["body"])
+    else:
+        LOG.info("CHECK-IN  %s (%s), fără escaladare", labels, via)
     return checkin
 
 
@@ -651,12 +703,29 @@ def kb_search(q: str, x_patient_token: str | None = Header(None)) -> dict[str, A
 
 
 @app.post("/demo/reset")
-def demo_reset(live_scan: int = 0) -> dict[str, Any]:
+def demo_reset(live_scan: Annotated[int, Query(ge=0, le=1)] = 0) -> dict[str, Any]:
     if not demo_mode():
         raise HTTPException(404, "Ruta există doar cu DEMO_MODE=1.")
     reset_demo(live_scan=bool(live_scan))
     store().clear_gtin_cache()
+    LOG.info("DEMO      pacientul demo recreat (%d medicamente)", len(store().list_meds(DEMO_ID)))
     return {"id": DEMO_ID, "patient_token": DEMO_TOKEN, "patient": store().get_patient(DEMO_ID)}
+
+
+@app.post("/demo/missed-dose")
+def demo_missed_dose() -> dict[str, Any]:
+    if not demo_mode():
+        raise HTTPException(404, "Ruta există doar cu DEMO_MODE=1.")
+    patient = store().get_patient(DEMO_ID)
+    if patient is None:
+        raise HTTPException(404, "Pacientul demo nu există; apelați întâi /demo/reset.")
+    meds = store().list_meds(DEMO_ID)
+    try:
+        return simulate_missed_dose(
+            store(), DEMO_ID, patient, meds, build_schedule(patient, meds, today(), kb()), datetime.now(TZ)
+        )
+    except LookupError as exc:
+        raise HTTPException(409, str(exc)) from None
 
 
 @app.exception_handler(HTTPException)

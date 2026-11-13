@@ -323,7 +323,8 @@ def test_doses_are_idempotent(client):
     assert r1.status_code == 200 and not contracts.schema_errors("dose", r1.json())
     client.post(f"{P}/doses", headers=H, json={**dose, "scheduled_at": "2026-11-14T05:00:00Z"})
     client.post(f"{P}/doses", headers=H, json={**dose, "status": "pending"})
-    stored = main.store().list_doses("pat_demo")
+    # istoricul demo (B7) are doar zilele de dinainte; azi e doar doza din test
+    stored = [d for d in main.store().list_doses("pat_demo") if d["scheduled_at"].startswith("2026-11-14")]
     assert len(stored) == 1 and stored[0]["status"] == "pending"
     assert client.post(f"{P}/doses", headers=H, json={**dose, "status": "maybe"}).status_code == 422
     assert client.post(f"{P}/doses", headers=H, json={**dose, "med_id": "med_99"}).status_code == 404

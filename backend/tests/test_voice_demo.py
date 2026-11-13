@@ -162,11 +162,17 @@ def test_checkin_demo_matches_fixture(client):
     assert "Ridicați-vă încet din pat" in ci["reply_text"]
 
 
+def new_events(client, **params):
+    """Noutățile fără cele 2 doze ratate din istoricul pacientului demo (B7, recreat la reset)."""
+    events = client.get(f"{P}/feed", params=params, headers=H).json()
+    return [e for e in events if not e["id"].startswith("ev_missed_")]
+
+
 def test_checkin_feed_and_graph(client):
-    before = client.get(f"{P}/feed", headers=H).json()
+    before = new_events(client)
     assert before == []
     ci = client.post(f"{P}/checkins", json={"text": CHECKIN["transcript"]}, headers=H).json()
-    events = client.get(f"{P}/feed", headers=H).json()
+    events = new_events(client)
     assert len(events) == 1
     ev = events[0]
     ok("feed_event", ev)
@@ -184,7 +190,7 @@ def test_red_flag_escalates_without_alert(client):
     ci = client.post(f"{P}/checkins", json={"text": "Am căzut aseară în bucătărie."}, headers=H).json()
     ok("checkin", ci)
     assert ci["escalate"] is True and ci["symptoms"][0]["code"] == "fall"
-    [ev] = client.get(f"{P}/feed", headers=H).json()
+    [ev] = new_events(client)
     assert ev["severity"] == "critical" and ev["body"].startswith("Semn de alarmă")
 
 
@@ -194,7 +200,7 @@ def test_mild_checkin_not_escalated(client):
     assert ci["escalate"] is False
     assert ci["correlations"] == [{"symptom": "dry_mouth", "med_ids": ["med_08"], "basis": "alert:al_anticholinergic_med_08"}]
     assert "I-am trimis" not in ci["reply_text"]
-    assert client.get(f"{P}/feed", headers=H).json() == []
+    assert new_events(client) == []
 
 
 def test_checkin_errors(client):
