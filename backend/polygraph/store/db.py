@@ -105,9 +105,22 @@ class Store:
             n += 1
         return f"med_{n:02d}"
 
-    def add_med(self, pid: str, med: Json) -> None:
-        pos = self._q("SELECT coalesce(max(position), 0) + 1 FROM meds WHERE patient_id = ?", (pid,))[0][0]
-        self._x("INSERT INTO meds(patient_id, id, data, position) VALUES (?, ?, ?, ?)", (pid, med["id"], _dump(med), pos))
+    def cached_gtin(self, gtin: str) -> int | None:
+        row = self._q("SELECT product FROM gtin_cache WHERE gtin = ?", (gtin,))
+        return int(row[0][0]) if row and row[0][0].isdigit() else None
+
+    def add_med(self, pid: str, med: Json, catalog_id: int | None = None) -> None:
+        with self._lock, self._conn:
+            if catalog_id is not None:
+                self._conn.execute(
+                    "INSERT OR IGNORE INTO gtin_cache(gtin, product) VALUES (?, ?)",
+                    (med["product"]["gtin"], str(catalog_id)),
+                )
+            self._conn.execute(
+                "INSERT INTO meds(patient_id, id, data, position)"
+                " SELECT ?, ?, ?, coalesce(max(position), 0) + 1 FROM meds WHERE patient_id = ?",
+                (pid, med["id"], _dump(med), pid),
+            )
 
     def update_med(self, pid: str, med: Json) -> None:
         self._x("UPDATE meds SET data = ? WHERE patient_id = ? AND id = ?", (_dump(med), pid, med["id"]))

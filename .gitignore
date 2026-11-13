@@ -11,6 +11,9 @@ __pycache__/
 .ruff_cache/
 .env
 
+# Cache Gemini local
+demo/llm_cache/*.json
+
 # Node (quicktype)
 node_modules/
 

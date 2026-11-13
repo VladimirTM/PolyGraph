@@ -15,3 +15,10 @@ Variabile de mediu pentru `make dev`: `PG_KB` (implicit `kb/kb.sqlite`), `PG_APP
 DEMO_MODE=1 PG_TODAY=2026-11-14 make dev
 curl -H 'X-Patient-Token: demo-token' localhost:8000/v1/patients/pat_demo/analysis
 ```
+
+
+## Scanarea B3
+
+`POST /v1/patients/{id}/scan` primește `kind`, `ocr_lines`, `image` și `datamatrix` conform contractului. Ruta întoarce candidați de verificat. Confirmarea prin `POST /meds` poate memora un GTIN valid împreună cu produsul verificat în catalog.
+
+Potrivirea OCR și DataMatrix funcționează local. Pentru rezerva Gemini, configurează `GEMINI_API_KEY` și, opțional, `GEMINI_MODEL` în mediu sau în `.env`. Cu această configurare, dacă potrivirea locală e insuficientă și cererea include o imagine, backend-ul poate trimite imaginea către Gemini. Rezultatul structurat este memorat local în `demo/llm_cache`. `make demo-warm` pregătește cache-ul din fotografiile demo din `demo/photos` și `demo/rx`.
