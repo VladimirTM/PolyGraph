@@ -5,7 +5,7 @@ PORT ?= 8000
 # Simulatorul pentru check-ios: primul iPhone disponibil (se poate forța: make check-ios SIM="iPhone 16")
 SIM ?= $(shell xcrun simctl list devices available 2>/dev/null | grep -m1 -oE 'iPhone [A-Za-z0-9 ]+' | sed 's/ *$$//')
 
-.PHONY: help setup check check-contracts lint test check-ios models mock dev kb demo-b3 demo-warm demo-check review
+.PHONY: help setup check check-contracts lint test check-ios models mock dev demo kb demo-b3 demo-warm demo-check review
 
 help:
 	@grep -E '^[a-z-]+:.*## ' Makefile | sed 's/:.*## /\t/' | column -t -s $$'\t'
@@ -49,6 +49,10 @@ dev: ## backend-ul real (din B2)
 	@test -f backend/polygraph/api/main.py || { echo "Backend-ul real vine la B2; până atunci: make mock"; exit 1; }
 	$(UV) uvicorn polygraph.api.main:app --app-dir backend --host 0.0.0.0 --port $(PORT) --reload
 
+demo: ## backend-ul pentru scenă: DEMO_MODE=1, 0.0.0.0:$(PORT), fără reload, IP-ul local + QR (B7)
+	@test -f kb/kb.sqlite || { echo "Lipsește kb/kb.sqlite: rulați întâi make kb"; exit 1; }
+	cd backend && PORT=$(PORT) uv run python -m polygraph.demo.serve
+
 kb: ## construiește kb/kb.sqlite din kb/raw (B1)
 	@test -f kb/build.py || { echo "kb/build.py vine la B1"; exit 1; }
 	$(UV) python kb/build.py
@@ -56,11 +60,11 @@ kb: ## construiește kb/kb.sqlite din kb/raw (B1)
 demo-b3: ## demonstrează B3 local cu OCR și DataMatrix sintetice
 	PYTHONPATH=backend GEMINI_API_KEY= $(UV) --locked python demo/b3.py
 
-demo-warm: ## pregătește cache-ul Gemini din fotografiile demo
+demo-warm: ## cache-ul Gemini pentru fotografiile și transcrierile demo (cu internet, înainte de scenă)
 	cd backend && uv run python -m polygraph.extract.gemini
 
-demo-check: ## R4: scenariul demo prin API (B7); deocamdată nimic
-	@echo "demo-check: vine la B7 (deocamdată no-op)"
+demo-check: ## R4: scenariul demo prin API (B7); cu URL=http://127.0.0.1:8000 pe serverul din make demo
+	cd backend && uv run python -W ignore::DeprecationWarning -m polygraph.demo.check $(if $(URL),--url $(URL))
 
 review: ## R5: turul de review pe simulator, make review Q=Q1 (Q0)
 	@test -x tools/review/run.sh || { echo "tools/review/run.sh vine la Q0"; exit 1; }
