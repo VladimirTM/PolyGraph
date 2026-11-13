@@ -95,8 +95,8 @@ Doar **tokenii + 3 interacțiuni lucrate**: butonul cu răspuns instant și guar
   |---|---|
   | pornire | `root.loading` |
   | onboarding | `onboarding.progress`, `onboarding.role.senior`, `onboarding.role.caregiver`, `onboarding.demoButton`, `onboarding.nameField`, `onboarding.birthYearPicker`, `onboarding.wakeTime`, `onboarding.breakfastTime`, `onboarding.lunchTime`, `onboarding.dinnerTime` (fiecare cu `.picker` când e deschis), `onboarding.bedTime`, `onboarding.nextButton`, `onboarding.finishButton`, `onboarding.backButton`, `onboarding.error` |
-  | Acum (senior) | `now.clock`, `now.nextMomentCard`, `now.dayButton` |
-  | Ziua de azi | `day.moment.<HH:MM>` |
+  | Acum (senior) | `now.clock`, `now.dayButton`; A4: `now.timeline`, `now.timeline.<HH:MM>`, `now.momentLabel`, `now.statusLine`, `now.speakButton`, `now.dose.<med_id>`, `now.takenButton`, `now.laterButton`, `now.skippedButton`, `now.undoBanner`, `now.undoButton`, `now.doneLabel` (moment deschis din „Ziua de azi”), `now.dayDone`, `now.error`, `now.patientNotice` (+ `.text`, `.okButton`), `now.reminders` (+ `.allowButton`, `.laterButton`) |
+  | Ziua de azi | `day.moment.<HH:MM>` (rândul deschide momentul), `day.error` |
   | tab-uri (aparținător) | conținutul: `tab.meds`, `tab.alerts`, `tab.graph`, `tab.feed`; butoanele din tab bar se caută după etichetă („Medicamente”, „Alerte”, „Graf”, „Noutăți”), SwiftUI nu le poate da identificator |
   | Medicamente | `meds.list`, `meds.row.<med_id>`, `meds.loading`, `meds.empty`, `meds.error`, `meds.retryButton`; A2: `meds.addButton`, `meds.emptyScanButton`, `meds.savedBanner`, `meds.savedBanner.showAlerts`; A3: `meds.row.<med_id>.alert` (cea mai gravă alertă), `meds.deleteButton.<med_id>` (swipe), `meds.undoBanner`, `meds.undoButton`, `meds.deleteError` |
   | Scanare (A2) | `scan.closeButton`, `scan.modePicker`, `scan.guidance`, `scan.shutter`, `scan.manualButton`, `scan.error`, `scan.retryButton`, `scan.unavailable`, `scan.unavailable.manualButton`; camera falsă (Debug): `scan.fakeCamera`, `scan.fake.usePage` |
@@ -106,7 +106,7 @@ Doar **tokenii + 3 interacțiuni lucrate**: butonul cu răspuns instant și guar
   | Detaliul medicamentului (A3) | `medDetail`, `medDetail.substances`, `medDetail.schedule`, `medDetail.alert.<alert_id>`, `medDetail.editButton` (deschide `ConfirmSheet` în modul de editare) |
   | Graf (A3) | `graph.web`, `graph.loading`, `graph.empty`, `graph.legend`, `graph.resetButton` |
   | Noutăți (placeholder) | `feed.placeholder` |
-  | Setări | `settings.openButton` (rotița din bara de navigare), `settings.baseURLField`, `settings.checkConnectionButton`, `settings.connectionStatus`, `settings.rolePicker`, `settings.demoModeToggle`, `settings.useDemoPatientButton`, `settings.signOutButton`, `settings.confirmSignOutButton`, `settings.doneButton` |
+  | Setări | `settings.openButton` (rotița din bara de navigare), `settings.baseURLField`, `settings.checkConnectionButton`, `settings.connectionStatus`, `settings.rolePicker`, `settings.demoModeToggle`, `settings.useDemoPatientButton`, `settings.speakOnOpenToggle` (A4, doar pacient), `settings.signOutButton`, `settings.confirmSignOutButton`, `settings.doneButton` |
 - **Logurile** aplicației: `Logger(subsystem: "ro.polygraph", category: <modul>)`. Categoriile sunt în `App/Log.swift` (`app`, `api`, `onboarding`, `settings`, `scan`, `graph`).
 - **Tokenii în cod**: `Animation.pgStandard / pgQuick / pgMove / pgFlick`, `withPgAnimation`, `.pgAnimation(_:value:)` și `PgMotion.transition` (`Design/Motion.swift`); `Spacing`, `Radius`, `ControlHeight`, `PgColor` (inclusiv `PgColor.review`, fundalul câmpurilor „verificați”), `Severity.color / .label` (`Design/Tokens.swift`); `PressableButtonStyle`, `GuardedAction`, `SeniorButton` (`Design/Buttons.swift`). Reduce Motion în view-uri: `@Environment(\.pgReduceMotion)` (sistemul sau `PG_REDUCE_MOTION`).
 - **Trecerea de accesibilitate (A6, punctul 5)**: rezultatele se notează aici.
