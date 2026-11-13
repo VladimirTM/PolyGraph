@@ -10,6 +10,13 @@ struct SettingsView: View {
     @State private var isChecking = false
     @State private var isResettingDemo = false
     @State private var confirmSignOut = false
+    @State private var demoAction: DemoAction?
+    @State private var demoStatus: String?
+
+    private enum DemoAction {
+        case prescription
+        case missedDose
+    }
 
     var body: some View {
         @Bindable var settings = store.settings
@@ -85,9 +92,20 @@ struct SettingsView: View {
                         }
                         .disabled(isResettingDemo)
                         .accessibilityIdentifier("settings.useDemoPatientButton")
+                        if settings.isSignedIn {
+                            demoButton("Adaugă rețeta ORL (Fromilid)", action: .prescription)
+                                .accessibilityIdentifier("settings.addRxButton")
+                            demoButton("Simulează o doză ratată", action: .missedDose)
+                                .accessibilityIdentifier("settings.missedDoseButton")
+                        }
+                        if let demoStatus {
+                            Text(demoStatus)
+                                .foregroundStyle(.secondary)
+                                .accessibilityIdentifier("settings.demoStatus")
+                        }
                     }
                 } footer: {
-                    Text("Pacientul demo e refăcut pe server cu lista inițială de medicamente.")
+                    Text("Pacientul demo e refăcut pe server cu lista inițială de medicamente. Rețeta ORL e medicul nou din scenariu; doza ratată apare la aparținător în Noutăți.")
                 }
 
                 if settings.isSignedIn {
@@ -149,6 +167,43 @@ struct SettingsView: View {
                 : "Serverul răspunde, dar nu e pregătit."
         } catch {
             connectionStatus = (error as? LocalizedError)?.errorDescription ?? "Nu pot ajunge la server."
+        }
+    }
+
+    private func demoButton(_ title: String, action: DemoAction) -> some View {
+        Button {
+            Task { await run(action) }
+        } label: {
+            HStack {
+                Text(title)
+                Spacer()
+                if demoAction == action { ProgressView() }
+            }
+        }
+        .disabled(demoAction != nil || isResettingDemo)
+    }
+
+    private func run(_ action: DemoAction) async {
+        saveBaseURL()
+        demoAction = action
+        defer { demoAction = nil }
+        do {
+            switch action {
+            case .prescription:
+                let newAlerts = try await store.addDemoPrescription()
+                demoStatus =
+                    switch newAlerts {
+                    case nil: "Fromilid e deja în listă."
+                    case 0?: "Am adăugat Fromilid. Nicio alertă nouă."
+                    case 1?: "Am adăugat Fromilid. O alertă nouă."
+                    case let count?: "Am adăugat Fromilid. \(count) alerte noi."
+                    }
+            case .missedDose:
+                try await store.simulateMissedDose()
+                demoStatus = "Am trimis o doză ratată. Apare în Noutăți în câteva secunde."
+            }
+        } catch {
+            demoStatus = (error as? LocalizedError)?.errorDescription ?? "Nu a mers. Verificați serverul."
         }
     }
 

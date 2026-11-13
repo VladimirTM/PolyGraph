@@ -41,3 +41,38 @@ enum JSONCoding {
         return formatter.string(from: date)
     }
 }
+
+// MARK: - Câmpurile null cerute de schemă
+
+extension JSONCoding {
+    /// Corpul pentru `POST /meds`. Encoderul sintetizat omite câmpurile `nil`, dar
+    /// `medication_item.schema.json` le cere prezente (cu `null`), iar backend-ul real validează schema
+    /// și răspunde 422 (o rețetă fără cod pe cutie n-are `gtin`, `batch`, `expiry`).
+    static func medicationBody(_ med: MedicationItem) throws -> Data {
+        let data = try encoder.encode(med)
+        guard var object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { return data }
+        fillNulls(&object, ["start_date", "end_date", "photo_url"])
+        fillNulls(&object, in: "product", ["strength_text", "form", "gtin", "pack_size", "expiry", "batch"])
+        fillNulls(&object, in: "dosage", ["raw"])
+        fillNulls(&object, in: "prescriber", ["name", "specialty"])
+        if var substances = object["substances"] as? [[String: Any]] {
+            for index in substances.indices {
+                fillNulls(&substances[index], ["dci", "inn", "atc", "strength_mg"])
+            }
+            object["substances"] = substances
+        }
+        return try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
+    }
+
+    private static func fillNulls(_ object: inout [String: Any], _ keys: [String]) {
+        for key in keys where object[key] == nil {
+            object[key] = NSNull()
+        }
+    }
+
+    private static func fillNulls(_ object: inout [String: Any], in parent: String, _ keys: [String]) {
+        guard var child = object[parent] as? [String: Any] else { return }
+        fillNulls(&child, keys)
+        object[parent] = child
+    }
+}

@@ -37,7 +37,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | A5 check-in vocal + Noutăți | Dev A | W19–W23 | S 21:30–D 02:00 | ✅ | `make check-ios` verde, încercat pe două iPhone-uri; bonusul X1 (`can_i_take`) nefăcut |
 | B6 portalul medicului de familie + tipărire | Dev B | W19–W23 | S 21:30–D 02:00 | 🟡 | portalul real (`/portal`): login cu cod, lista pacienților, fișa cu decizie + notă → alertă + Noutăți, tipărire în 2 pagini A4, QR care adaugă pacientul; `/graph?embed=1`; rămâne T-B6-04 (manual pe iPhone) |
 | Q3 review (noaptea) | agent | somn | D 02:00–08:00 | ⬜ | triere 15 min |
-| A6 QR, modul demo · B7 demo hardening | A · B | W23–W24.5 | D 08:00–09:30 | 🔄 | B7 gata: `make demo`, `make demo-check` verde, istoricul demo, `/demo/missed-dose`; rămân A6, T-B7-06 (Wi-Fi oprit) și fix-urile blocker din Q3 |
+| A6 QR, modul demo · B7 demo hardening | A · B | W23–W24.5 | D 08:00–09:30 | 🔄 | B7 gata: `make demo`, `make demo-check` verde, istoricul demo, `/demo/missed-dose`. A6 gata (PR #25): QR pentru medic (aparținător + pacient), rețeta ORL și doza ratată în modul demo, iconița, trecerea de accesibilitate, T-A6-01/02 verzi. Rămân T-B7-06 (Wi-Fi oprit) și fix-urile blocker din Q3 |
 | **S4** feature freeze + Q4 | amândoi | W24.5 | D 09:30 | ⬜ | după S4 nu se mai scrie cod nou |
 | D1 integrare, repetiții, video de rezervă | amândoi | W24.5–W27.5 | D 09:30–12:30 | ⬜ | |
 | D2 pitch, submit | amândoi | W27.5–W30 | D 12:30–15:00 | ⬜ | |

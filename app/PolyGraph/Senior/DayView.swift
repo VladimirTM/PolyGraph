@@ -6,6 +6,7 @@ struct DayView: View {
     @Environment(AppStore.self) private var store
     @Environment(\.dynamicTypeSize) private var typeSize
     let onOpenMoment: (String) -> Void
+    @State private var isSharing = false
 
     @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 28
     @ScaledMetric(relativeTo: .title2) private var textSize: CGFloat = 22
@@ -29,12 +30,23 @@ struct DayView: View {
                         .foregroundStyle(PgColor.textPrimary)
                         .accessibilityIdentifier("day.error")
                 }
+                SeniorButton(
+                    "Cod pentru medicul de familie", systemImage: "qrcode", prominence: .secondary,
+                    identifier: "day.shareButton"
+                ) {
+                    isSharing = true
+                }
+                .padding(.top, Spacing.s)
             }
             .padding(Spacing.m)
         }
         .background(PgColor.background)
         .navigationTitle("Ziua de azi")
         .refreshable { await store.refreshAll() }
+        .sheet(isPresented: $isSharing) {
+            ShareSheet(audience: .senior)
+                .environment(store)
+        }
     }
 
     private func row(_ moment: Moment, day: String) -> some View {

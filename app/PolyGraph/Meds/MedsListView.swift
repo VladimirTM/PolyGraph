@@ -10,6 +10,7 @@ struct MedsListView: View {
     @Environment(AppStore.self) private var store
     @Environment(\.pgReduceMotion) private var reduceMotion
     @State private var isScanning = false
+    @State private var isSharing = false
     @State private var completion: ScanOutcome?
 
     init(showAlerts: @escaping () -> Void = {}) {
@@ -22,6 +23,11 @@ struct MedsListView: View {
             .navigationBarTitleDisplayMode(.large)
             .refreshable { await store.refreshAll() }
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Arată medicului") { isSharing = true }
+                        .accessibilityHint("Deschide codul QR pentru medicul de familie")
+                        .accessibilityIdentifier("meds.shareButton")
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         isScanning = true
@@ -32,6 +38,11 @@ struct MedsListView: View {
                 }
             }
             .pgSettingsToolbar()
+            .sheet(isPresented: $isSharing) {
+                ShareSheet(audience: .caregiver)
+                    .environment(store)
+                    .presentationDetents([.medium, .large])
+            }
             .fullScreenCover(isPresented: $isScanning) {
                 ScanView { outcome in
                     withPgAnimation(.pgStandard) { completion = outcome }

@@ -1,0 +1,44 @@
+{
+  "id": "med_09",
+  "source": "photo_rx",
+  "product": {
+    "brand": "Fromilid",
+    "strength_text": "500 mg",
+    "form": "comprimate filmate",
+    "gtin": null,
+    "pack_size": 14,
+    "expiry": null,
+    "batch": null
+  },
+  "substances": [
+    {
+      "dci": "CLARITHROMYCINUM",
+      "inn": "clarithromycin",
+      "atc": "J01FA09",
+      "strength_mg": 500.0
+    }
+  ],
+  "dosage": {
+    "raw": "1-0-1, 7 zile",
+    "pattern": {
+      "morning": 1,
+      "noon": 0,
+      "evening": 1,
+      "bedtime": 0
+    },
+    "as_needed": false,
+    "with_food": "any"
+  },
+  "prescriber": {
+    "name": null,
+    "specialty": "ORL"
+  },
+  "start_date": "2026-11-14",
+  "end_date": "2026-11-20",
+  "photo_url": "/media/med_09.jpg",
+  "match": {
+    "method": "exact_brand",
+    "confidence": 0.95,
+    "needs_review": false
+  }
+}

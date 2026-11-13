@@ -28,6 +28,21 @@ enum PgFormat {
         return Calendar.current.date(bySettingHour: parts[0], minute: parts[1], second: 0, of: day)
     }
 
+    /// „Valabil până azi, 18:00”, „… mâine, 09:30”, „… luni, 22:30” (expirarea linkului pentru medic)
+    static func validUntil(_ date: Date, now: Date) -> String {
+        let calendar = Calendar.current
+        let days = calendar.dateComponents(
+            [.day], from: calendar.startOfDay(for: now), to: calendar.startOfDay(for: date)
+        ).day ?? 0
+        let day: String =
+            switch days {
+            case 0: "azi"
+            case 1: "mâine"
+            default: date.formatted(.dateTime.weekday(.wide).locale(romanian))
+            }
+        return "Valabil până \(day), \(clock(date))"
+    }
+
     /// „un medicament”, „3 medicamente”, „20 de medicamente”
     static func medicationCount(_ count: Int) -> String {
         switch count {
