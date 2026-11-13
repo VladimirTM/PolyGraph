@@ -54,10 +54,6 @@ private struct CheckInText: Encodable {
     let text: String
 }
 
-private struct VerifyNote: Encodable {
-    let note: String?
-}
-
 // MARK: - Clientul
 
 /// O metodă per rută din `contracts/api/openapi.yaml`. Rutele care întorc HTML (portalul medicului de familie)
@@ -196,18 +192,8 @@ struct APIClient {
         makeURL("share/\(token)")
     }
 
-    func sharePrintURL(token: String) -> URL? {
-        makeURL("share/\(token)/print")
-    }
-
     func shareGraphURL(token: String, embed: Bool = true) -> URL? {
         makeURL("share/\(token)/graph", query: [URLQueryItem(name: "embed", value: embed ? "1" : "0")])
-    }
-
-    func verifyAlert(shareToken: String, alertID: String, note: String? = nil) async throws -> Alert {
-        try await send(request(
-            "POST", "share/\(shareToken)/alerts/\(alertID)/verify",
-            body: VerifyNote(note: note), authorized: false))
     }
 
     // MARK: Baza de cunoștințe
