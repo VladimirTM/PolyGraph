@@ -7,6 +7,8 @@ import UIKit
 nonisolated enum CaregiverRoute: Hashable {
     case alert(id: String, zoom: Bool)
     case med(id: String)
+    /// un check-in din Noutăți, după id-ul evenimentului
+    case checkin(eventID: String)
 }
 
 extension View {
@@ -19,6 +21,8 @@ extension View {
                     .zoomTransition(sourceID: id, in: zoom ? namespace : nil)
             case .med(let id):
                 MedDetailView(medID: id)
+            case .checkin(let eventID):
+                CheckInEventView(eventID: eventID)
             }
         }
     }
