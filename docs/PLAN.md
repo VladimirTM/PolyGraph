@@ -10,7 +10,7 @@
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **Urmează:** Dev A continuă A1 (`feature/a1-app-skeleton`), Dev B pornește B2 (`feature/b2-engine`). Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e gata** (`feature/b2-engine`, PR de deschis): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`; `make check` are 111 teste (în CI: 63 + 48 sărite fără `kb.sqlite`). **Urmează:** Dev A continuă A1 (`feature/a1-app-skeleton`), Dev B pornește B3 (`feature/b3-extract`). Actualizați coloana „Status” la fiecare sync point.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
@@ -22,10 +22,10 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | **P0** repo, contracte, mock | amândoi | W0–W1.5 | V 18:00–19:30 | ✅ | `contracts/`, mock server, Makefile, CI, proiectul Xcode pe ambele iPhone-uri |
 | **S0** | amândoi | W1.5 | V 19:30 | ✅ | contracte în `main`, mock pornit, Xcode pe ambele telefoane |
 | A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | ⬜ | app pe mock |
-| B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | 🔄 | `make kb`, substanțele demo găsite |
+| B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | ✅ | `make kb`, substanțele demo găsite |
 | Q0 infrastructura de review | agent (worktree) | în paralel cu A2 | V seara | ⬜ | `make review Q=…` |
 | A2 scanarea (DataMatrix, poză, rețetă, confirmare) | Dev A | W4–W8 | V 22:00–02:00 | ⬜ | cutie → listă, pe mock |
-| B2 motorul de interacțiuni + graful | Dev B | W4–W12 | V 22:00–S 13:00 | ⬜ | golden test = `expected_alerts.json` |
+| B2 motorul de interacțiuni + graful | Dev B | W4–W12 | V 22:00–S 13:00 | ✅ | golden test = `expected_alerts.json` |
 | **S1** | amândoi | W8 | S 02:00 | ⬜ | |
 | Q1 review (noaptea) | agent | somn | S 02:00–09:00 | ⬜ | `docs/reviews/Q1.md`, triere 10 min |
 | A3 medicamente, alerte, graf | Dev A | W8–W12 (+ integrare W12–W14) | S 09:00–16:00 | ⬜ | modul aparținător |
@@ -950,12 +950,12 @@ Nu face: motorul de alerte (B2).
 **Responsabil:** Dev B · **Depinde de:** B1 · **Durată:** 5 h · **Branch:** `feature/b2-engine`
 
 **Checklist**
-- [ ] `engine.analyze(patient, meds, today) → AnalysisResult` (pur, fără I/O în afară de `kb`)
-- [ ] Verificări: DDI, DFI, dubluri (aceeași substanță; aceeași clasă ATC4 dintre AINS / benzodiazepine / IPP / anticoagulante; tabela `duplication`), Beers / STOPP, ACB, expirare
-- [ ] Textele RO din template-uri per `kind` (fără LLM)
-- [ ] `graph.build(...)` → JSON Cytoscape (5.6)
-- [ ] Rutele reale `/meds`, `/analysis`, `/what-if` în backend (SQLite `app.sqlite`)
-- [ ] Golden test: pacientul demo → exact `expected_alerts.json`
+- [x] `engine.analyze(patient, meds, today) → AnalysisResult` (pur, fără I/O în afară de `kb`; `backend/polygraph/kb.py` e singurul acces la `kb.sqlite`)
+- [x] Verificări: DDI (curated → DDInter → regula de clasă: sora cea mai gravă din clasa ATC4 a oricăreia dintre substanțe, apoi după INN), DFI, dubluri (aceeași substanță; aceeași clasă ATC4 dintre AINS / benzodiazepine / IPP / anticoagulante; tabela `duplication`), Beers / STOPP (AINS + anticoagulant doar ca mențiune în alerta ddi), ACB, expirare
+- [x] Textele RO din template-uri per `kind` (fără LLM), `engine/texts_ro.py`; `safe_recommendation` înlocuiește orice recomandare cu „opri…”, „nu mai luați” sau doze
+- [x] `graph.build(...)` → JSON Cytoscape (5.6), cu muchii gri `unknown` pentru perechile fără nivel și simptomele din ultimele 7 zile (construit direct în dict-uri, fără NetworkX: nu aducea nimic în plus și ar fi fost o dependență nouă)
+- [x] Rutele reale `/meds`, `/analysis`, `/what-if` în backend (SQLite `app.sqlite`), plus pacienții, `/kb/search` și `/demo/reset` (`DEMO_MODE=1`); `make dev`
+- [x] Golden test: pacientul demo → exact `expected_alerts.json`
 
 ~~~text
 [WORKFLOW] Branch: feature/b2-engine.
@@ -982,12 +982,12 @@ Nu face: extracția din poze, programul, vocea.
 ~~~
 
 **Teste**
-- [ ] T-B2-01 Golden pe pacientul demo (fără și cu med_09), inclusiv câmpul `basis` al fiecărei alerte.
-- [ ] T-B2-06 Regula de clasă: o pereche `Unknown` cu o soră de clasă cu nivel → alertă cu `basis = class_analogy`; fără soră de clasă → nicio alertă; o pereche din `curated_ddi.csv` are prioritate față de analogie.
-- [ ] T-B2-02 Dublura „Nurofen + Ibuprofen generic” → `duplicate`, `major`.
-- [ ] T-B2-03 Nicio `recommendation` generată nu conține „opri”, „nu mai luați”, „mg” (test pe toate alertele posibile din pacientul demo + 20 de perechi aleatoare din DDInter).
-- [ ] T-B2-04 `id`-urile alertelor sunt stabile între două rulări.
-- [ ] T-B2-05 Graful validează după `graph.schema.json`; fiecare muchie `interacts` are `alert_id` existent.
+- [x] T-B2-01 Golden pe pacientul demo (fără și cu med_09), inclusiv câmpul `basis` al fiecărei alerte.
+- [x] T-B2-06 Regula de clasă: o pereche `Unknown` cu o soră de clasă cu nivel → alertă cu `basis = class_analogy`; fără soră de clasă → nicio alertă; o pereche din `curated_ddi.csv` are prioritate față de analogie.
+- [x] T-B2-02 Dublura „Nurofen + Ibuprofen generic” → `duplicate`, `major`.
+- [x] T-B2-03 Nicio `recommendation` generată nu conține „opri”, „nu mai luați”, „mg” (test pe toate alertele posibile din pacientul demo + 20 de perechi aleatoare din DDInter).
+- [x] T-B2-04 `id`-urile alertelor sunt stabile între două rulări.
+- [x] T-B2-05 Graful validează după `graph.schema.json`; fiecare muchie `interacts` are `alert_id` existent.
 
 ---
 
