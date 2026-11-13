@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PatientCreate",
+  "description": "Corpul pentru POST /v1/patients și PATCH /v1/patients/{id} (la PATCH toate câmpurile sunt opționale).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "birth_year"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "birth_year": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 2026
+    },
+    "caregiver_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "anchors": {
+      "$ref": "schedule.schema.json#/$defs/anchors"
+    }
+  }
+}

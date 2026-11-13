@@ -1,0 +1,38 @@
+{
+  "id": "ci_01",
+  "at": "2026-11-14T09:12:00+02:00",
+  "transcript": "Dimineața, când mă ridic din pat, mi se învârte capul și am observat niște vânătăi pe mână.",
+  "intent": "symptom_report",
+  "symptoms": [
+    {
+      "code": "dizziness_orthostatic",
+      "label": "amețeală la ridicare",
+      "severity": "moderate"
+    },
+    {
+      "code": "bruising",
+      "label": "vânătăi",
+      "severity": "moderate"
+    }
+  ],
+  "correlations": [
+    {
+      "symptom": "bruising",
+      "med_ids": [
+        "med_01",
+        "med_02"
+      ],
+      "basis": "alert:al_ddi_med_01_med_02"
+    },
+    {
+      "symptom": "dizziness_orthostatic",
+      "med_ids": [
+        "med_04",
+        "med_08"
+      ],
+      "basis": "adverse_effects.yaml"
+    }
+  ],
+  "escalate": true,
+  "reply_text": "Mulțumesc. I-am trimis Anei ce mi-ați spus. Vă rog să nu vă ridicați brusc din pat."
+}

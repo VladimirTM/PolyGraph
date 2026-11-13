@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Graph",
+  "description": "Graful terapeutic al pacientului, în formatul Cytoscape (elements). Plan, secțiunea 5.6.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "nodes",
+    "edges"
+  ],
+  "properties": {
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "type",
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "p | med_NN | s:<ATC5> | c:<ATC4> | f:<aliment> | y:<cod simptom>"
+              },
+              "type": {
+                "enum": [
+                  "patient",
+                  "product",
+                  "substance",
+                  "atc_class",
+                  "food",
+                  "symptom"
+                ],
+                "title": "GraphNodeType"
+              },
+              "label": {
+                "type": "string"
+              },
+              "prescriber": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "severity": {
+                "$ref": "alert.schema.json#/$defs/severity",
+                "description": "cea mai gravă alertă a nodului, dacă există"
+              }
+            },
+            "title": "GraphNodeData"
+          }
+        },
+        "title": "GraphNode"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source",
+              "target",
+              "type"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "takes",
+                  "contains",
+                  "in_class",
+                  "interacts",
+                  "food_interaction",
+                  "reported",
+                  "possibly_related"
+                ],
+                "title": "GraphEdgeType"
+              },
+              "severity": {
+                "enum": [
+                  "critical",
+                  "major",
+                  "moderate",
+                  "minor",
+                  "unknown"
+                ],
+                "description": "unknown = pereche DDInter fără nivel: muchie gri, fără alertă",
+                "title": "GraphEdgeSeverity"
+              },
+              "alert_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "title": "GraphEdgeData"
+          }
+        },
+        "title": "GraphEdge"
+      }
+    }
+  }
+}

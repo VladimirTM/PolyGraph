@@ -1,0 +1,26 @@
+{
+  "id": "al_food_med_03_grapefruit",
+  "kind": "food",
+  "severity": "major",
+  "med_ids": [
+    "med_03"
+  ],
+  "title": "Grepfrutul crește mult concentrația de simvastatină",
+  "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+  "detail": "Grepfrutul crește mult concentrația de simvastatină.",
+  "recommendation": "Evitați grepfrutul și sucul de grepfrut.",
+  "action": "avoid_food",
+  "route_to": [
+    "caregiver",
+    "pharmacist"
+  ],
+  "source": {
+    "db": "curated",
+    "ref": "kb/curated_dfi.csv: grapefruit",
+    "url": "https://ddinter2.scbdd.com/"
+  },
+  "basis": "direct",
+  "analogy": null,
+  "status": "open",
+  "resolution": null
+}

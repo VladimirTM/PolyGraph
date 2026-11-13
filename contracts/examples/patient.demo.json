@@ -1,0 +1,13 @@
+{
+  "id": "pat_demo",
+  "name": "Maria",
+  "birth_year": 1948,
+  "caregiver_name": "Ana",
+  "anchors": {
+    "wake": "07:00",
+    "breakfast": "08:00",
+    "lunch": "13:00",
+    "dinner": "19:00",
+    "bed": "22:30"
+  }
+}

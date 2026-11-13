@@ -1,0 +1,553 @@
+openapi: 3.1.0
+info:
+  title: PolyGraph API
+  version: 1.0.0
+  description: |
+    Contractul HTTP dintre aplicația iOS (Dev A) și backend (Dev B). Plan, secțiunea 5.7.
+    Schemele sunt în contracts/schema/ (JSON Schema 2020-12). Orice schimbare se face într-un
+    commit separat, cu acordul amândurora, înaintea codului.
+servers:
+  - url: http://localhost:8000
+    description: mock (make mock) sau backend (make dev)
+security:
+  - patientToken: []
+tags:
+  - name: patients
+  - name: meds
+  - name: analysis
+  - name: day
+  - name: caregiver
+  - name: share
+  - name: kb
+  - name: demo
+  - name: system
+
+paths:
+  /health:
+    get:
+      tags: [system]
+      operationId: health
+      summary: Starea serverului (scriptul de review așteaptă după ea)
+      security: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok]
+                properties:
+                  ok: { type: boolean }
+                  mode: { enum: [mock, backend] }
+
+  /v1/patients:
+    post:
+      tags: [patients]
+      operationId: createPatient
+      summary: Creează pacientul (onboarding)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "../schema/patient_create.schema.json" }
+      responses:
+        "201":
+          description: Pacient creat; token-ul se trimite apoi în X-Patient-Token
+          content:
+            application/json:
+              schema: { $ref: "../schema/patient_created.schema.json" }
+
+  /v1/patients/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    get:
+      tags: [patients]
+      operationId: getPatient
+      responses:
+        "200":
+          description: Profilul și ancorele zilei
+          content:
+            application/json:
+              schema: { $ref: "../schema/patient.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [patients]
+      operationId: updatePatient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                name: { type: string, minLength: 1 }
+                birth_year: { type: integer }
+                caregiver_name: { type: [string, "null"] }
+                anchors: { $ref: "../schema/schedule.schema.json#/$defs/anchors" }
+      responses:
+        "200":
+          description: Profilul actualizat
+          content:
+            application/json:
+              schema: { $ref: "../schema/patient.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /v1/patients/{id}/scan:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    post:
+      tags: [meds]
+      operationId: scan
+      summary: Text OCR (+ poză, + DataMatrix) → candidați de confirmat (nu salvează)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [kind]
+              properties:
+                kind: { enum: [box, prescription] }
+                ocr_lines:
+                  type: string
+                  description: |
+                    JSON: [{ "text": "...", "height": 0.12 }, ...] în ordinea de citire;
+                    height = înălțimea relativă a liniei (0–1). Poate lipsi dacă e doar DataMatrix.
+                image:
+                  type: string
+                  format: binary
+                  description: JPEG ≤ 1600 px; opțional (rezerva Gemini și poza din listă)
+                datamatrix:
+                  type: string
+                  description: conținutul brut al codului GS1 DataMatrix, dacă a fost citit
+      responses:
+        "200":
+          description: Candidați (0..n) și avertismente
+          content:
+            application/json:
+              schema: { $ref: "../schema/extraction.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /v1/patients/{id}/meds:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    get:
+      tags: [meds]
+      operationId: listMeds
+      responses:
+        "200":
+          description: Lista de medicamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "../schema/medication_item.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [meds]
+      operationId: addMed
+      summary: Salvează un medicament confirmat → reanaliză
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "../schema/medication_item.schema.json" }
+      responses:
+        "201":
+          description: Medicamentul salvat (id-ul poate fi schimbat de server dacă exista deja)
+          content:
+            application/json:
+              schema: { $ref: "../schema/medication_item.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/Invalid" }
+
+  /v1/patients/{id}/meds/{mid}:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+      - name: mid
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      tags: [meds]
+      operationId: updateMed
+      summary: Editare (câmpurile de nivel unu ale MedicationItem, înlocuite întregi) → reanaliză
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: subset din MedicationItem, fără id
+              properties:
+                product: { $ref: "../schema/medication_item.schema.json#/$defs/product" }
+                substances:
+                  type: array
+                  items: { $ref: "../schema/medication_item.schema.json#/$defs/substance" }
+                dosage: { $ref: "../schema/medication_item.schema.json#/$defs/dosage" }
+                prescriber: { type: object }
+                start_date: { type: [string, "null"], format: date }
+                end_date: { type: [string, "null"], format: date }
+      responses:
+        "200":
+          description: Medicamentul actualizat
+          content:
+            application/json:
+              schema: { $ref: "../schema/medication_item.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    delete:
+      tags: [meds]
+      operationId: deleteMed
+      responses:
+        "204": { description: Șters }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /v1/patients/{id}/analysis:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    get:
+      tags: [analysis]
+      operationId: getAnalysis
+      responses:
+        "200":
+          description: Alertele (sortate severitate → kind → id), scorul ACB și graful
+          content:
+            application/json:
+              schema: { $ref: "../schema/analysis.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /v1/patients/{id}/what-if:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    post:
+      tags: [analysis]
+      operationId: whatIf
+      summary: Ce alerte noi ar apărea dacă s-ar adăuga un medicament (X1)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "../schema/what_if_request.schema.json" }
+      responses:
+        "200":
+          description: Doar alertele noi
+          content:
+            application/json:
+              schema: { $ref: "../schema/what_if_result.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /v1/patients/{id}/schedule:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    get:
+      tags: [day]
+      operationId: getSchedule
+      parameters:
+        - name: date
+          in: query
+          required: false
+          description: implicit azi (ora României)
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: Programul zilei
+          content:
+            application/json:
+              schema: { $ref: "../schema/schedule.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /v1/patients/{id}/doses:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    post:
+      tags: [day]
+      operationId: recordDose
+      summary: Am luat / Am sărit / anulare (idempotent pe med_id + scheduled_at)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "../schema/dose.schema.json" }
+      responses:
+        "200":
+          description: Doza înregistrată (cu recorded_at)
+          content:
+            application/json:
+              schema: { $ref: "../schema/dose.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /v1/patients/{id}/checkins:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    post:
+      tags: [day]
+      operationId: createCheckIn
+      summary: Transcrierea de pe telefon (JSON) sau, doar ca rezervă, audio (multipart) → CheckIn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [text]
+              properties:
+                text: { type: string, minLength: 1 }
+          multipart/form-data:
+            schema:
+              type: object
+              required: [audio]
+              properties:
+                audio: { type: string, format: binary, description: m4a (doar varianta de rezervă cu Whisper) }
+      responses:
+        "201":
+          description: Check-in interpretat
+          content:
+            application/json:
+              schema: { $ref: "../schema/checkin.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /v1/patients/{id}/feed:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    get:
+      tags: [caregiver]
+      operationId: getFeed
+      summary: Noutăți pentru aparținător (polling la 10 s)
+      parameters:
+        - name: since
+          in: query
+          required: false
+          description: doar evenimentele strict după acest moment
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: Evenimente, cele mai noi primele
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "../schema/feed_event.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /v1/patients/{id}/share:
+    parameters:
+      - $ref: "#/components/parameters/PatientId"
+    post:
+      tags: [share]
+      operationId: createShare
+      summary: Link / QR pentru farmacist sau medic (implicit 72 h)
+      responses:
+        "201":
+          description: Link creat
+          content:
+            application/json:
+              schema: { $ref: "../schema/share_link.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /share/{token}:
+    parameters:
+      - $ref: "#/components/parameters/ShareToken"
+    get:
+      tags: [share]
+      operationId: sharePage
+      security: []
+      responses:
+        "200":
+          description: Pagina HTML pentru farmacist / medic
+          content:
+            text/html:
+              schema: { type: string }
+        "404":
+          description: Link expirat sau inexistent (pagină prietenoasă, fără date)
+          content:
+            text/html:
+              schema: { type: string }
+
+  /share/{token}/alerts/{alert_id}/verify:
+    parameters:
+      - $ref: "#/components/parameters/ShareToken"
+      - name: alert_id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [share]
+      operationId: verifyAlert
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                note: { type: string }
+      responses:
+        "200":
+          description: Alerta cu status verified_by_pharmacist
+          content:
+            application/json:
+              schema: { $ref: "../schema/alert.schema.json" }
+        "404":
+          description: Link sau alertă inexistente
+
+  /share/{token}/print:
+    parameters:
+      - $ref: "#/components/parameters/ShareToken"
+    get:
+      tags: [share]
+      operationId: sharePrint
+      security: []
+      responses:
+        "200":
+          description: „Reconcilierea medicației”, pentru tipărire / Salvează ca PDF
+          content:
+            text/html:
+              schema: { type: string }
+        "404":
+          description: Link expirat sau inexistent
+
+  /share/{token}/graph:
+    parameters:
+      - $ref: "#/components/parameters/ShareToken"
+    get:
+      tags: [share]
+      operationId: shareGraph
+      security: []
+      parameters:
+        - name: embed
+          in: query
+          required: false
+          schema: { type: integer, enum: [0, 1] }
+      responses:
+        "200":
+          description: Doar graful, pe tot ecranul (WKWebView din app); tap pe muchie → window.webkit.messageHandlers.alert.postMessage(alert_id)
+          content:
+            text/html:
+              schema: { type: string }
+        "404":
+          description: Link expirat sau inexistent
+
+  /v1/kb/search:
+    get:
+      tags: [kb]
+      operationId: kbSearch
+      summary: Autocomplete pentru adăugarea manuală
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 2 }
+      responses:
+        "200":
+          description: Produse potrivite
+          content:
+            application/json:
+              schema: { $ref: "../schema/kb_search_result.schema.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /media/{name}:
+    get:
+      tags: [system]
+      operationId: media
+      security: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Poza cutiei (pe mock, un placeholder PNG)
+          content:
+            image/png:
+              schema: { type: string, format: binary }
+            image/jpeg:
+              schema: { type: string, format: binary }
+
+  /demo/reset:
+    post:
+      tags: [demo]
+      operationId: demoReset
+      summary: Doar cu DEMO_MODE=1 (mock-ul îl are mereu). Recreează pacientul demo din fixture.
+      security: []
+      parameters:
+        - name: live_scan
+          in: query
+          required: false
+          description: 1 = fără Sintrom și Nurofen, ca să fie scanate live în demo (secțiunea 7)
+          schema: { type: integer, enum: [0, 1] }
+      responses:
+        "200":
+          description: Pacientul demo, cu token-ul lui
+          content:
+            application/json:
+              schema: { $ref: "../schema/patient_created.schema.json" }
+        "404":
+          description: DEMO_MODE nu e activ
+
+  /demo/missed-dose:
+    post:
+      tags: [demo]
+      operationId: demoMissedDose
+      summary: Doar cu DEMO_MODE=1. Simulează o doză ratată (apare în feed).
+      security: []
+      responses:
+        "200":
+          description: Evenimentul creat
+          content:
+            application/json:
+              schema: { $ref: "../schema/feed_event.schema.json" }
+        "404":
+          description: DEMO_MODE nu e activ
+
+components:
+  securitySchemes:
+    patientToken:
+      type: apiKey
+      in: header
+      name: X-Patient-Token
+  parameters:
+    PatientId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, pattern: "^pat_[a-z0-9_]+$" }
+    ShareToken:
+      name: token
+      in: path
+      required: true
+      schema: { type: string }
+  schemas:
+    Error:
+      type: object
+      required: [detail]
+      properties:
+        detail: { type: string, description: mesaj în română, afișabil }
+  responses:
+    Unauthorized:
+      description: X-Patient-Token lipsă sau greșit
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: Inexistent
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Invalid:
+      description: Corpul nu respectă schema
+      content:
+        application/json:
+          schema: { type: object }

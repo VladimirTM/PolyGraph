@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Analysis",
+  "description": "Răspunsul la GET /analysis.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "alerts",
+    "acb_total",
+    "graph",
+    "analyzed_at"
+  ],
+  "properties": {
+    "alerts": {
+      "type": "array",
+      "items": {
+        "$ref": "alert.schema.json"
+      }
+    },
+    "acb_total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "graph": {
+      "$ref": "graph.schema.json"
+    },
+    "analyzed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

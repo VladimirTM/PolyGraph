@@ -1,0 +1,121 @@
+{
+  "date": "2026-11-14",
+  "anchors": {
+    "wake": "07:00",
+    "breakfast": "08:00",
+    "lunch": "13:00",
+    "dinner": "19:00",
+    "bed": "22:30"
+  },
+  "moments": [
+    {
+      "time": "07:00",
+      "label": "Imediat după trezire",
+      "doses": [
+        {
+          "med_id": "med_05",
+          "qty": 1,
+          "instruction": "pe stomacul gol, cu jumătate de pahar cu apă",
+          "reasons": [
+            "Euthyrox se ia pe stomacul gol, cu cel puțin 30 de minute înainte de micul dejun (RCP Euthyrox)",
+            "Singur, ca nimic să nu-i scadă absorbția"
+          ]
+        }
+      ]
+    },
+    {
+      "time": "07:30",
+      "label": "Cu o jumătate de oră înainte de micul dejun",
+      "doses": [
+        {
+          "med_id": "med_07",
+          "qty": 1,
+          "instruction": "înainte de micul dejun, înghițită întreagă",
+          "reasons": [
+            "Omeprazolul se ia înainte de micul dejun (RCP omeprazol)"
+          ]
+        },
+        {
+          "med_id": "med_04",
+          "qty": 1,
+          "instruction": "cu un pahar cu apă",
+          "reasons": [
+            "Amlodipina se ia o dată pe zi, dimineața"
+          ]
+        }
+      ]
+    },
+    {
+      "time": "08:00",
+      "label": "La micul dejun",
+      "doses": [
+        {
+          "med_id": "med_02",
+          "qty": 1,
+          "instruction": "la masă, cu un pahar cu apă",
+          "reasons": [
+            "Ibuprofenul se ia la masă, ca să protejeze stomacul"
+          ]
+        }
+      ]
+    },
+    {
+      "time": "13:00",
+      "label": "La prânz",
+      "doses": [
+        {
+          "med_id": "med_06",
+          "qty": 1,
+          "instruction": "la masă",
+          "reasons": [
+            "Calciul se ia la masă",
+            "La cel puțin 4 ore după Euthyrox"
+          ]
+        }
+      ]
+    },
+    {
+      "time": "19:00",
+      "label": "La cină",
+      "doses": [
+        {
+          "med_id": "med_01",
+          "qty": 0.5,
+          "instruction": "în fiecare zi la aceeași oră",
+          "reasons": [
+            "Sintrom în fiecare zi la aceeași oră, seara"
+          ]
+        },
+        {
+          "med_id": "med_02",
+          "qty": 1,
+          "instruction": "la masă, cu un pahar cu apă",
+          "reasons": [
+            "Ibuprofenul se ia la masă"
+          ]
+        },
+        {
+          "med_id": "med_03",
+          "qty": 1,
+          "instruction": "seara",
+          "reasons": [
+            "Simvastatina se ia seara (RCP simvastatină)"
+          ]
+        },
+        {
+          "med_id": "med_08",
+          "qty": 1,
+          "instruction": "seara (dă somnolență)",
+          "reasons": [
+            "Amitriptilina seara, pentru că dă somnolență"
+          ]
+        }
+      ]
+    }
+  ],
+  "unsatisfied": [],
+  "solver": {
+    "moments_count": 5,
+    "version": "fixture-p0"
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "description": "Cazuri GS1 DataMatrix (AI 01 GTIN, 17 expirare AAZZLL, 10 lot, 21 serie). La P0 toate sunt sintetice; codurile reale ale cutiilor demo se adaugă cu synthetic: false după scanare. Aceleași cazuri rulează în Swift (T-A2-01) și în Python (T-B3-04). GS = \\u001d.",
+  "cases": [
+    {
+      "name": "sintrom_synthetic",
+      "raw": "]d2010594900000001417280331\u001d10AB123\u001d21SN0001",
+      "expected": {
+        "gtin": "05949000000014",
+        "expiry": "2028-03-31",
+        "batch": "AB123",
+        "serial": "SN0001"
+      },
+      "note": "cu prefix ]d2 și GS după fiecare AI variabil",
+      "synthetic": true,
+      "med_id": "med_01"
+    },
+    {
+      "name": "nurofen_synthetic",
+      "raw": "010594900000002121XYZ987654\u001d1727093010L2026A",
+      "expected": {
+        "gtin": "05949000000021",
+        "expiry": "2027-09-30",
+        "batch": "L2026A",
+        "serial": "XYZ987654"
+      },
+      "note": "fără prefix; serie înaintea expirării; lotul la final fără GS",
+      "synthetic": true,
+      "med_id": "med_02"
+    },
+    {
+      "name": "day_00",
+      "raw": "]d2010400000000003717271200\u001d10LOT7",
+      "expected": {
+        "gtin": "04000000000037",
+        "expiry": "2027-12-31",
+        "batch": "LOT7",
+        "serial": null
+      },
+      "note": "ziua 00 = ultima zi a lunii",
+      "synthetic": true
+    },
+    {
+      "name": "day_00_february_leap",
+      "raw": "01040000000000371728020010B1",
+      "expected": {
+        "gtin": "04000000000037",
+        "expiry": "2028-02-29",
+        "batch": "B1",
+        "serial": null
+      },
+      "note": "ziua 00 în februarie, an bisect",
+      "synthetic": true
+    },
+    {
+      "name": "gtin_leading_zero",
+      "raw": "010000000000004817261130\u001d10Z",
+      "expected": {
+        "gtin": "00000000000048",
+        "expiry": "2026-11-30",
+        "batch": "Z",
+        "serial": null
+      },
+      "note": "GTIN cu zerouri la început (EAN-8 extins)",
+      "synthetic": true
+    },
+    {
+      "name": "only_gtin",
+      "raw": "0105949000000014",
+      "expected": {
+        "gtin": "05949000000014",
+        "expiry": null,
+        "batch": null,
+        "serial": null
+      },
+      "note": "doar GTIN-ul",
+      "synthetic": true
+    },
+    {
+      "name": "order_batch_first",
+      "raw": "10ABC\u001d010594900000002117290115",
+      "expected": {
+        "gtin": "05949000000021",
+        "expiry": "2029-01-15",
+        "batch": "ABC",
+        "serial": null
+      },
+      "note": "lotul primul, apoi AI-urile de lungime fixă",
+      "synthetic": true
+    },
+    {
+      "name": "max_len_batch",
+      "raw": "010400000000003710AAAAAAAAAAAAAAAAAAAA\u001d17280101",
+      "expected": {
+        "gtin": "04000000000037",
+        "expiry": "2028-01-01",
+        "batch": "AAAAAAAAAAAAAAAAAAAA",
+        "serial": null
+      },
+      "note": "lot de 20 de caractere (maxim)",
+      "synthetic": true
+    },
+    {
+      "name": "serial_with_symbols",
+      "raw": "]d2010000000000004821a-b/c.12\u001d17300228",
+      "expected": {
+        "gtin": "00000000000048",
+        "expiry": "2030-02-28",
+        "batch": null,
+        "serial": "a-b/c.12"
+      },
+      "note": "serie cu caractere permise de GS1",
+      "synthetic": true
+    },
+    {
+      "name": "expired",
+      "raw": "010594900000001417240131\u001d10OLD1",
+      "expected": {
+        "gtin": "05949000000014",
+        "expiry": "2024-01-31",
+        "batch": "OLD1",
+        "serial": null
+      },
+      "note": "cutie expirată: alertă expired în motor",
+      "synthetic": true,
+      "med_id": "med_01"
+    },
+    {
+      "name": "bad_check_digit",
+      "raw": "010400000000003817280331",
+      "expected": null,
+      "note": "cifra de control greșită",
+      "synthetic": true,
+      "error": "invalid_gtin_check_digit"
+    },
+    {
+      "name": "not_gs1",
+      "raw": "HELLO-WORLD",
+      "expected": null,
+      "note": "text care nu e GS1",
+      "synthetic": true,
+      "error": "not_gs1"
+    }
+  ]
+}

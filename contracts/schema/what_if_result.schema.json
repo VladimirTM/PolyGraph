@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WhatIfResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "matched",
+    "new_alerts"
+  ],
+  "properties": {
+    "matched": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "medication_item.schema.json"
+        }
+      ],
+      "description": "medicamentul găsit pentru query; null dacă nu s-a găsit"
+    },
+    "new_alerts": {
+      "type": "array",
+      "items": {
+        "$ref": "alert.schema.json"
+      }
+    }
+  }
+}

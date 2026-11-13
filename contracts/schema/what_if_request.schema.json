@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WhatIfRequest",
+  "description": "Corpul pentru POST /what-if: fie query (text liber, ex. „algocalmin”), fie med.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "query": {
+      "type": "string",
+      "minLength": 1
+    },
+    "med": {
+      "$ref": "medication_item.schema.json"
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "query"
+      ]
+    },
+    {
+      "required": [
+        "med"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PatientCreated",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "patient_token",
+    "patient"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "patient_token": {
+      "type": "string",
+      "minLength": 8
+    },
+    "patient": {
+      "$ref": "patient.schema.json"
+    }
+  }
+}

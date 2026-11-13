@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Alert",
+  "description": "O problemă găsită determinist în regimul pacientului. Plan, secțiunea 5.3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "kind",
+    "severity",
+    "med_ids",
+    "title",
+    "patient_text",
+    "detail",
+    "recommendation",
+    "action",
+    "route_to",
+    "source",
+    "basis",
+    "analogy",
+    "status",
+    "resolution"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^al_[a-z0-9_-]+$",
+      "description": "determinist: al_<kind>_<id-uri sortate>[_<regulă / aliment>]"
+    },
+    "kind": {
+      "enum": [
+        "ddi",
+        "food",
+        "duplicate",
+        "elderly_pim",
+        "anticholinergic",
+        "timing",
+        "expired",
+        "symptom"
+      ]
+    },
+    "severity": {
+      "$ref": "#/$defs/severity"
+    },
+    "med_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^med_[a-z0-9_]+$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "patient_text": {
+      "type": "string",
+      "description": "textul pentru pacient: fără termeni tehnici, fără roșu"
+    },
+    "detail": {
+      "type": "string"
+    },
+    "recommendation": {
+      "type": "string",
+      "description": "nu conține niciodată „opriți”, „nu mai luați” sau doze"
+    },
+    "action": {
+      "enum": [
+        "contact_doctor",
+        "ask_pharmacist",
+        "separate_times",
+        "avoid_food",
+        "monitor",
+        "replace_box"
+      ]
+    },
+    "route_to": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "patient",
+          "caregiver",
+          "pharmacist"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "db",
+        "ref",
+        "url"
+      ],
+      "properties": {
+        "db": {
+          "enum": [
+            "ddinter",
+            "curated",
+            "beers",
+            "stopp",
+            "acb",
+            "rcp",
+            "schedule",
+            "app"
+          ]
+        },
+        "ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "basis": {
+      "enum": [
+        "direct",
+        "curated",
+        "class_analogy"
+      ]
+    },
+    "analogy": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "via",
+            "atc4"
+          ],
+          "properties": {
+            "via": {
+              "type": "string",
+              "description": "substanța din aceeași clasă prin care s-a evaluat (ex. warfarină)"
+            },
+            "atc4": {
+              "type": "string",
+              "pattern": "^[A-Z][0-9]{2}[A-Z]{2}$"
+            }
+          }
+        }
+      ]
+    },
+    "status": {
+      "enum": [
+        "open",
+        "acknowledged",
+        "verified_by_pharmacist"
+      ]
+    },
+    "resolution": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "by",
+            "note",
+            "at"
+          ],
+          "properties": {
+            "by": {
+              "enum": [
+                "pharmacist",
+                "doctor",
+                "caregiver"
+              ]
+            },
+            "note": {
+              "type": "string"
+            },
+            "at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "severity": {
+      "enum": [
+        "critical",
+        "major",
+        "moderate",
+        "minor",
+        "info"
+      ],
+      "title": "Severity"
+    }
+  }
+}
