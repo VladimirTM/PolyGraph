@@ -1,6 +1,6 @@
 """Backend-ul real PolyGraph (FastAPI), din B2: pacienți, medicamente, analiză, what-if, căutare în kb.
 
-Pornire: `make dev` (0.0.0.0:8000). Rutele care vin în etapele următoare (scan B3, schedule B4, checkins B5,
+Pornire: `make dev` (0.0.0.0:8000). Rutele care vin în etapele următoare (schedule B4, checkins B5,
 share B6) rămân deocamdată pe mock. Variabile de mediu:
 - PG_KB: calea către kb.sqlite (implicit kb/kb.sqlite, `make kb`)
 - PG_APP_DB: calea către app.sqlite (implicit backend/app.sqlite)
@@ -18,11 +18,12 @@ import sys
 from contextlib import asynccontextmanager
 from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any, Literal
 from zoneinfo import ZoneInfo
 
-from fastapi import FastAPI, Header, HTTPException, Request, Response
+from fastapi import FastAPI, File, Form, Header, HTTPException, Request, Response, UploadFile
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "contracts"))
@@ -30,7 +31,9 @@ sys.path.insert(0, str(ROOT / "contracts"))
 import validate as contracts  # noqa: E402  (contracts/validate.py: schemele JSON)
 
 from polygraph.engine import analyze, new_alerts  # noqa: E402
-from polygraph.kb import Kb, default_kb  # noqa: E402
+from polygraph.extract.match import confirmed_product, scan  # noqa: E402
+from polygraph.extract.ocr_match import OcrLine  # noqa: E402
+from polygraph.kb import Kb, KbMissing, default_kb  # noqa: E402
 from polygraph.store import Store  # noqa: E402
 
 FIX = ROOT / "contracts" / "fixtures"
@@ -157,6 +160,38 @@ def update_patient(pid: str, body: dict[str, Any], x_patient_token: str | None =
 # ---------------------------------------------------------------- medicamente
 
 
+class ScanLine(BaseModel):
+    text: str = Field(max_length=1024)
+    height: float = Field(default=0, ge=0, le=1)
+
+
+OCR_LINES = TypeAdapter(list[ScanLine])
+MAX_SCAN_IMAGE = 5 * 1024 * 1024
+
+
+@app.post("/v1/patients/{pid}/scan")
+def scan_med(
+    pid: str,
+    kind: Literal["box", "prescription"] = Form(),
+    ocr_lines: str | None = Form(None),
+    datamatrix: str | None = Form(None, max_length=256),
+    image: Annotated[UploadFile | None, File()] = None,
+    x_patient_token: str | None = Header(None),
+) -> dict[str, Any]:
+    auth(pid, x_patient_token)
+    try:
+        data = OCR_LINES.validate_json(ocr_lines) if ocr_lines else []
+    except ValidationError:
+        raise HTTPException(422, "ocr_lines trebuie să conțină liniile OCR în format JSON.") from None
+    if len(data) > 256:
+        raise HTTPException(422, "Sunt prea multe linii OCR.")
+    picture = image.file.read(MAX_SCAN_IMAGE + 1) if image else b""
+    if len(picture) > MAX_SCAN_IMAGE:
+        raise HTTPException(413, "Imaginea depășește 5 MB.")
+    mime = (image.content_type or "image/jpeg") if image else "image/jpeg"
+    return scan(kb(), store(), kind, [OcrLine(line.text, line.height) for line in data], picture, mime, datamatrix)
+
+
 @app.get("/v1/patients/{pid}/meds")
 def list_meds(pid: str, x_patient_token: str | None = Header(None)) -> list[dict[str, Any]]:
     auth(pid, x_patient_token)
@@ -169,7 +204,13 @@ def add_med(pid: str, body: dict[str, Any], x_patient_token: str | None = Header
     invalid("medication_item", body)
     med = copy.deepcopy(body)
     med["id"] = store().free_med_id(pid, med.get("id"))
-    store().add_med(pid, med)
+    catalog_id = None
+    if med["product"].get("gtin"):
+        try:
+            catalog_id = confirmed_product(kb(), med)
+        except KbMissing:
+            pass
+    store().add_med(pid, med, catalog_id)
     return med
 
 

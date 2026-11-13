@@ -29,7 +29,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | **S1** | amândoi | W8 | S 02:00 | ⬜ | |
 | Q1 review (noaptea) | agent | somn | S 02:00–09:00 | ⬜ | `docs/reviews/Q1.md`, triere 10 min |
 | A3 medicamente, alerte, graf | Dev A | W8–W12 (+ integrare W12–W14) | S 09:00–16:00 | ⬜ | modul aparținător |
-| B3 extracția (OCR → catalog, GS1, cache) | Dev B | W12–W14 | S 14:00–16:00 | ⬜ | `/scan` real |
+| B3 extracția (OCR → catalog, GS1, cache) | Dev B | W12–W14 | S 14:00–16:00 | 🔄 | `/scan` real |
 | **S2** + Q2 | amândoi | W14 | S 16:00 | ⬜ | fluxul real cap-coadă |
 | A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | ⬜ | Acum, Ziua de azi, „Am luat”, TTS, notificări |
 | B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | ⬜ | `/schedule`, `/checkins` reale |
@@ -998,12 +998,12 @@ Nu face: extracția din poze, programul, vocea.
 Telefonul citește textul de pe cutie / rețetă cu OCR-ul Apple (A2) și trimite textul (plus poza). Backend-ul îl potrivește **determinist** în catalog. Gemini (tier-ul gratuit) intervine doar când potrivirea eșuează, iar răspunsurile lui se păstrează în cache.
 
 **Checklist**
-- [ ] Potrivirea pe text OCR: nume comercial + concentrație + DCI, în `kb`
-- [ ] Parserul de posologie (notația românească „1-0-1”, „1 cp/zi”, „D.S.”, „Rp./”)
-- [ ] Ordinea: GTIN cache → potrivire pe text → Gemini (doar dacă e nevoie) → completare manuală
-- [ ] DataMatrix: parser GS1 în Python; decodare pe server cu `zxing-cpp` dacă telefonul n-a trimis codul
-- [ ] Client Gemini (cheie gratuită din Google AI Studio), cu cache pe hash-ul imaginii și timeout
-- [ ] Ruta reală `/scan`
+- [x] Potrivirea pe text OCR: nume comercial + concentrație + DCI, în `kb`
+- [x] Parserul de posologie (notația românească „1-0-1”, „1 cp/zi”, „D.S.”, „Rp./”)
+- [x] Ordinea: GTIN cache → potrivire pe text → Gemini (doar dacă e nevoie) → completare manuală
+- [x] DataMatrix: parser GS1 în Python; decodare pe server cu `zxing-cpp` dacă telefonul n-a trimis codul
+- [x] Client Gemini (cheie gratuită din Google AI Studio), cu cache pe hash-ul imaginii și timeout
+- [x] Ruta reală `/scan`
 
 ~~~text
 [WORKFLOW] Branch: feature/b3-extract.
@@ -1025,13 +1025,16 @@ Obiectiv: POST /v1/patients/{id}/scan întoarce candidați corecți pentru cutii
 Criterii de acceptare: tests/test_extract_demo.py pe textele OCR salvate de pe pozele demo (demo/ocr/*.json, produse la A2 cu telefonul): fiecare cutie → produsul corect pe calea ocr_match, fără Gemini; rețeta tipărită → toate medicamentele, cu pattern-ul corect; fără internet și fără potrivire → warning „nu am putut citi cutia, completați manual”, nu eroare 500.
 ~~~
 
+**Status:** Backend implementat. Testele locale acoperă cutiile pe transcrieri, rețeta fictivă din PDF, parserul Python pe fixture-ul GS1 comun și clientul Gemini cu răspunsuri simulate. Validarea pe OCR-ul și fotografiile A2 și comparația cu parserul Swift rămân de verificat.
+
 **Teste**
-- [ ] T-B3-01 `posology.py`: 20 de formulări românești reale.
+- [x] Gemini live: o imagine sintetică a produs candidatul Sintrom 4 mg (B01AA07). Rescanarea cu cheia dezactivată a întors același candidat din cache, fără apel de rețea.
+- [x] T-B3-01 `posology.py`: 20 de formulări românești reale.
 - [ ] T-B3-02 Toate cutiile demo găsite pe calea `ocr_match` (fără Gemini); rețeta demo complet.
-- [ ] T-B3-03 Un brand inexistent → `needs_review`, nicio substanță inventată (nici pe calea Gemini).
+- [x] T-B3-03 Un brand inexistent → `needs_review`, nicio substanță inventată (nici pe calea Gemini).
 - [ ] T-B3-04 GS1: aceleași cazuri ca în T-A2-01 dau aceleași rezultate în Python și Swift (fixture comun în `contracts/fixtures/gs1_cases.json`).
-- [ ] T-B3-05 OCR cu diacritice pierdute și litere confundate (`0`/`O`, `l`/`1`) pe 10 cazuri → aceeași potrivire.
-- [ ] T-B3-06 Normalizarea unităților: „100 µg”, „100 mcg” și „100 ug” dau aceeași potrivire în catalog; o cutie de generic cu producătorul în loc de brand („Actavis”) se potrivește pe substanță + doză; un răspuns cu toate câmpurile `null` produce `needs_review`, nu un produs.
+- [x] T-B3-05 OCR cu diacritice pierdute și litere confundate (`0`/`O`, `l`/`1`) pe 10 cazuri → aceeași potrivire.
+- [x] T-B3-06 Normalizarea unităților: „100 µg”, „100 mcg” și „100 ug” dau aceeași potrivire în catalog; o cutie de generic cu producătorul în loc de brand („Actavis”) se potrivește pe substanță + doză; un răspuns cu toate câmpurile `null` produce `needs_review`, nu un produs.
 
 ---
 

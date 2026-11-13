@@ -177,6 +177,22 @@ class Kb:
 
     # ------------------------------------------------------------------ căutare (autocomplete, what-if)
 
+    @cache  # noqa: B019
+    def scan_catalog(self) -> tuple[tuple, ...]:
+        return tuple(
+            self._q("SELECT id, brand, brand_norm, strength_text, form, dci_raw FROM product ORDER BY source = 'extra' DESC, id")
+        )
+
+    @cache  # noqa: B019
+    def scan_substances(self, product_id: int) -> tuple[tuple, ...]:
+        return tuple(
+            self._q(
+                "SELECT s.dci_ro, s.inn, s.atc, s.synonyms FROM product_substance ps"
+                " JOIN substance s ON s.id = ps.substance_id WHERE ps.product_id = ? ORDER BY s.inn",
+                (product_id,),
+            )
+        )
+
     def search(self, q: str, limit: int = 20) -> list[dict[str, Any]]:
         """Produse după brand (prefix) sau după substanță (INN / DCI). Fiecare cu substanțele din kb."""
         key = norm(q)

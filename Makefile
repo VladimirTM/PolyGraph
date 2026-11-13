@@ -5,7 +5,7 @@ PORT ?= 8000
 # Simulatorul pentru check-ios: primul iPhone disponibil (se poate forța: make check-ios SIM="iPhone 16")
 SIM ?= $(shell xcrun simctl list devices available 2>/dev/null | grep -m1 -oE 'iPhone [^(]+' | sed 's/ *$$//')
 
-.PHONY: help setup check check-contracts lint test check-ios models mock dev kb demo-check review
+.PHONY: help setup check check-contracts lint test check-ios models mock dev kb demo-b3 demo-warm demo-check review
 
 help:
 	@grep -E '^[a-z-]+:.*## ' Makefile | sed 's/:.*## /\t/' | column -t -s $$'\t'
@@ -50,6 +50,12 @@ dev: ## backend-ul real (din B2)
 kb: ## construiește kb/kb.sqlite din kb/raw (B1)
 	@test -f kb/build.py || { echo "kb/build.py vine la B1"; exit 1; }
 	$(UV) python kb/build.py
+
+demo-b3: ## demonstrează B3 local cu OCR și DataMatrix sintetice
+	PYTHONPATH=backend GEMINI_API_KEY= $(UV) --locked python demo/b3.py
+
+demo-warm: ## pregătește cache-ul Gemini din fotografiile demo
+	cd backend && uv run python -m polygraph.extract.gemini
 
 demo-check: ## R4: scenariul demo prin API (B7); deocamdată nimic
 	@echo "demo-check: vine la B7 (deocamdată no-op)"
