@@ -10,7 +10,7 @@
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e în `main`** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9)), partea de backend: `/scan` real (GTIN cache → potrivire OCR → Gemini cu cache → completare manuală), `make demo-b3` arată fluxul cap-coadă pe date sintetice; rămân T-B3-02 și T-B3-04, care așteaptă OCR-ul și parserul GS1 din A2. `make check` are 170 de teste (în CI: 96 + 74 sărite fără `kb.sqlite`). **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **Urmează:** Dev A pornește A2 (`feature/a2-scan`), Dev B închide B3 când vin datele din A2 (`demo/ocr/`, `GS1Tests`). Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e în `main`** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9)), partea de backend: `/scan` real (GTIN cache → potrivire OCR → Gemini cu cache → completare manuală), `make demo-b3` arată fluxul cap-coadă pe date sintetice; rămân T-B3-02 și T-B3-04, care așteaptă OCR-ul și parserul GS1 din A2. `make check` are 170 de teste (în CI: 96 + 74 sărite fără `kb.sqlite`). **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e gata** (`feature/b4-schedule`): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_pharmacist`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. `make check` are 186 de teste. **Urmează:** Dev A pornește A2 (`feature/a2-scan`), Dev B închide B3 când vin datele din A2 (`demo/ocr/`, `GS1Tests`). Actualizați coloana „Status” la fiecare sync point.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
@@ -32,7 +32,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | B3 extracția (OCR → catalog, GS1, cache) | Dev B | W12–W14 | S 14:00–16:00 | 🔄 | `/scan` real |
 | **S2** + Q2 | amândoi | W14 | S 16:00 | ⬜ | fluxul real cap-coadă |
 | A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | ⬜ | Acum, Ziua de azi, „Am luat”, TTS, notificări |
-| B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | ⬜ | `/schedule`, `/checkins` reale |
+| B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | 🔄 | `/schedule`, `/checkins` reale; B4 gata (`/schedule`, `/doses`), B5 neînceput |
 | **S3** (MVP complet) | amândoi | W19 | S 21:30 | ⬜ | |
 | A5 check-in vocal + Noutăți | Dev A | W19–W23 | S 21:30–D 02:00 | ⬜ | |
 | B6 pagina farmacistului + tipărire | Dev B | W19–W23 | S 21:30–D 02:00 | ⬜ | |
@@ -1063,9 +1063,9 @@ Criterii de acceptare: tests/test_schedule_golden.py: demo_patient → expected_
 ~~~
 
 **Teste**
-- [ ] T-B4-01 Golden pe pacientul demo.
-- [ ] T-B4-02 Proprietate: pe 200 de regimuri aleatoare din substanțele cu reguli, nicio constrângere dură încălcată când `unsatisfied` e gol.
-- [ ] T-B4-03 Ancore schimbate (trezire 05:30) → programul se mută coerent.
+- [x] T-B4-01 Golden pe pacientul demo.
+- [x] T-B4-02 Proprietate: pe 200 de regimuri aleatoare din substanțele cu reguli, nicio constrângere dură încălcată când `unsatisfied` e gol.
+- [x] T-B4-03 Ancore schimbate (trezire 05:30) → programul se mută coerent.
 
 ---
 
