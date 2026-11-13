@@ -23,20 +23,21 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | **S0** | amândoi | W1.5 | V 19:30 | ✅ | contracte în `main`, mock pornit, Xcode pe ambele telefoane |
 | A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | ✅ | app pe mock, pe ambele iPhone-uri (`make check-ios` verde, 18 teste) |
 | B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | ✅ | `make kb`, substanțele demo găsite |
-| Q0 infrastructura de review | agent (worktree) | în paralel cu A2 | V seara | ⬜ | `make review Q=…` |
+| Q0 infrastructura de review | agent (worktree), pornit de Dev A | ~1 h de agent | V 23:00–24:00 (de zi, vezi „Planul Q de zi”) | ⬜ | `make review Q=…` |
 | A2 scanarea (DataMatrix, poză, rețetă, confirmare) | Dev A | W4–W8 | V 22:00–02:00 | 🟡 | `make check-ios` verde, merge pe iPhone cu cutiile de test; rămân cutiile fizice în sală (T-A2-03) |
 | B2 motorul de interacțiuni + graful | Dev B | W4–W12 | V 22:00–S 13:00 | ✅ | golden test = `expected_alerts.json` |
 | **S1** | amândoi | W8 | S 02:00 | ⬜ | |
-| Q1 review (noaptea) | agent | somn | S 02:00–09:00 | ⬜ | `docs/reviews/Q1.md`, triere 10 min |
+| Q1 review complet (de zi) | agent, pe Mac-ul lui Dev B | ~15 min tur + ~45 min agent | imediat după Q0, înainte de somn | ⬜ | `docs/reviews/Q1.md` pe tot ce e livrat (A1–A6, B1–B7), triere 15 min împreună |
 | A3 medicamente, alerte, graf | Dev A | W8–W12 (+ integrare W12–W14) | S 09:00–16:00 | ✅ | modul aparținător; `make check-ios` verde, graful pe iPhone fără internet în 427 ms; „Arată medicului” (QR) rămâne pentru A6 |
 | B3 extracția (OCR → catalog, GS1, cache) | Dev B | W12–W14 | S 14:00–16:00 | ✅ | `/scan` real |
-| **S2** + Q2 | amândoi | W14 | S 16:00 | ⬜ | fluxul real cap-coadă |
+| **S2** | amândoi | W14 | S 16:00 | ⬜ | fluxul real cap-coadă |
+| Q2 verificarea fix-urilor (de zi) | agent, pe Mac-ul lui Dev B | ~30 min | S dimineața, după fix-urile din Q1 | ⬜ | `docs/reviews/Q2.md`: fix-urile din Q1 închise, fără regresii |
 | A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | ✅ | Acum, Ziua de azi, „Am luat”, TTS, notificări; `make check-ios` verde, încercat pe iPhone; „Spuneți-mi cum vă simțiți” vine cu A5 |
 | B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | ✅ | `/schedule`, `/checkins` reale; B4 gata (`/schedule`, `/doses`), B5 gata (`/checkins`, `/feed`); X1 (can_i_take → what-if) și Whisper rămân condiționale |
 | **S3** (MVP complet) | amândoi | W19 | S 21:30 | ⬜ | |
 | A5 check-in vocal + Noutăți | Dev A | W19–W23 | S 21:30–D 02:00 | ✅ | `make check-ios` verde, încercat pe două iPhone-uri; bonusul X1 (`can_i_take`) nefăcut |
 | B6 portalul medicului de familie + tipărire | Dev B | W19–W23 | S 21:30–D 02:00 | 🟡 | portalul real (`/portal`): login cu cod, lista pacienților, fișa cu decizie + notă → alertă + Noutăți, tipărire în 2 pagini A4, QR care adaugă pacientul; `/graph?embed=1`; rămâne T-B6-04 (manual pe iPhone) |
-| Q3 review (noaptea) | agent | somn | D 02:00–08:00 | ⬜ | triere 15 min |
+| Q3 review (de zi, doar dacă se mai scrie cod după Q2) | agent | ~45 min | S după-amiaza, înainte de S4 | ⬜ | triere 15 min |
 | A6 QR, modul demo · B7 demo hardening | A · B | W23–W24.5 | D 08:00–09:30 | 🔄 | B7 gata: `make demo`, `make demo-check` verde, istoricul demo, `/demo/missed-dose`. A6 gata (PR #25): QR pentru medic (aparținător + pacient), rețeta ORL și doza ratată în modul demo, iconița, trecerea de accesibilitate, T-A6-01/02 verzi. Rămân T-B7-06 (Wi-Fi oprit) și fix-urile blocker din Q3 |
 | **S4** feature freeze + Q4 | amândoi | W24.5 | D 09:30 | ⬜ | după S4 nu se mai scrie cod nou |
 | D1 integrare, repetiții, video de rezervă | amândoi | W24.5–W27.5 | D 09:30–12:30 | ⬜ | |
@@ -64,7 +65,7 @@ Un sync point nu e trecut cât timp raportul Q aferent are un blocker cu decizia
 | W1.5–W4 | V 19:30–22:00 | A1 schelet + tokeni + modele + client API pe mock | B1 ingestia: catalog RO + DDInter → `kb.sqlite` |
 | W4–W8 | V 22:00–02:00 | A2 scanarea: DataMatrix + poză, rețetă, sheet-ul de confirmare | B1 potrivirea; B2 motorul (DDI, dubluri) |
 | **W8** | **S 02:00** | **S1** | **S1** |
-| – | S 02:00–09:00 | 😴 · **Q1 rulează pe Mac-ul lui Dev A** | 😴 |
+| – | S 02:00–09:00 | 😴 (fără review peste noapte, vezi „Planul Q de zi”) | 😴 |
 | W8–W8.2 | S 09:00 | **triere Q1 (împreună, 10 min)**; blocker-ele intră primele în blocul următor | |
 | W8–W12 | S 09:00–13:00 | A3 medicamente, alerte (zoom), graf (WKWebView) | B2 motorul: food, Beers/STOPP, ACB, graful, rutele reale |
 | W12–W14 | S 14:00–16:00 | integrarea scanării cu backend-ul real | B3 extracția: OCR → catalog + GS1 + cache demo |
@@ -72,7 +73,7 @@ Un sync point nu e trecut cât timp raportul Q aferent are un blocker cu decizia
 | W14–W19 | S 16:00–21:30 | A4 modul senior: Acum, Ziua de azi, „Am luat”, TTS, notificări | B4 solverul de program; B5 simptome + corelare |
 | **W19** | **S 21:30** | **S3 (MVP complet)** | **S3** |
 | W19–W23 | S 21:30–02:00 | A5 check-in vocal (pe telefon) + Noutăți | B6 portalul medicului de familie + versiunea de tipărit |
-| – | D 02:00–08:00 | 😴 · **Q3 rulează pe Mac-ul lui Dev A** | 😴 |
+| – | D 02:00–08:00 | 😴 (fără review peste noapte) | 😴 |
 | W23–W24.5 | D 08:00–09:30 | triere Q3 (15 min); A6 QR, modul demo; fix-urile blocker din Q3 | B7 demo hardening; fix-urile blocker din Q3 pe backend |
 | **W24.5** | **D 09:30** | **S4 feature freeze** | **S4 feature freeze** |
 | W24.5–W27.5 | D 09:30–12:30 | **D1 împreună:** Q4 (primele 45 min, pe Mac-ul lui Dev B) în paralel cu repetițiile pe iPhone; blocker-ele din Q4; video de rezervă | **D1** |
@@ -132,7 +133,7 @@ Regulă: un bug găsit în demo primește întâi un test (sau o intrare în `ex
 ### Cum lucrați cu agenții (nimeni nu scrie Swift de mână)
 
 - **Bucla de verificare a agentului:** după fiecare modificare, agentul rulează `xcodebuild build` (și `make check-ios` pentru teste) și repară singur erorile de compilare. Nu predă niciodată cod care nu compilează. Un task se dă în bucăți mici (un ecran, o funcție), nu „fă tot A3”.
-- **Verificarea după milestone:** după S1–S4, o sesiune nouă de agent rulează aplicația pe simulator, trece prin toate ecranele în 5 variante de afișare și scrie un raport cu bug-uri, inconsistențe și îmbunătățiri (etapa Q). Q1 și Q3 rulează peste noapte, cât dormiți.
+- **Verificarea după milestone:** după S1–S4, o sesiune nouă de agent rulează aplicația pe simulator, trece prin toate ecranele în 5 variante de afișare și scrie un raport cu bug-uri, inconsistențe și îmbunătățiri (etapa Q). Niciun review nu rulează peste noapte (decizie 13.11.2026): fiecare rulează cât cineva e treaz lângă Mac, iar trierea se face imediat după (vezi „Planul Q de zi”).
 - **Ce agentul nu poate verifica:** camera și scanerul (VisionKit), microfonul și recunoașterea vocală, citirea vocală, notificările, haptic-ul și animațiile reale nu merg pe simulator (pe simulator, etapa Q le înlocuiește cu intrări simulate, deci verifică tot ce e după ele). Le verifică omul, rulând din Xcode pe iPhone (⌘R), apoi dă agentului ce a văzut: text, o captură de ecran sau eroarea din consola Xcode. De aceea fiecare sync point include „rulat pe iPhone”.
 - **Ce rămâne manual:** semnarea (Team-ul, Developer Mode pe telefon, „Trust” la prima rulare) și instalarea pe telefon. Se fac în prima oră (P0), nu la S1.
 - **Reguli în `AGENTS.md` / `CLAUDE.md`:** nu edita `project.pbxproj`; fără dependențe externe (nici SPM); la o eroare repetată de două ori, schimbă abordarea (componentă de sistem mai simplă), nu insista; nu scrie animații proprii unde există componentă de sistem (2.4).
@@ -1189,12 +1190,32 @@ Criterii de acceptare: cu Wi-Fi-ul laptopului oprit (telefoanele pe hotspot-ul l
 
 | Review | Când | Unde rulează | Ce acoperă | Cât costă oamenii |
 |---|---|---|---|---|
-| **Q1** | după S1 (W8), **peste noapte** | Mac-ul lui Dev A, cât dormiți | onboarding, navigarea, medicamentele și alertele pe mock, sheet-ul de confirmare cu scanarea simulată | 10 min de triere dimineața |
-| **Q2** | după S2 (W14) | Mac-ul lui Dev B, în paralel cu lucrul | fluxul real: scanare → confirmare → alerte → graf; erorile de rețea; + verificarea fix-urilor din Q1 | 10 min de triere |
-| **Q3** | după S3 + A5 / B6 (W23), **peste noapte** | Mac-ul lui Dev A | tot MVP-ul: modul senior, programul, „Am luat”, check-in-ul, Noutăți, portalul medicului; toate variantele de accesibilitate | 15 min de triere dimineața; fix-urile blocker / major în W23–W24.5 |
+| **Q1** | imediat după Q0 (V seara), **de zi** | Mac-ul lui Dev B, cu Dev B lângă el | tot ce e livrat (A1–A6, B1–B7), pe backend-ul real (`make demo`): onboarding, scanarea simulată, medicamentele, alertele, graful, modul senior, „Am luat”, check-in-ul, Noutăți, codul pentru medic, portalul medicului, modul demo; toate cele 5 variante de afișare (acoperă ce era împărțit între vechile Q1, Q2 și Q3) | 15 min de triere, împreună, înainte de somn |
+| **Q2** | sâmbătă dimineața, după fix-urile din Q1, **de zi** | Mac-ul lui Dev B | doar fluxurile atinse de fix-uri (`-only-testing`) + regresia tuturor constatărilor din Q1 | 10 min de triere |
+| **Q3** | doar dacă se scrie cod nou după Q2 (ex. bonusul X1), înainte de S4, **de zi** | Mac-ul lui Dev B | fluxurile noi + regresia Q1–Q2 | 10 min de triere |
 | **Q4** | la S4 (W24.5), primele 45 min din D1 | Mac-ul lui Dev B | scenariul demo din secțiunea 7, cap-coadă, de 2 ori; regresia tuturor constatărilor închise | se repară doar blocker-ele |
 
 Fiecare Q verifică din nou și constatările rămase deschise din Q-urile anterioare.
+
+#### Planul Q de zi (decizie 13.11.2026: nimic nu rulează peste noapte)
+
+La 13.11, ora 23:00, A1–A6 și B1–B7 sunt deja în `main`, iar Q0–Q2 n-au rulat. De aceea vechile Q1 (pe mock), Q2 (fluxul real) și Q3 (tot MVP-ul) se strâng într-un singur review complet, rulat de zi, iar Q2 devine verificarea fix-urilor.
+
+| Pas | Când | Cine | Ce se face | Gata când |
+|---|---|---|---|---|
+| **1. Q0** | acum (V ~23:00), ~1 h de agent | Dev A pornește agentul în worktree (`git worktree add ../polygraph-q0 -b test/q0-review-tour`), cu promptul Q0 de mai jos; în paralel, amândoi trec formal S1–S3 (`make demo-check`, rulat pe iPhone) | turul automat pe simulator, `tools/review/run.sh`, `make review` | `make review Q=Q0` rulează cap-coadă în < 15 min, cu capturi în toate cele 5 variante; PR cu `make check` verde, merge |
+| **2. Q1** | imediat după merge-ul Q0, înainte de somn | Dev B pornește o sesiune **nouă** de agent pe Mac-ul lui, pe `main` actualizat, cu promptul de review (`QN` = Q1, etapele livrate = A1–A6, B1–B7), backend-ul pornit cu `make demo`; Dev A rămâne liber pentru fix-uri | turul + raportul `docs/reviews/Q1.md` | raportul e în PR-ul `test/Q1-review` |
+| **3. Trierea Q1** | imediat după raport (15 min) | amândoi | decizia pe fiecare constatare (acum / etapa următoare / după hackathon / nu) | fiecare constatare are o decizie |
+| **4. Fix-urile** | blocker-ele sub 30 min în aceeași seară; restul sâmbătă dimineața, primele | Dev A pe `app/`, Dev B pe `backend/`, pe branch-uri `fix/q1-…` | fix + testul care îl prinde, `make check` / `make check-ios`, rulat pe iPhone | toate blocker-ele „acum” închise |
+| **5. Q2** | sâmbătă dimineața, după fix-uri (~30 min) | sesiune nouă de agent, pe Mac-ul lui Dev B | doar fluxurile atinse (`-only-testing`) + regresia constatărilor din Q1; raportul `docs/reviews/Q2.md` | niciun blocker deschis, nicio regresie |
+| **6. Q3** (opțional) | doar dacă se scrie cod nou după Q2 (ex. X1), înainte de S4 | ca la Q2 | fluxurile noi + regresia | niciun blocker deschis |
+| **7. Q4** | la S4, cum era planificat | Mac-ul lui Dev B | scenariul demo de 2 ori + regresia tuturor constatărilor | fără blocker |
+
+Reguli pentru rularea de zi:
+- **Cineva rămâne treaz lângă Mac-ul pe care rulează review-ul**, lucrând în paralel la altceva; dacă agentul cere o aprobare, o dă imediat. Fără `caffeinate`, fără capac închis, fără rulări lăsate peste noapte.
+- **Review-ul rulează pe Mac-ul lui Dev B**, ca Mac-ul lui Dev A să rămână liber pentru build-urile iOS și fix-uri (simulatorul ocupă procesorul ~15 min).
+- **Sesiune nouă de agent pentru fiecare Q**, de preferat Gemini CLI sau Codex CLI; dacă nu sunt instalate, Claude Code, pornit la începutul unei ferestre noi de 5 h.
+- **Review-ul rulează pe `main`**, nu pe un branch pe care se lucrează în același timp.
 
 #### Q0 · Infrastructura de review
 
@@ -1229,17 +1250,17 @@ Obiectiv: un tur automat al aplicației pe simulator care produce, pentru fiecar
    - pentru animațiile lucrate („Am luat”, inelul microfonului): `xcrun simctl io <udid> recordVideo` cât rulează testTakenAndUndo și testVoiceCheckInFake, apoi `ffmpeg` extrage cadrele la 0, 100, 200, 300, 500, 800 ms după atingere în .review/<QN>/frames/;
    - scrie .review/<QN>/index.md: lista capturilor pe flux și variantă, numărul de erori de audit, durata.
 5. Makefile: `make review Q=Q1` rulează scriptul. .review/ e în .gitignore (capturile sunt mari); raportul final merge în docs/reviews/.
-6. .claude/settings.json: permisiuni pre-aprobate pentru xcodebuild, xcrun, make, ffmpeg, git, curl pe localhost, ca turul de noapte să nu se oprească așteptând aprobări; echivalentul pentru agentul de review (Gemini CLI: comenzile permise în setările proiectului sau modul fără confirmări, doar în acest repo).
+6. .claude/settings.json: permisiuni pre-aprobate pentru xcodebuild, xcrun, make, ffmpeg, git, curl pe localhost, ca turul să nu se oprească așteptând aprobări cât omul lucrează în paralel; echivalentul pentru agentul de review (Gemini CLI: comenzile permise în setările proiectului sau modul fără confirmări, doar în acest repo).
 
 Criterii de acceptare: `make review Q=Q0` rulează cap-coadă pe aplicația de la A1 (ecranele lipsă apar ca „absent”), în < 15 min, și produce capturi în toate cele 5 configurații.
 ~~~
 
 #### Promptul pentru agentul de review (Q1–Q4)
 
-**Notă (12.11.2026):** Codex CLI și Gemini CLI au fost sărite la pregătire (secțiunea 10). Dacă nu sunt instalate la hackathon, review-ul rulează pe Claude Code, într-o sesiune nouă, fără contextul celei care a scris codul, și cu atenție la limitele de 5 h. Se pornește o **sesiune nouă de Gemini CLI** (contul Google AI Pro) în repo, pe `main` actualizat, cu promptul de mai jos; dacă Gemini CLI nu poate citi capturile de ecran (testat la pregătire), Codex CLI, iar Claude Code doar ca ultimă variantă, ca să nu consume limitele folosite pentru cod (`QN` și lista de etape se completează). Pentru rulările de noapte: laptopul la priză, `caffeinate -dimsu &`, capacul deschis.
+**Notă (12.11.2026):** Codex CLI și Gemini CLI au fost sărite la pregătire (secțiunea 10). Dacă nu sunt instalate la hackathon, review-ul rulează pe Claude Code, într-o sesiune nouă, fără contextul celei care a scris codul, și cu atenție la limitele de 5 h. Se pornește o **sesiune nouă de Gemini CLI** (contul Google AI Pro) în repo, pe `main` actualizat, cu promptul de mai jos; dacă Gemini CLI nu poate citi capturile de ecran (testat la pregătire), Codex CLI, iar Claude Code doar ca ultimă variantă, ca să nu consume limitele folosite pentru cod (`QN` și lista de etape se completează). Review-urile nu rulează peste noapte (vezi „Planul Q de zi”): cine pornește review-ul rămâne lângă Mac.
 
 ~~~text
-Ești agentul de review pentru PolyGraph. NU modifici codul din app/PolyGraph/ sau backend/. Poți rula orice, poți citi orice și poți adăuga teste în app/PolyGraphUITests/ (pe branch-ul test/QN-review). Lucrezi singur, fără să aștepți răspunsuri: nimeni nu e la calculator.
+Ești agentul de review pentru PolyGraph. NU modifici codul din app/PolyGraph/ sau backend/. Poți rula orice, poți citi orice și poți adăuga teste în app/PolyGraphUITests/ (pe branch-ul test/QN-review). Lucrezi singur, fără să aștepți răspunsuri; un om e lângă Mac doar pentru aprobări.
 
 Context de citit întâi: docs/PLAN.md (secțiunile 1, 2.4, 5, 7 și etapele livrate: <lista>), docs/DESIGN.md, .claude/skills/apple-design/SKILL.md, contracts/fixtures/expected_alerts.json, contracts/symptoms.md și rapoartele anterioare din docs/reviews/.
 
@@ -1358,7 +1379,7 @@ Plan B pentru fiecare pas: scanarea pică → butonul „Adaugă rețeta ORL” 
 | Limitele Claude Pro (fereastra de 5 h și plafonul săptămânal) în timp ce agenții scriu tot codul | două conturi Pro; Codex CLI și Gemini CLI ca rezerve cu același prompt; review-urile pe Gemini CLI; limita săptămânală verificată și păstrată plină înainte de hackathon | amândoi |
 | Tier-ul gratuit Gemini API (limite mici, nepublicate; cererile pot fi folosite de Google) | doar rezervă, cu cache; date demo fictive; menționat la pitch | B |
 | OCR-ul Apple pe cutii (font mic, reflexii, diacritice) | `customWords` cu brandurile; potrivire fuzzy; date OCR reale salvate la A2 pentru testele B3; rezerva Gemini; completare manuală | A, B |
-| Agentul de review se oprește peste noapte (o aprobare cerută, Mac-ul adormit, simulatorul blocat) | `.claude/settings.json` cu permisiunile pre-aprobate (Q0), `caffeinate`, laptop la priză; testele UI tolerante la ecrane lipsă; dacă Q1 / Q3 n-au rulat până dimineața, se rulează doar fluxurile noi (`-only-testing`) în 15 min | A |
+| Agentul de review se oprește (o aprobare cerută, simulatorul blocat) | review-urile rulează doar de zi, cu cineva lângă Mac (decizie 13.11.2026); `.claude/settings.json` cu permisiunile pre-aprobate (Q0); testele UI tolerante la ecrane lipsă; dacă turul se blochează, se rulează doar fluxurile noi (`-only-testing`) | A, B |
 | Constatări din review prea multe sau vagi | maximum 25, fiecare cu captură și fix concret; trierea decide, nu agentul; după S4 se repară doar blocker-ele | amândoi |
 | Notificări push reale (APNs) | decizie: **nu** la hackathon; polling la 10 s în prim-plan + notificări locale | A |
 | 30 h în loc de 48 h | scope tăiat: fără Android, fără PDF generat, fără Whisper pe drumul critic, bonusurile X doar dacă S3 e la timp; după S4 (W24.5) nu se mai scrie cod nou | amândoi |
