@@ -21,8 +21,9 @@ final class AppStore {
     var lastError: String?
     /// alertele la care aparținătorul a apăsat „Am înțeles” (doar pe telefon; contractul nu are rută pentru asta)
     private(set) var acknowledgedAlertIDs: Set<String> = []
-    /// creat o singură dată, pentru graf (B6) și codul QR pentru medicul de familie (A6)
-    private(set) var shareToken: String?
+    /// cerut o dată și refolosit cât mai e valabil: graful (B6) și codul QR pentru medicul de familie (A6)
+    private(set) var shareLink: ShareLink?
+    var shareToken: String? { shareLink?.shareToken }
     /// ștergerea cu „Anulează” din lista de medicamente
     @ObservationIgnored private(set) var deletions = DeleteUndoQueue()
     /// „Am luat” / „Am sărit” din modul senior
@@ -94,7 +95,7 @@ final class AppStore {
         let created = try await api.createPatient(body)
         settings.role = role
         settings.signIn(patientID: created.id, token: created.patientToken)
-        shareToken = nil
+        shareLink = nil
         patient = created.patient
         Log.app.info("Pacient creat: \(created.id, privacy: .public)")
         await refreshAll()
@@ -106,7 +107,7 @@ final class AppStore {
         do {
             let created = try await api.demoReset(liveScan: liveScan)
             settings.signIn(patientID: created.id, token: created.patientToken)
-            shareToken = nil
+            shareLink = nil
             patient = created.patient
             // pacientul demo pornește de la zero: nimic confirmat, alertele de pacient din nou nevăzute
             doseLog.clear()
@@ -131,7 +132,7 @@ final class AppStore {
         schedule = nil
         lastError = nil
         acknowledgedAlertIDs = []
-        shareToken = nil
+        shareLink = nil
     }
 
     // MARK: - Încărcare
@@ -256,13 +257,35 @@ final class AppStore {
         acknowledgedAlertIDs.insert(alertID)
     }
 
-    /// Token-ul de partajare: cerut o singură dată și ținut cât e legat pacientul.
-    func ensureShareToken() async throws -> String {
-        if let shareToken { return shareToken }
+    /// Linkul de partajare (72 h): refolosit cât mai e valabil cel puțin o oră, altfel cerut din nou,
+    /// ca medicul să nu primească un cod care expiră în timp ce îl scanează.
+    func ensureShareLink() async throws -> ShareLink {
+        if let shareLink, shareLink.expiresAt > Date().addingTimeInterval(3600) { return shareLink }
         let id = try requirePatientID()
         let link = try await api.createShare(patientID: id)
-        shareToken = link.shareToken
-        return link.shareToken
+        shareLink = link
+        return link
+    }
+
+    func ensureShareToken() async throws -> String {
+        try await ensureShareLink().shareToken
+    }
+
+    // MARK: - Modul demo
+
+    /// „Adaugă rețeta ORL”: Fromilid din scenariul „medic nou”. Întoarce câte alerte noi a adus,
+    /// sau `nil` dacă e deja în listă (a doua apăsare nu-l dublează).
+    func addDemoPrescription() async throws -> Int? {
+        let med = try DemoData.prescription()
+        if meds.contains(where: { $0.product.brand == med.product.brand }) { return nil }
+        let newAlerts = try await addMed(med)
+        Log.demo.info("rețeta ORL adăugată, \(newAlerts) alerte noi")
+        return newAlerts
+    }
+
+    func simulateMissedDose() async throws {
+        _ = try await api.demoMissedDose()
+        Log.demo.info("doză ratată simulată")
     }
 
     #if DEBUG
