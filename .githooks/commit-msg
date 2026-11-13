@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Regulile de commit din CONTRIBUTING.md:
+#  - primul rând ≤ 72 de caractere, fără punct final;
+#  - Co-authored-by = celălalt membru al echipei (după git config user.name);
+#  - fără co-author sau mențiuni AI.
+set -euo pipefail
+
+msg_file="$1"
+msg="$(grep -v '^#' "$msg_file")"
+subject="$(printf '%s\n' "$msg" | head -n1)"
+name="$(git config user.name || true)"
+
+VLAD='Co-authored-by: VladimirTM <vladimirghimpau@gmail.com>'
+MIHNEA='Co-authored-by: Remetan Mihnea-Florin <mihnearemetan@gmail.com>'
+
+fail() { echo "commit-msg: $1" >&2; exit 1; }
+
+# Merge, revert și fixup-urile generate de git trec
+case "$subject" in Merge*|Revert*|fixup!*|squash!*) exit 0 ;; esac
+
+[ -n "$subject" ] || fail "mesaj gol"
+[ "${#subject}" -le 72 ] || fail "primul rând are ${#subject} caractere (maxim 72)"
+case "$subject" in *.) fail "primul rând se termină cu punct" ;; esac
+
+case "$name" in
+  VladimirTM) expected="$MIHNEA" ;;
+  *Mihnea*|*Remetan*) expected="$VLAD" ;;
+  *) expected="" ;;
+esac
+if [ -n "$expected" ]; then
+  printf '%s\n' "$msg" | grep -qxF "$expected" || fail "lipsește linia: $expected"
+else
+  printf '%s\n' "$msg" | grep -q '^Co-authored-by: ' || fail "lipsește Co-authored-by (user.name necunoscut: '$name')"
+fi
+
+# Fără mențiuni AI. Numele de fișiere CLAUDE.md și .claude/ sunt permise.
+cleaned="$(printf '%s\n' "$msg" | sed -E 's#CLAUDE\.md##g; s#\.claude/?##g')"
+if printf '%s\n' "$cleaned" | grep -qiE 'claude|anthropic|generated with|co-authored-by: .*(gpt|codex|gemini|copilot)'; then
+  fail "mesajul conține o mențiune AI (Claude / Anthropic / Generated with)"
+fi
+exit 0

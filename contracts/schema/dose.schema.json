@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dose",
+  "description": "O doză confirmată / sărită / anulată. Idempotent pe med_id + scheduled_at.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "med_id",
+    "scheduled_at",
+    "status"
+  ],
+  "properties": {
+    "med_id": {
+      "type": "string",
+      "pattern": "^med_[a-z0-9_]+$"
+    },
+    "scheduled_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "enum": [
+        "taken",
+        "skipped",
+        "pending"
+      ],
+      "description": "pending = anularea din banner-ul „Anulează”"
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "completat de server"
+    }
+  }
+}

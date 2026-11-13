@@ -1,0 +1,1304 @@
+{
+  "alerts": [
+    {
+      "id": "al_ddi_med_01_med_02",
+      "kind": "ddi",
+      "severity": "major",
+      "med_ids": [
+        "med_01",
+        "med_02"
+      ],
+      "title": "Risc crescut de sângerare",
+      "patient_text": "Două dintre pastile, luate împreună, pot crește riscul de sângerare. Am anunțat-o pe Ana.",
+      "detail": "Acenocumarol (Sintrom) + ibuprofen (Nurofen): antiinflamatoarele cresc efectul anticoagulant și riscul de sângerare. Și criteriul Beers 2023: AINS de evitat împreună cu un anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "Discutați cu medicul cardiolog sau cu farmacistul înainte de următoarea doză de Nurofen. Anunțați medicul la vânătăi sau sângerări neobișnuite.",
+      "action": "contact_doctor",
+      "route_to": [
+        "patient",
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: acenocoumarol + ibuprofen (DDInter: warfarină + ibuprofen = Major)",
+        "url": "https://ddinter2.scbdd.com/server/interact/10470/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_03_med_04",
+      "kind": "ddi",
+      "severity": "major",
+      "med_ids": [
+        "med_03",
+        "med_04"
+      ],
+      "title": "Doza de simvastatină e prea mare lângă amlodipină",
+      "patient_text": "Două dintre pastile trebuie verificate de medic. Am anunțat-o pe Ana.",
+      "detail": "Amlodipina crește concentrația de simvastatină (risc de dureri și slăbiciune musculară). Cu amlodipină, doza zilnică de simvastatină nu trebuie să depășească 20 mg; Maria ia 40 mg.",
+      "recommendation": "Discutați cu medicul de familie doza de simvastatină potrivită lângă amlodipină.",
+      "action": "contact_doctor",
+      "route_to": [
+        "patient",
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: amlodipine + simvastatin = Major; RCP simvastatină 4.5",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_elderly_pim_med_02_beers-nsaid-chronic",
+      "kind": "elderly_pim",
+      "severity": "major",
+      "med_ids": [
+        "med_02"
+      ],
+      "title": "Antiinflamator (AINS) luat de mult timp la vârstnic",
+      "patient_text": "Una dintre pastilele pentru durere trebuie discutată cu medicul. Am anunțat-o pe Ana.",
+      "detail": "La peste 65 de ani, AINS luate pe termen lung cresc riscul de sângerare digestivă, de afectare a rinichilor și de probleme cardiace.",
+      "recommendation": "Discutați cu medicul de familie dacă există o alternativă pentru durere (de ex. paracetamol) și dacă e nevoie de protecție gastrică.",
+      "action": "contact_doctor",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "beers",
+        "ref": "AGS Beers 2023, tabelul 2 (beers-nsaid-chronic)",
+        "url": null
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_elderly_pim_med_08_beers-tricyclic-antidepressants",
+      "kind": "elderly_pim",
+      "severity": "major",
+      "med_ids": [
+        "med_08"
+      ],
+      "title": "Antidepresiv triciclic la vârstnic",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Amitriptilina are efect anticolinergic și sedativ puternic: confuzie, amețeală la ridicare, căderi.",
+      "recommendation": "Discutați cu medicul neurolog dacă există o alternativă mai sigură.",
+      "action": "contact_doctor",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "beers",
+        "ref": "AGS Beers 2023, tabelul 2 (beers-tricyclic-antidepressants)",
+        "url": null
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_03_grapefruit",
+      "kind": "food",
+      "severity": "major",
+      "med_ids": [
+        "med_03"
+      ],
+      "title": "Grepfrutul crește mult concentrația de simvastatină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Grepfrutul crește mult concentrația de simvastatină.",
+      "recommendation": "Evitați grepfrutul și sucul de grepfrut.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: grapefruit",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_anticholinergic_med_08",
+      "kind": "anticholinergic",
+      "severity": "moderate",
+      "med_ids": [
+        "med_08"
+      ],
+      "title": "Încărcare anticolinergică: scor 3",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Scorul ACB total este 3 (amitriptilină). Un scor de 3 sau mai mare crește riscul de confuzie, căderi și declin cognitiv.",
+      "recommendation": "Discutați la revizuirea tratamentului dacă se poate reduce încărcarea anticolinergică.",
+      "action": "ask_pharmacist",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "acb",
+        "ref": "ACB Scale 2012 (Regenstrief)",
+        "url": null
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_01_med_05",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_01",
+        "med_05"
+      ],
+      "title": "Euthyrox-ul poate crește efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Hormonii tiroidieni pot crește efectul anticoagulant, mai ales la schimbarea dozei. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "La orice schimbare a dozei de Euthyrox, întrebați medicul dacă e nevoie de un INR.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: acenocoumarol + levothyroxine (DDInter: warfarină + levotiroxină = Moderate)",
+        "url": "https://ddinter2.scbdd.com/server/interact/100196/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_01_med_07",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_01",
+        "med_07"
+      ],
+      "title": "Omeprazolul poate crește efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Inhibitorii de pompă de protoni au fost asociați ocazional cu creșterea efectului anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "La începerea sau la renunțarea la omeprazol, întrebați medicul dacă e nevoie de un INR.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: acenocoumarol + omeprazole (DDInter: warfarină + omeprazol = Moderate)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_02_med_04",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_02",
+        "med_04"
+      ],
+      "title": "Ibuprofenul poate slăbi efectul amlodipinei",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Antiinflamatoarele pot crește tensiunea arterială și scad efectul unor medicamente pentru tensiune.",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: amlodipine + ibuprofen = Moderate",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_03_med_07",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_03",
+        "med_07"
+      ],
+      "title": "Simvastatină + omeprazol",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Omeprazolul poate crește ușor concentrația de simvastatină.",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: omeprazole + simvastatin = Moderate",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_04_med_06",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_04",
+        "med_06"
+      ],
+      "title": "Calciul poate scădea efectul amlodipinei",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Suplimentele de calciu pot reduce efectul blocantelor canalelor de calciu.",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: amlodipine + calcium carbonate = Moderate",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_05_med_06",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_05",
+        "med_06"
+      ],
+      "title": "Calciul scade absorbția Euthyrox-ului",
+      "patient_text": "Euthyrox-ul și calciul se iau la ore diferite. Programul de azi ține cont de asta.",
+      "detail": "Calciul scade absorbția levotiroxinei. Separarea de cel puțin 4 ore e respectată în programul zilnic.",
+      "recommendation": "Păstrați cel puțin 4 ore între Euthyrox și calciu.",
+      "action": "separate_times",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: levothyroxine + calcium carbonate (DDInter Moderate)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_05_med_07",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_05",
+        "med_07"
+      ],
+      "title": "Omeprazolul poate scădea absorbția Euthyrox-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Omeprazolul modifică aciditatea gastrică și poate scădea absorbția levotiroxinei.",
+      "recommendation": "Întrebați medicul endocrinolog dacă e nevoie de un control al hormonilor tiroidieni (TSH).",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: levothyroxine + omeprazole (DDInter Moderate)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_05_med_08",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_05",
+        "med_08"
+      ],
+      "title": "Euthyrox + amitriptilină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Asocierea poate crește riscul de aritmii și de stimulare a sistemului nervos.",
+      "recommendation": "Anunțați medicul la palpitații sau agitație.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: levothyroxine + amitriptyline (DDInter Moderate)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_elderly_pim_med_07_beers-ppi-long-term",
+      "kind": "elderly_pim",
+      "severity": "moderate",
+      "med_ids": [
+        "med_07"
+      ],
+      "title": "Protector gastric (IPP) luat de mai mult de 8 săptămâni",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Pe termen lung, IPP sunt asociate cu infecții, pierdere osoasă și fracturi.",
+      "recommendation": "Întrebați medicul de familie dacă mai e nevoie de el; pentru unele boli e totuși indicat.",
+      "action": "ask_pharmacist",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "beers",
+        "ref": "AGS Beers 2023, tabelul 2 (beers-ppi-long-term)",
+        "url": null
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_01_alcohol",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_01"
+      ],
+      "title": "Alcoolul în exces poate crește efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Alcoolul în exces poate crește efectul Sintrom-ului.",
+      "recommendation": "Evitați cantitățile mari de alcool.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: alcohol",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_01_vitamin_k",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_01"
+      ],
+      "title": "Alimentele bogate în vitamina K (legume cu frunze verzi) scad efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Alimentele bogate în vitamina K (legume cu frunze verzi) scad efectul Sintrom-ului.",
+      "recommendation": "Mâncați constant, fără schimbări bruște de dietă; anunțați medicul la schimbări mari.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: vitamin_k",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_02_alcohol",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_02"
+      ],
+      "title": "Alcoolul cu ibuprofen crește riscul de sângerare digestivă",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Alcoolul cu ibuprofen crește riscul de sângerare digestivă.",
+      "recommendation": "Evitați alcoolul cât luați Nurofen.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: alcohol",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_03_alcohol",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_03"
+      ],
+      "title": "Alcoolul în cantități mari, cu simvastatină, crește riscul de afectare a ficatului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Alcoolul în cantități mari, cu simvastatină, crește riscul de afectare a ficatului.",
+      "recommendation": "Evitați cantitățile mari de alcool.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: alcohol",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_05_fiber",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_05"
+      ],
+      "title": "Fibrele alimentare pot scădea absorbția Euthyrox-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Fibrele alimentare pot scădea absorbția Euthyrox-ului.",
+      "recommendation": "Luați Euthyrox-ul mereu la aceeași oră și în aceeași relație cu masa.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: fiber",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_05_soy",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_05"
+      ],
+      "title": "Produsele din soia pot scădea absorbția Euthyrox-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Produsele din soia pot scădea absorbția Euthyrox-ului.",
+      "recommendation": "Luați Euthyrox-ul mereu la aceeași oră și în aceeași relație cu masa.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: soy",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_08_alcohol",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_08"
+      ],
+      "title": "Alcoolul accentuează somnolența dată de amitriptilină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Alcoolul accentuează somnolența dată de amitriptilină.",
+      "recommendation": "Evitați alcoolul.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: alcohol",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_01_med_03",
+      "kind": "ddi",
+      "severity": "minor",
+      "med_ids": [
+        "med_01",
+        "med_03"
+      ],
+      "title": "Simvastatina poate crește ușor efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Simvastatina poate crește ușor răspunsul anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
+      "action": "monitor",
+      "route_to": [
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: acenocoumarol + simvastatin (DDInter: warfarină + simvastatină = Minor)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_03_med_05",
+      "kind": "ddi",
+      "severity": "minor",
+      "med_ids": [
+        "med_03",
+        "med_05"
+      ],
+      "title": "Simvastatină + Euthyrox",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Interacțiune minoră.",
+      "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
+      "action": "monitor",
+      "route_to": [
+        "pharmacist"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: levothyroxine + simvastatin = Minor",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    }
+  ],
+  "acb_total": 3,
+  "graph": {
+    "nodes": [
+      {
+        "data": {
+          "id": "p",
+          "type": "patient",
+          "label": "Maria"
+        }
+      },
+      {
+        "data": {
+          "id": "med_01",
+          "type": "product",
+          "label": "Sintrom 4 mg",
+          "prescriber": "cardiologie",
+          "severity": "major"
+        }
+      },
+      {
+        "data": {
+          "id": "s:B01AA07",
+          "type": "substance",
+          "label": "acenocoumarol"
+        }
+      },
+      {
+        "data": {
+          "id": "c:B01AA",
+          "type": "atc_class",
+          "label": "antagoniști ai vitaminei K"
+        }
+      },
+      {
+        "data": {
+          "id": "med_02",
+          "type": "product",
+          "label": "Nurofen 400 mg",
+          "prescriber": null,
+          "severity": "major"
+        }
+      },
+      {
+        "data": {
+          "id": "s:M01AE01",
+          "type": "substance",
+          "label": "ibuprofen"
+        }
+      },
+      {
+        "data": {
+          "id": "c:M01AE",
+          "type": "atc_class",
+          "label": "antiinflamatoare (derivați de acid propionic)"
+        }
+      },
+      {
+        "data": {
+          "id": "med_03",
+          "type": "product",
+          "label": "Simvastatin Terapia 40 mg",
+          "prescriber": "medicină de familie",
+          "severity": "major"
+        }
+      },
+      {
+        "data": {
+          "id": "s:C10AA01",
+          "type": "substance",
+          "label": "simvastatin"
+        }
+      },
+      {
+        "data": {
+          "id": "c:C10AA",
+          "type": "atc_class",
+          "label": "statine"
+        }
+      },
+      {
+        "data": {
+          "id": "med_04",
+          "type": "product",
+          "label": "Amlodipină 10 mg",
+          "prescriber": "medicină de familie",
+          "severity": "major"
+        }
+      },
+      {
+        "data": {
+          "id": "s:C08CA01",
+          "type": "substance",
+          "label": "amlodipine"
+        }
+      },
+      {
+        "data": {
+          "id": "c:C08CA",
+          "type": "atc_class",
+          "label": "blocante ale canalelor de calciu"
+        }
+      },
+      {
+        "data": {
+          "id": "med_05",
+          "type": "product",
+          "label": "Euthyrox 75 mcg",
+          "prescriber": "endocrinologie",
+          "severity": "moderate"
+        }
+      },
+      {
+        "data": {
+          "id": "s:H03AA01",
+          "type": "substance",
+          "label": "levothyroxine"
+        }
+      },
+      {
+        "data": {
+          "id": "c:H03AA",
+          "type": "atc_class",
+          "label": "hormoni tiroidieni"
+        }
+      },
+      {
+        "data": {
+          "id": "med_06",
+          "type": "product",
+          "label": "Calciu + Vitamina D3",
+          "prescriber": "medicină de familie",
+          "severity": "moderate"
+        }
+      },
+      {
+        "data": {
+          "id": "s:A12AA04",
+          "type": "substance",
+          "label": "calcium carbonate"
+        }
+      },
+      {
+        "data": {
+          "id": "c:A12AA",
+          "type": "atc_class",
+          "label": "calciu"
+        }
+      },
+      {
+        "data": {
+          "id": "s:A11CC05",
+          "type": "substance",
+          "label": "cholecalciferol"
+        }
+      },
+      {
+        "data": {
+          "id": "c:A11CC",
+          "type": "atc_class",
+          "label": "vitamina D"
+        }
+      },
+      {
+        "data": {
+          "id": "med_07",
+          "type": "product",
+          "label": "Omeprazol 20 mg",
+          "prescriber": "gastroenterologie",
+          "severity": "moderate"
+        }
+      },
+      {
+        "data": {
+          "id": "s:A02BC01",
+          "type": "substance",
+          "label": "omeprazole"
+        }
+      },
+      {
+        "data": {
+          "id": "c:A02BC",
+          "type": "atc_class",
+          "label": "inhibitori de pompă de protoni"
+        }
+      },
+      {
+        "data": {
+          "id": "med_08",
+          "type": "product",
+          "label": "Amitriptilina Arena 25 mg",
+          "prescriber": "neurologie",
+          "severity": "major"
+        }
+      },
+      {
+        "data": {
+          "id": "s:N06AA09",
+          "type": "substance",
+          "label": "amitriptyline"
+        }
+      },
+      {
+        "data": {
+          "id": "c:N06AA",
+          "type": "atc_class",
+          "label": "antidepresive triciclice"
+        }
+      },
+      {
+        "data": {
+          "id": "f:grapefruit",
+          "type": "food",
+          "label": "grepfrut"
+        }
+      },
+      {
+        "data": {
+          "id": "f:alcohol",
+          "type": "food",
+          "label": "alcool"
+        }
+      },
+      {
+        "data": {
+          "id": "f:k",
+          "type": "food",
+          "label": "k"
+        }
+      },
+      {
+        "data": {
+          "id": "f:fiber",
+          "type": "food",
+          "label": "fibre alimentare"
+        }
+      },
+      {
+        "data": {
+          "id": "f:soy",
+          "type": "food",
+          "label": "soia"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "data": {
+          "source": "p",
+          "target": "med_01",
+          "type": "takes",
+          "id": "e0"
+        }
+      },
+      {
+        "data": {
+          "source": "s:B01AA07",
+          "target": "c:B01AA",
+          "type": "in_class",
+          "id": "e1"
+        }
+      },
+      {
+        "data": {
+          "source": "med_01",
+          "target": "s:B01AA07",
+          "type": "contains",
+          "id": "e2"
+        }
+      },
+      {
+        "data": {
+          "source": "p",
+          "target": "med_02",
+          "type": "takes",
+          "id": "e3"
+        }
+      },
+      {
+        "data": {
+          "source": "s:M01AE01",
+          "target": "c:M01AE",
+          "type": "in_class",
+          "id": "e4"
+        }
+      },
+      {
+        "data": {
+          "source": "med_02",
+          "target": "s:M01AE01",
+          "type": "contains",
+          "id": "e5"
+        }
+      },
+      {
+        "data": {
+          "source": "p",
+          "target": "med_03",
+          "type": "takes",
+          "id": "e6"
+        }
+      },
+      {
+        "data": {
+          "source": "s:C10AA01",
+          "target": "c:C10AA",
+          "type": "in_class",
+          "id": "e7"
+        }
+      },
+      {
+        "data": {
+          "source": "med_03",
+          "target": "s:C10AA01",
+          "type": "contains",
+          "id": "e8"
+        }
+      },
+      {
+        "data": {
+          "source": "p",
+          "target": "med_04",
+          "type": "takes",
+          "id": "e9"
+        }
+      },
+      {
+        "data": {
+          "source": "s:C08CA01",
+          "target": "c:C08CA",
+          "type": "in_class",
+          "id": "e10"
+        }
+      },
+      {
+        "data": {
+          "source": "med_04",
+          "target": "s:C08CA01",
+          "type": "contains",
+          "id": "e11"
+        }
+      },
+      {
+        "data": {
+          "source": "p",
+          "target": "med_05",
+          "type": "takes",
+          "id": "e12"
+        }
+      },
+      {
+        "data": {
+          "source": "s:H03AA01",
+          "target": "c:H03AA",
+          "type": "in_class",
+          "id": "e13"
+        }
+      },
+      {
+        "data": {
+          "source": "med_05",
+          "target": "s:H03AA01",
+          "type": "contains",
+          "id": "e14"
+        }
+      },
+      {
+        "data": {
+          "source": "p",
+          "target": "med_06",
+          "type": "takes",
+          "id": "e15"
+        }
+      },
+      {
+        "data": {
+          "source": "s:A12AA04",
+          "target": "c:A12AA",
+          "type": "in_class",
+          "id": "e16"
+        }
+      },
+      {
+        "data": {
+          "source": "med_06",
+          "target": "s:A12AA04",
+          "type": "contains",
+          "id": "e17"
+        }
+      },
+      {
+        "data": {
+          "source": "s:A11CC05",
+          "target": "c:A11CC",
+          "type": "in_class",
+          "id": "e18"
+        }
+      },
+      {
+        "data": {
+          "source": "med_06",
+          "target": "s:A11CC05",
+          "type": "contains",
+          "id": "e19"
+        }
+      },
+      {
+        "data": {
+          "source": "p",
+          "target": "med_07",
+          "type": "takes",
+          "id": "e20"
+        }
+      },
+      {
+        "data": {
+          "source": "s:A02BC01",
+          "target": "c:A02BC",
+          "type": "in_class",
+          "id": "e21"
+        }
+      },
+      {
+        "data": {
+          "source": "med_07",
+          "target": "s:A02BC01",
+          "type": "contains",
+          "id": "e22"
+        }
+      },
+      {
+        "data": {
+          "source": "p",
+          "target": "med_08",
+          "type": "takes",
+          "id": "e23"
+        }
+      },
+      {
+        "data": {
+          "source": "s:N06AA09",
+          "target": "c:N06AA",
+          "type": "in_class",
+          "id": "e24"
+        }
+      },
+      {
+        "data": {
+          "source": "med_08",
+          "target": "s:N06AA09",
+          "type": "contains",
+          "id": "e25"
+        }
+      },
+      {
+        "data": {
+          "source": "s:B01AA07",
+          "target": "s:M01AE01",
+          "type": "interacts",
+          "severity": "major",
+          "alert_id": "al_ddi_med_01_med_02",
+          "id": "e26"
+        }
+      },
+      {
+        "data": {
+          "source": "s:C10AA01",
+          "target": "s:C08CA01",
+          "type": "interacts",
+          "severity": "major",
+          "alert_id": "al_ddi_med_03_med_04",
+          "id": "e27"
+        }
+      },
+      {
+        "data": {
+          "source": "s:C10AA01",
+          "target": "f:grapefruit",
+          "type": "food_interaction",
+          "severity": "major",
+          "alert_id": "al_food_med_03_grapefruit",
+          "id": "e28"
+        }
+      },
+      {
+        "data": {
+          "source": "s:B01AA07",
+          "target": "s:H03AA01",
+          "type": "interacts",
+          "severity": "moderate",
+          "alert_id": "al_ddi_med_01_med_05",
+          "id": "e29"
+        }
+      },
+      {
+        "data": {
+          "source": "s:B01AA07",
+          "target": "s:A02BC01",
+          "type": "interacts",
+          "severity": "moderate",
+          "alert_id": "al_ddi_med_01_med_07",
+          "id": "e30"
+        }
+      },
+      {
+        "data": {
+          "source": "s:M01AE01",
+          "target": "s:C08CA01",
+          "type": "interacts",
+          "severity": "moderate",
+          "alert_id": "al_ddi_med_02_med_04",
+          "id": "e31"
+        }
+      },
+      {
+        "data": {
+          "source": "s:C10AA01",
+          "target": "s:A02BC01",
+          "type": "interacts",
+          "severity": "moderate",
+          "alert_id": "al_ddi_med_03_med_07",
+          "id": "e32"
+        }
+      },
+      {
+        "data": {
+          "source": "s:C08CA01",
+          "target": "s:A12AA04",
+          "type": "interacts",
+          "severity": "moderate",
+          "alert_id": "al_ddi_med_04_med_06",
+          "id": "e33"
+        }
+      },
+      {
+        "data": {
+          "source": "s:H03AA01",
+          "target": "s:A12AA04",
+          "type": "interacts",
+          "severity": "moderate",
+          "alert_id": "al_ddi_med_05_med_06",
+          "id": "e34"
+        }
+      },
+      {
+        "data": {
+          "source": "s:H03AA01",
+          "target": "s:A02BC01",
+          "type": "interacts",
+          "severity": "moderate",
+          "alert_id": "al_ddi_med_05_med_07",
+          "id": "e35"
+        }
+      },
+      {
+        "data": {
+          "source": "s:H03AA01",
+          "target": "s:N06AA09",
+          "type": "interacts",
+          "severity": "moderate",
+          "alert_id": "al_ddi_med_05_med_08",
+          "id": "e36"
+        }
+      },
+      {
+        "data": {
+          "source": "s:B01AA07",
+          "target": "f:alcohol",
+          "type": "food_interaction",
+          "severity": "moderate",
+          "alert_id": "al_food_med_01_alcohol",
+          "id": "e37"
+        }
+      },
+      {
+        "data": {
+          "source": "s:B01AA07",
+          "target": "f:k",
+          "type": "food_interaction",
+          "severity": "moderate",
+          "alert_id": "al_food_med_01_vitamin_k",
+          "id": "e38"
+        }
+      },
+      {
+        "data": {
+          "source": "s:M01AE01",
+          "target": "f:alcohol",
+          "type": "food_interaction",
+          "severity": "moderate",
+          "alert_id": "al_food_med_02_alcohol",
+          "id": "e39"
+        }
+      },
+      {
+        "data": {
+          "source": "s:C10AA01",
+          "target": "f:alcohol",
+          "type": "food_interaction",
+          "severity": "moderate",
+          "alert_id": "al_food_med_03_alcohol",
+          "id": "e40"
+        }
+      },
+      {
+        "data": {
+          "source": "s:H03AA01",
+          "target": "f:fiber",
+          "type": "food_interaction",
+          "severity": "moderate",
+          "alert_id": "al_food_med_05_fiber",
+          "id": "e41"
+        }
+      },
+      {
+        "data": {
+          "source": "s:H03AA01",
+          "target": "f:soy",
+          "type": "food_interaction",
+          "severity": "moderate",
+          "alert_id": "al_food_med_05_soy",
+          "id": "e42"
+        }
+      },
+      {
+        "data": {
+          "source": "s:N06AA09",
+          "target": "f:alcohol",
+          "type": "food_interaction",
+          "severity": "moderate",
+          "alert_id": "al_food_med_08_alcohol",
+          "id": "e43"
+        }
+      },
+      {
+        "data": {
+          "source": "s:B01AA07",
+          "target": "s:C10AA01",
+          "type": "interacts",
+          "severity": "minor",
+          "alert_id": "al_ddi_med_01_med_03",
+          "id": "e44"
+        }
+      },
+      {
+        "data": {
+          "source": "s:C10AA01",
+          "target": "s:H03AA01",
+          "type": "interacts",
+          "severity": "minor",
+          "alert_id": "al_ddi_med_03_med_05",
+          "id": "e45"
+        }
+      }
+    ]
+  },
+  "analyzed_at": "2026-11-14T09:00:00Z"
+}

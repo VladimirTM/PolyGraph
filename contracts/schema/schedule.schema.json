@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Schedule",
+  "description": "Programul unei zile, calculat de solver. Plan, secțiunea 5.4.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["date", "anchors", "moments", "unsatisfied", "solver"],
+  "properties": {
+    "date": { "type": "string", "format": "date" },
+    "anchors": { "$ref": "#/$defs/anchors" },
+    "moments": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["time", "label", "doses"],
+        "properties": {
+          "time": { "$ref": "#/$defs/clock" },
+          "label": { "type": "string" },
+          "doses": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["med_id", "qty", "instruction", "reasons"],
+              "properties": {
+                "med_id": { "type": "string", "pattern": "^med_[a-z0-9_]+$" },
+                "qty": { "type": "number", "exclusiveMinimum": 0 },
+                "instruction": { "type": "string" },
+                "reasons": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "unsatisfied": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["med_ids", "rule", "reason"],
+        "properties": {
+          "med_ids": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "rule": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "solver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["moments_count", "version"],
+      "properties": {
+        "moments_count": { "type": "integer", "minimum": 0 },
+        "version": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "clock": { "type": "string", "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$", "description": "ora locală HH:MM, 24 h" },
+    "anchors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wake", "breakfast", "lunch", "dinner", "bed"],
+      "properties": {
+        "wake": { "$ref": "#/$defs/clock" },
+        "breakfast": { "$ref": "#/$defs/clock" },
+        "lunch": { "$ref": "#/$defs/clock" },
+        "dinner": { "$ref": "#/$defs/clock" },
+        "bed": { "$ref": "#/$defs/clock" }
+      }
+    }
+  }
+}

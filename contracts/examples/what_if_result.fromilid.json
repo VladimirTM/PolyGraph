@@ -1,0 +1,209 @@
+{
+  "matched": {
+    "id": "med_09",
+    "source": "photo_rx",
+    "product": {
+      "brand": "Fromilid",
+      "strength_text": "500 mg",
+      "form": "comprimate filmate",
+      "gtin": null,
+      "pack_size": 14,
+      "expiry": null,
+      "batch": null
+    },
+    "substances": [
+      {
+        "dci": "CLARITHROMYCINUM",
+        "inn": "clarithromycin",
+        "atc": "J01FA09",
+        "strength_mg": 500.0
+      }
+    ],
+    "dosage": {
+      "raw": "1-0-1, 7 zile",
+      "pattern": {
+        "morning": 1,
+        "noon": 0,
+        "evening": 1,
+        "bedtime": 0
+      },
+      "as_needed": false,
+      "with_food": "any"
+    },
+    "prescriber": {
+      "name": null,
+      "specialty": "ORL"
+    },
+    "start_date": "2026-11-14",
+    "end_date": "2026-11-20",
+    "photo_url": "/media/med_09.jpg",
+    "match": {
+      "method": "exact_brand",
+      "confidence": 0.95,
+      "needs_review": false
+    }
+  },
+  "new_alerts": [
+    {
+      "id": "al_ddi_med_03_med_09",
+      "kind": "ddi",
+      "severity": "critical",
+      "med_ids": [
+        "med_03",
+        "med_09"
+      ],
+      "title": "Antibioticul nou nu se asociază cu simvastatina",
+      "patient_text": "Antibioticul nou trebuie verificat de medic înainte de prima pastilă. Am anunțat-o pe Ana.",
+      "detail": "Claritromicina (Fromilid) crește mult concentrația de simvastatină: risc de miopatie și rabdomioliză. Asocierea este contraindicată în RCP-ul simvastatinei și al claritromicinei.",
+      "recommendation": "Discutați cu medicul ORL care a prescris antibioticul sau cu farmacistul înainte de prima doză.",
+      "action": "contact_doctor",
+      "route_to": [
+        "patient",
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: simvastatin + clarithromycin (RCP: contraindicat)",
+        "url": "https://ddinter2.scbdd.com/server/drug-detail/DDInter1675/"
+      },
+      "basis": "curated",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_01_med_09",
+      "kind": "ddi",
+      "severity": "major",
+      "med_ids": [
+        "med_01",
+        "med_09"
+      ],
+      "title": "Antibioticul nou poate crește efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Claritromicina poate crește mult efectul anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "Discutați cu medicul cardiolog sau cu farmacistul dacă e nevoie de un INR în timpul curei de antibiotic.",
+      "action": "contact_doctor",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: acenocoumarol + clarithromycin (DDInter: warfarină + claritromicină = Major)",
+        "url": "https://ddinter2.scbdd.com/server/interact/68158/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_04_med_09",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_04",
+        "med_09"
+      ],
+      "title": "Amlodipină + claritromicină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Claritromicina poate crește concentrația de amlodipină (amețeală, glezne umflate).",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: amlodipine + clarithromycin = Moderate",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_08_med_09",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_08",
+        "med_09"
+      ],
+      "title": "Amitriptilină + claritromicină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Asocierea poate crește concentrația de amitriptilină și riscul de tulburări de ritm.",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: amitriptyline + clarithromycin = Moderate",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_07_med_09",
+      "kind": "ddi",
+      "severity": "minor",
+      "med_ids": [
+        "med_07",
+        "med_09"
+      ],
+      "title": "Omeprazol + claritromicină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Interacțiune minoră.",
+      "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
+      "action": "monitor",
+      "route_to": [
+        "pharmacist"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: clarithromycin + omeprazole = Minor",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_09_grapefruit",
+      "kind": "food",
+      "severity": "minor",
+      "med_ids": [
+        "med_09"
+      ],
+      "title": "Grepfrutul cu claritromicină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Grepfrutul poate modifica concentrația de claritromicină.",
+      "recommendation": "În general, evitați grepfrutul și sucul de grepfrut.",
+      "action": "avoid_food",
+      "route_to": [
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: grapefruit",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    }
+  ]
+}

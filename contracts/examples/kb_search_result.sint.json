@@ -1,0 +1,17 @@
+{
+  "results": [
+    {
+      "brand": "Sintrom",
+      "strength_text": "4 mg",
+      "form": "comprimate",
+      "substances": [
+        {
+          "dci": "ACENOCUMAROLUM",
+          "inn": "acenocoumarol",
+          "atc": "B01AA07",
+          "strength_mg": 4.0
+        }
+      ]
+    }
+  ]
+}

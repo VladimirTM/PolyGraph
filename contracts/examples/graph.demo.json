@@ -1,0 +1,654 @@
+{
+  "nodes": [
+    {
+      "data": {
+        "id": "p",
+        "type": "patient",
+        "label": "Maria"
+      }
+    },
+    {
+      "data": {
+        "id": "med_01",
+        "type": "product",
+        "label": "Sintrom 4 mg",
+        "prescriber": "cardiologie",
+        "severity": "major"
+      }
+    },
+    {
+      "data": {
+        "id": "s:B01AA07",
+        "type": "substance",
+        "label": "acenocoumarol"
+      }
+    },
+    {
+      "data": {
+        "id": "c:B01AA",
+        "type": "atc_class",
+        "label": "antagoniști ai vitaminei K"
+      }
+    },
+    {
+      "data": {
+        "id": "med_02",
+        "type": "product",
+        "label": "Nurofen 400 mg",
+        "prescriber": null,
+        "severity": "major"
+      }
+    },
+    {
+      "data": {
+        "id": "s:M01AE01",
+        "type": "substance",
+        "label": "ibuprofen"
+      }
+    },
+    {
+      "data": {
+        "id": "c:M01AE",
+        "type": "atc_class",
+        "label": "antiinflamatoare (derivați de acid propionic)"
+      }
+    },
+    {
+      "data": {
+        "id": "med_03",
+        "type": "product",
+        "label": "Simvastatin Terapia 40 mg",
+        "prescriber": "medicină de familie",
+        "severity": "major"
+      }
+    },
+    {
+      "data": {
+        "id": "s:C10AA01",
+        "type": "substance",
+        "label": "simvastatin"
+      }
+    },
+    {
+      "data": {
+        "id": "c:C10AA",
+        "type": "atc_class",
+        "label": "statine"
+      }
+    },
+    {
+      "data": {
+        "id": "med_04",
+        "type": "product",
+        "label": "Amlodipină 10 mg",
+        "prescriber": "medicină de familie",
+        "severity": "major"
+      }
+    },
+    {
+      "data": {
+        "id": "s:C08CA01",
+        "type": "substance",
+        "label": "amlodipine"
+      }
+    },
+    {
+      "data": {
+        "id": "c:C08CA",
+        "type": "atc_class",
+        "label": "blocante ale canalelor de calciu"
+      }
+    },
+    {
+      "data": {
+        "id": "med_05",
+        "type": "product",
+        "label": "Euthyrox 75 mcg",
+        "prescriber": "endocrinologie",
+        "severity": "moderate"
+      }
+    },
+    {
+      "data": {
+        "id": "s:H03AA01",
+        "type": "substance",
+        "label": "levothyroxine"
+      }
+    },
+    {
+      "data": {
+        "id": "c:H03AA",
+        "type": "atc_class",
+        "label": "hormoni tiroidieni"
+      }
+    },
+    {
+      "data": {
+        "id": "med_06",
+        "type": "product",
+        "label": "Calciu + Vitamina D3",
+        "prescriber": "medicină de familie",
+        "severity": "moderate"
+      }
+    },
+    {
+      "data": {
+        "id": "s:A12AA04",
+        "type": "substance",
+        "label": "calcium carbonate"
+      }
+    },
+    {
+      "data": {
+        "id": "c:A12AA",
+        "type": "atc_class",
+        "label": "calciu"
+      }
+    },
+    {
+      "data": {
+        "id": "s:A11CC05",
+        "type": "substance",
+        "label": "cholecalciferol"
+      }
+    },
+    {
+      "data": {
+        "id": "c:A11CC",
+        "type": "atc_class",
+        "label": "vitamina D"
+      }
+    },
+    {
+      "data": {
+        "id": "med_07",
+        "type": "product",
+        "label": "Omeprazol 20 mg",
+        "prescriber": "gastroenterologie",
+        "severity": "moderate"
+      }
+    },
+    {
+      "data": {
+        "id": "s:A02BC01",
+        "type": "substance",
+        "label": "omeprazole"
+      }
+    },
+    {
+      "data": {
+        "id": "c:A02BC",
+        "type": "atc_class",
+        "label": "inhibitori de pompă de protoni"
+      }
+    },
+    {
+      "data": {
+        "id": "med_08",
+        "type": "product",
+        "label": "Amitriptilina Arena 25 mg",
+        "prescriber": "neurologie",
+        "severity": "major"
+      }
+    },
+    {
+      "data": {
+        "id": "s:N06AA09",
+        "type": "substance",
+        "label": "amitriptyline"
+      }
+    },
+    {
+      "data": {
+        "id": "c:N06AA",
+        "type": "atc_class",
+        "label": "antidepresive triciclice"
+      }
+    },
+    {
+      "data": {
+        "id": "f:grapefruit",
+        "type": "food",
+        "label": "grepfrut"
+      }
+    },
+    {
+      "data": {
+        "id": "f:alcohol",
+        "type": "food",
+        "label": "alcool"
+      }
+    },
+    {
+      "data": {
+        "id": "f:k",
+        "type": "food",
+        "label": "k"
+      }
+    },
+    {
+      "data": {
+        "id": "f:fiber",
+        "type": "food",
+        "label": "fibre alimentare"
+      }
+    },
+    {
+      "data": {
+        "id": "f:soy",
+        "type": "food",
+        "label": "soia"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "data": {
+        "source": "p",
+        "target": "med_01",
+        "type": "takes",
+        "id": "e0"
+      }
+    },
+    {
+      "data": {
+        "source": "s:B01AA07",
+        "target": "c:B01AA",
+        "type": "in_class",
+        "id": "e1"
+      }
+    },
+    {
+      "data": {
+        "source": "med_01",
+        "target": "s:B01AA07",
+        "type": "contains",
+        "id": "e2"
+      }
+    },
+    {
+      "data": {
+        "source": "p",
+        "target": "med_02",
+        "type": "takes",
+        "id": "e3"
+      }
+    },
+    {
+      "data": {
+        "source": "s:M01AE01",
+        "target": "c:M01AE",
+        "type": "in_class",
+        "id": "e4"
+      }
+    },
+    {
+      "data": {
+        "source": "med_02",
+        "target": "s:M01AE01",
+        "type": "contains",
+        "id": "e5"
+      }
+    },
+    {
+      "data": {
+        "source": "p",
+        "target": "med_03",
+        "type": "takes",
+        "id": "e6"
+      }
+    },
+    {
+      "data": {
+        "source": "s:C10AA01",
+        "target": "c:C10AA",
+        "type": "in_class",
+        "id": "e7"
+      }
+    },
+    {
+      "data": {
+        "source": "med_03",
+        "target": "s:C10AA01",
+        "type": "contains",
+        "id": "e8"
+      }
+    },
+    {
+      "data": {
+        "source": "p",
+        "target": "med_04",
+        "type": "takes",
+        "id": "e9"
+      }
+    },
+    {
+      "data": {
+        "source": "s:C08CA01",
+        "target": "c:C08CA",
+        "type": "in_class",
+        "id": "e10"
+      }
+    },
+    {
+      "data": {
+        "source": "med_04",
+        "target": "s:C08CA01",
+        "type": "contains",
+        "id": "e11"
+      }
+    },
+    {
+      "data": {
+        "source": "p",
+        "target": "med_05",
+        "type": "takes",
+        "id": "e12"
+      }
+    },
+    {
+      "data": {
+        "source": "s:H03AA01",
+        "target": "c:H03AA",
+        "type": "in_class",
+        "id": "e13"
+      }
+    },
+    {
+      "data": {
+        "source": "med_05",
+        "target": "s:H03AA01",
+        "type": "contains",
+        "id": "e14"
+      }
+    },
+    {
+      "data": {
+        "source": "p",
+        "target": "med_06",
+        "type": "takes",
+        "id": "e15"
+      }
+    },
+    {
+      "data": {
+        "source": "s:A12AA04",
+        "target": "c:A12AA",
+        "type": "in_class",
+        "id": "e16"
+      }
+    },
+    {
+      "data": {
+        "source": "med_06",
+        "target": "s:A12AA04",
+        "type": "contains",
+        "id": "e17"
+      }
+    },
+    {
+      "data": {
+        "source": "s:A11CC05",
+        "target": "c:A11CC",
+        "type": "in_class",
+        "id": "e18"
+      }
+    },
+    {
+      "data": {
+        "source": "med_06",
+        "target": "s:A11CC05",
+        "type": "contains",
+        "id": "e19"
+      }
+    },
+    {
+      "data": {
+        "source": "p",
+        "target": "med_07",
+        "type": "takes",
+        "id": "e20"
+      }
+    },
+    {
+      "data": {
+        "source": "s:A02BC01",
+        "target": "c:A02BC",
+        "type": "in_class",
+        "id": "e21"
+      }
+    },
+    {
+      "data": {
+        "source": "med_07",
+        "target": "s:A02BC01",
+        "type": "contains",
+        "id": "e22"
+      }
+    },
+    {
+      "data": {
+        "source": "p",
+        "target": "med_08",
+        "type": "takes",
+        "id": "e23"
+      }
+    },
+    {
+      "data": {
+        "source": "s:N06AA09",
+        "target": "c:N06AA",
+        "type": "in_class",
+        "id": "e24"
+      }
+    },
+    {
+      "data": {
+        "source": "med_08",
+        "target": "s:N06AA09",
+        "type": "contains",
+        "id": "e25"
+      }
+    },
+    {
+      "data": {
+        "source": "s:B01AA07",
+        "target": "s:M01AE01",
+        "type": "interacts",
+        "severity": "major",
+        "alert_id": "al_ddi_med_01_med_02",
+        "id": "e26"
+      }
+    },
+    {
+      "data": {
+        "source": "s:C10AA01",
+        "target": "s:C08CA01",
+        "type": "interacts",
+        "severity": "major",
+        "alert_id": "al_ddi_med_03_med_04",
+        "id": "e27"
+      }
+    },
+    {
+      "data": {
+        "source": "s:C10AA01",
+        "target": "f:grapefruit",
+        "type": "food_interaction",
+        "severity": "major",
+        "alert_id": "al_food_med_03_grapefruit",
+        "id": "e28"
+      }
+    },
+    {
+      "data": {
+        "source": "s:B01AA07",
+        "target": "s:H03AA01",
+        "type": "interacts",
+        "severity": "moderate",
+        "alert_id": "al_ddi_med_01_med_05",
+        "id": "e29"
+      }
+    },
+    {
+      "data": {
+        "source": "s:B01AA07",
+        "target": "s:A02BC01",
+        "type": "interacts",
+        "severity": "moderate",
+        "alert_id": "al_ddi_med_01_med_07",
+        "id": "e30"
+      }
+    },
+    {
+      "data": {
+        "source": "s:M01AE01",
+        "target": "s:C08CA01",
+        "type": "interacts",
+        "severity": "moderate",
+        "alert_id": "al_ddi_med_02_med_04",
+        "id": "e31"
+      }
+    },
+    {
+      "data": {
+        "source": "s:C10AA01",
+        "target": "s:A02BC01",
+        "type": "interacts",
+        "severity": "moderate",
+        "alert_id": "al_ddi_med_03_med_07",
+        "id": "e32"
+      }
+    },
+    {
+      "data": {
+        "source": "s:C08CA01",
+        "target": "s:A12AA04",
+        "type": "interacts",
+        "severity": "moderate",
+        "alert_id": "al_ddi_med_04_med_06",
+        "id": "e33"
+      }
+    },
+    {
+      "data": {
+        "source": "s:H03AA01",
+        "target": "s:A12AA04",
+        "type": "interacts",
+        "severity": "moderate",
+        "alert_id": "al_ddi_med_05_med_06",
+        "id": "e34"
+      }
+    },
+    {
+      "data": {
+        "source": "s:H03AA01",
+        "target": "s:A02BC01",
+        "type": "interacts",
+        "severity": "moderate",
+        "alert_id": "al_ddi_med_05_med_07",
+        "id": "e35"
+      }
+    },
+    {
+      "data": {
+        "source": "s:H03AA01",
+        "target": "s:N06AA09",
+        "type": "interacts",
+        "severity": "moderate",
+        "alert_id": "al_ddi_med_05_med_08",
+        "id": "e36"
+      }
+    },
+    {
+      "data": {
+        "source": "s:B01AA07",
+        "target": "f:alcohol",
+        "type": "food_interaction",
+        "severity": "moderate",
+        "alert_id": "al_food_med_01_alcohol",
+        "id": "e37"
+      }
+    },
+    {
+      "data": {
+        "source": "s:B01AA07",
+        "target": "f:k",
+        "type": "food_interaction",
+        "severity": "moderate",
+        "alert_id": "al_food_med_01_vitamin_k",
+        "id": "e38"
+      }
+    },
+    {
+      "data": {
+        "source": "s:M01AE01",
+        "target": "f:alcohol",
+        "type": "food_interaction",
+        "severity": "moderate",
+        "alert_id": "al_food_med_02_alcohol",
+        "id": "e39"
+      }
+    },
+    {
+      "data": {
+        "source": "s:C10AA01",
+        "target": "f:alcohol",
+        "type": "food_interaction",
+        "severity": "moderate",
+        "alert_id": "al_food_med_03_alcohol",
+        "id": "e40"
+      }
+    },
+    {
+      "data": {
+        "source": "s:H03AA01",
+        "target": "f:fiber",
+        "type": "food_interaction",
+        "severity": "moderate",
+        "alert_id": "al_food_med_05_fiber",
+        "id": "e41"
+      }
+    },
+    {
+      "data": {
+        "source": "s:H03AA01",
+        "target": "f:soy",
+        "type": "food_interaction",
+        "severity": "moderate",
+        "alert_id": "al_food_med_05_soy",
+        "id": "e42"
+      }
+    },
+    {
+      "data": {
+        "source": "s:N06AA09",
+        "target": "f:alcohol",
+        "type": "food_interaction",
+        "severity": "moderate",
+        "alert_id": "al_food_med_08_alcohol",
+        "id": "e43"
+      }
+    },
+    {
+      "data": {
+        "source": "s:B01AA07",
+        "target": "s:C10AA01",
+        "type": "interacts",
+        "severity": "minor",
+        "alert_id": "al_ddi_med_01_med_03",
+        "id": "e44"
+      }
+    },
+    {
+      "data": {
+        "source": "s:C10AA01",
+        "target": "s:H03AA01",
+        "type": "interacts",
+        "severity": "minor",
+        "alert_id": "al_ddi_med_03_med_05",
+        "id": "e45"
+      }
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "KbSearchResult",
+  "description": "Răspunsul la GET /v1/kb/search (autocomplete la adăugarea manuală).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "results"
+  ],
+  "properties": {
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "brand",
+          "strength_text",
+          "form",
+          "substances"
+        ],
+        "properties": {
+          "brand": {
+            "type": "string"
+          },
+          "strength_text": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "form": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "substances": {
+            "type": "array",
+            "items": {
+              "$ref": "medication_item.schema.json#/$defs/substance"
+            }
+          }
+        }
+      }
+    }
+  }
+}

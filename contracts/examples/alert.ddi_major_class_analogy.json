@@ -1,0 +1,31 @@
+{
+  "id": "al_ddi_med_01_med_02",
+  "kind": "ddi",
+  "severity": "major",
+  "med_ids": [
+    "med_01",
+    "med_02"
+  ],
+  "title": "Risc crescut de sângerare",
+  "patient_text": "Două dintre pastile, luate împreună, pot crește riscul de sângerare. Am anunțat-o pe Ana.",
+  "detail": "Acenocumarol (Sintrom) + ibuprofen (Nurofen): antiinflamatoarele cresc efectul anticoagulant și riscul de sângerare. Și criteriul Beers 2023: AINS de evitat împreună cu un anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+  "recommendation": "Discutați cu medicul cardiolog sau cu farmacistul înainte de următoarea doză de Nurofen. Anunțați medicul la vânătăi sau sângerări neobișnuite.",
+  "action": "contact_doctor",
+  "route_to": [
+    "patient",
+    "caregiver",
+    "pharmacist"
+  ],
+  "source": {
+    "db": "curated",
+    "ref": "kb/curated_ddi.csv: acenocoumarol + ibuprofen (DDInter: warfarină + ibuprofen = Major)",
+    "url": "https://ddinter2.scbdd.com/server/interact/10470/"
+  },
+  "basis": "class_analogy",
+  "analogy": {
+    "via": "warfarină",
+    "atc4": "B01AA"
+  },
+  "status": "open",
+  "resolution": null
+}

@@ -1,0 +1,26 @@
+{
+  "id": "al_elderly_pim_med_02_beers-nsaid-chronic",
+  "kind": "elderly_pim",
+  "severity": "major",
+  "med_ids": [
+    "med_02"
+  ],
+  "title": "Antiinflamator (AINS) luat de mult timp la vârstnic",
+  "patient_text": "Una dintre pastilele pentru durere trebuie discutată cu medicul. Am anunțat-o pe Ana.",
+  "detail": "La peste 65 de ani, AINS luate pe termen lung cresc riscul de sângerare digestivă, de afectare a rinichilor și de probleme cardiace.",
+  "recommendation": "Discutați cu medicul de familie dacă există o alternativă pentru durere (de ex. paracetamol) și dacă e nevoie de protecție gastrică.",
+  "action": "contact_doctor",
+  "route_to": [
+    "caregiver",
+    "pharmacist"
+  ],
+  "source": {
+    "db": "beers",
+    "ref": "AGS Beers 2023, tabelul 2 (beers-nsaid-chronic)",
+    "url": null
+  },
+  "basis": "direct",
+  "analogy": null,
+  "status": "open",
+  "resolution": null
+}

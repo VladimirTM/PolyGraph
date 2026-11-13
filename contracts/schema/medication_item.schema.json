@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MedicationItem",
+  "description": "Un medicament din lista pacientului (o cutie / o linie de rețetă). Plan, secțiunea 5.2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "source",
+    "product",
+    "substances",
+    "dosage",
+    "prescriber",
+    "start_date",
+    "end_date",
+    "photo_url",
+    "match"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^med_[a-z0-9_]+$"
+    },
+    "source": {
+      "enum": [
+        "photo_box",
+        "photo_rx",
+        "datamatrix",
+        "manual",
+        "voice"
+      ],
+      "title": "MedicationSource"
+    },
+    "product": {
+      "$ref": "#/$defs/product"
+    },
+    "substances": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/substance"
+      }
+    },
+    "dosage": {
+      "$ref": "#/$defs/dosage"
+    },
+    "prescriber": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "specialty"
+      ],
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "specialty": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "null = fără rețetă (OTC)"
+        }
+      }
+    },
+    "start_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "end_date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "setat pentru cure scurte; după end_date medicamentul iese din analiză"
+    },
+    "photo_url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "match": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "confidence",
+        "needs_review"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "gtin_cache",
+            "exact_brand",
+            "exact_dci",
+            "fuzzy",
+            "override",
+            "manual"
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "needs_review": {
+          "type": "boolean",
+          "description": "true dacă confidence < 0.85 sau o substanță nu are atc"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "product": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "brand",
+        "strength_text",
+        "form",
+        "gtin",
+        "pack_size",
+        "expiry",
+        "batch"
+      ],
+      "properties": {
+        "brand": {
+          "type": "string",
+          "minLength": 1
+        },
+        "strength_text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "form": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gtin": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9]{14}$"
+        },
+        "pack_size": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "expiry": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "batch": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "substance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dci",
+        "inn",
+        "atc",
+        "strength_mg"
+      ],
+      "properties": {
+        "dci": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "DCI în latină, ca în catalogul românesc (ex. ACENOCUMAROLUM)"
+        },
+        "inn": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "INN în engleză, ca în DDInter (ex. acenocoumarol)"
+        },
+        "atc": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z][0-9]{2}[A-Z]{2}[0-9]{2}$"
+        },
+        "strength_mg": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "dosage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "raw",
+        "pattern",
+        "as_needed",
+        "with_food"
+      ],
+      "properties": {
+        "raw": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "textul de pe rețetă / cutie (ex. „1/2 cp seara”)"
+        },
+        "pattern": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "morning",
+            "noon",
+            "evening",
+            "bedtime"
+          ],
+          "description": "notația „dimineața-prânz-seara(-culcare)”; fracțiile sunt permise",
+          "properties": {
+            "morning": {
+              "type": "number",
+              "minimum": 0
+            },
+            "noon": {
+              "type": "number",
+              "minimum": 0
+            },
+            "evening": {
+              "type": "number",
+              "minimum": 0
+            },
+            "bedtime": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "as_needed": {
+          "type": "boolean"
+        },
+        "with_food": {
+          "enum": [
+            "empty_stomach",
+            "before_meal",
+            "with_meal",
+            "after_meal",
+            "any"
+          ]
+        }
+      }
+    }
+  }
+}

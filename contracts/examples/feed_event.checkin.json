@@ -1,0 +1,14 @@
+{
+  "id": "ev_0001",
+  "at": "2026-11-14T07:12:03Z",
+  "type": "checkin",
+  "severity": "major",
+  "title": "Maria a raportat: amețeală la ridicare, vânătăi",
+  "body": "Posibil legat de Sintrom + Nurofen (alerta de sângerare deja găsită).",
+  "med_ids": [
+    "med_01",
+    "med_02"
+  ],
+  "alert_id": null,
+  "checkin_id": "ci_01"
+}

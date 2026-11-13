@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Patient",
+  "description": "Profilul pacientului și ancorele zilei (5.7).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "name",
+    "birth_year",
+    "caregiver_name",
+    "anchors"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^pat_[a-z0-9_]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "birth_year": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 2026
+    },
+    "caregiver_name": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "numele aparținătorului, folosit în texte („Am anunțat-o pe Ana”)"
+    },
+    "anchors": {
+      "$ref": "schedule.schema.json#/$defs/anchors"
+    }
+  }
+}

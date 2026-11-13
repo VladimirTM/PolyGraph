@@ -1,0 +1,376 @@
+{
+  "today": "2026-11-14",
+  "patient": {
+    "id": "pat_demo",
+    "name": "Maria",
+    "birth_year": 1948,
+    "caregiver_name": "Ana",
+    "anchors": {
+      "wake": "07:00",
+      "breakfast": "08:00",
+      "lunch": "13:00",
+      "dinner": "19:00",
+      "bed": "22:30"
+    }
+  },
+  "meds": [
+    {
+      "id": "med_01",
+      "source": "photo_box",
+      "product": {
+        "brand": "Sintrom",
+        "strength_text": "4 mg",
+        "form": "comprimate",
+        "gtin": null,
+        "pack_size": 30,
+        "expiry": null,
+        "batch": null
+      },
+      "substances": [
+        {
+          "dci": "ACENOCUMAROLUM",
+          "inn": "acenocoumarol",
+          "atc": "B01AA07",
+          "strength_mg": 4.0
+        }
+      ],
+      "dosage": {
+        "raw": "1/2 cp seara",
+        "pattern": {
+          "morning": 0,
+          "noon": 0,
+          "evening": 0.5,
+          "bedtime": 0
+        },
+        "as_needed": false,
+        "with_food": "any"
+      },
+      "prescriber": {
+        "name": null,
+        "specialty": "cardiologie"
+      },
+      "start_date": "2025-03-01",
+      "end_date": null,
+      "photo_url": "/media/med_01.jpg",
+      "match": {
+        "method": "exact_brand",
+        "confidence": 0.97,
+        "needs_review": false
+      }
+    },
+    {
+      "id": "med_02",
+      "source": "photo_box",
+      "product": {
+        "brand": "Nurofen",
+        "strength_text": "400 mg",
+        "form": "comprimate filmate",
+        "gtin": null,
+        "pack_size": 24,
+        "expiry": null,
+        "batch": null
+      },
+      "substances": [
+        {
+          "dci": "IBUPROFENUM",
+          "inn": "ibuprofen",
+          "atc": "M01AE01",
+          "strength_mg": 400.0
+        }
+      ],
+      "dosage": {
+        "raw": "1-0-1, după masă",
+        "pattern": {
+          "morning": 1,
+          "noon": 0,
+          "evening": 1,
+          "bedtime": 0
+        },
+        "as_needed": false,
+        "with_food": "with_meal"
+      },
+      "prescriber": {
+        "name": null,
+        "specialty": null
+      },
+      "start_date": "2026-09-15",
+      "end_date": null,
+      "photo_url": "/media/med_02.jpg",
+      "match": {
+        "method": "exact_brand",
+        "confidence": 0.97,
+        "needs_review": false
+      }
+    },
+    {
+      "id": "med_03",
+      "source": "photo_box",
+      "product": {
+        "brand": "Simvastatin Terapia",
+        "strength_text": "40 mg",
+        "form": "comprimate filmate",
+        "gtin": null,
+        "pack_size": 28,
+        "expiry": null,
+        "batch": null
+      },
+      "substances": [
+        {
+          "dci": "SIMVASTATINUM",
+          "inn": "simvastatin",
+          "atc": "C10AA01",
+          "strength_mg": 40.0
+        }
+      ],
+      "dosage": {
+        "raw": "0-0-1",
+        "pattern": {
+          "morning": 0,
+          "noon": 0,
+          "evening": 1,
+          "bedtime": 0
+        },
+        "as_needed": false,
+        "with_food": "any"
+      },
+      "prescriber": {
+        "name": null,
+        "specialty": "medicină de familie"
+      },
+      "start_date": "2023-05-10",
+      "end_date": null,
+      "photo_url": "/media/med_03.jpg",
+      "match": {
+        "method": "exact_brand",
+        "confidence": 0.97,
+        "needs_review": false
+      }
+    },
+    {
+      "id": "med_04",
+      "source": "photo_box",
+      "product": {
+        "brand": "Amlodipină",
+        "strength_text": "10 mg",
+        "form": "comprimate",
+        "gtin": null,
+        "pack_size": 30,
+        "expiry": null,
+        "batch": null
+      },
+      "substances": [
+        {
+          "dci": "AMLODIPINUM",
+          "inn": "amlodipine",
+          "atc": "C08CA01",
+          "strength_mg": 10.0
+        }
+      ],
+      "dosage": {
+        "raw": "1-0-0",
+        "pattern": {
+          "morning": 1,
+          "noon": 0,
+          "evening": 0,
+          "bedtime": 0
+        },
+        "as_needed": false,
+        "with_food": "any"
+      },
+      "prescriber": {
+        "name": null,
+        "specialty": "medicină de familie"
+      },
+      "start_date": "2023-05-10",
+      "end_date": null,
+      "photo_url": "/media/med_04.jpg",
+      "match": {
+        "method": "exact_brand",
+        "confidence": 0.97,
+        "needs_review": false
+      }
+    },
+    {
+      "id": "med_05",
+      "source": "photo_box",
+      "product": {
+        "brand": "Euthyrox",
+        "strength_text": "75 mcg",
+        "form": "comprimate",
+        "gtin": null,
+        "pack_size": 100,
+        "expiry": null,
+        "batch": null
+      },
+      "substances": [
+        {
+          "dci": "LEVOTHYROXINUM NATRIUM",
+          "inn": "levothyroxine",
+          "atc": "H03AA01",
+          "strength_mg": 0.075
+        }
+      ],
+      "dosage": {
+        "raw": "1 cp dimineața, pe stomacul gol",
+        "pattern": {
+          "morning": 1,
+          "noon": 0,
+          "evening": 0,
+          "bedtime": 0
+        },
+        "as_needed": false,
+        "with_food": "empty_stomach"
+      },
+      "prescriber": {
+        "name": null,
+        "specialty": "endocrinologie"
+      },
+      "start_date": "2021-02-01",
+      "end_date": null,
+      "photo_url": "/media/med_05.jpg",
+      "match": {
+        "method": "exact_brand",
+        "confidence": 0.97,
+        "needs_review": false
+      }
+    },
+    {
+      "id": "med_06",
+      "source": "photo_box",
+      "product": {
+        "brand": "Calciu + Vitamina D3",
+        "strength_text": null,
+        "form": "comprimate",
+        "gtin": null,
+        "pack_size": 60,
+        "expiry": null,
+        "batch": null
+      },
+      "substances": [
+        {
+          "dci": "CALCII CARBONAS",
+          "inn": "calcium carbonate",
+          "atc": "A12AA04",
+          "strength_mg": null
+        },
+        {
+          "dci": "COLECALCIFEROLUM",
+          "inn": "cholecalciferol",
+          "atc": "A11CC05",
+          "strength_mg": null
+        }
+      ],
+      "dosage": {
+        "raw": "0-1-0, la masă",
+        "pattern": {
+          "morning": 0,
+          "noon": 1,
+          "evening": 0,
+          "bedtime": 0
+        },
+        "as_needed": false,
+        "with_food": "with_meal"
+      },
+      "prescriber": {
+        "name": null,
+        "specialty": "medicină de familie"
+      },
+      "start_date": "2024-01-15",
+      "end_date": null,
+      "photo_url": "/media/med_06.jpg",
+      "match": {
+        "method": "manual",
+        "confidence": 1.0,
+        "needs_review": false
+      }
+    },
+    {
+      "id": "med_07",
+      "source": "photo_box",
+      "product": {
+        "brand": "Omeprazol",
+        "strength_text": "20 mg",
+        "form": "capsule gastrorezistente",
+        "gtin": null,
+        "pack_size": 28,
+        "expiry": null,
+        "batch": null
+      },
+      "substances": [
+        {
+          "dci": "OMEPRAZOLUM",
+          "inn": "omeprazole",
+          "atc": "A02BC01",
+          "strength_mg": 20.0
+        }
+      ],
+      "dosage": {
+        "raw": "1-0-0, înainte de masă",
+        "pattern": {
+          "morning": 1,
+          "noon": 0,
+          "evening": 0,
+          "bedtime": 0
+        },
+        "as_needed": false,
+        "with_food": "before_meal"
+      },
+      "prescriber": {
+        "name": null,
+        "specialty": "gastroenterologie"
+      },
+      "start_date": "2024-11-01",
+      "end_date": null,
+      "photo_url": "/media/med_07.jpg",
+      "match": {
+        "method": "exact_brand",
+        "confidence": 0.97,
+        "needs_review": false
+      }
+    },
+    {
+      "id": "med_08",
+      "source": "photo_box",
+      "product": {
+        "brand": "Amitriptilina Arena",
+        "strength_text": "25 mg",
+        "form": "comprimate filmate",
+        "gtin": null,
+        "pack_size": 20,
+        "expiry": null,
+        "batch": null
+      },
+      "substances": [
+        {
+          "dci": "AMITRIPTYLINUM",
+          "inn": "amitriptyline",
+          "atc": "N06AA09",
+          "strength_mg": 25.0
+        }
+      ],
+      "dosage": {
+        "raw": "0-0-1",
+        "pattern": {
+          "morning": 0,
+          "noon": 0,
+          "evening": 1,
+          "bedtime": 0
+        },
+        "as_needed": false,
+        "with_food": "any"
+      },
+      "prescriber": {
+        "name": null,
+        "specialty": "neurologie"
+      },
+      "start_date": "2025-06-20",
+      "end_date": null,
+      "photo_url": "/media/med_08.jpg",
+      "match": {
+        "method": "exact_brand",
+        "confidence": 0.97,
+        "needs_review": false
+      }
+    }
+  ]
+}

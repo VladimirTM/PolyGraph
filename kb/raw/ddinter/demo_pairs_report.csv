@@ -1,0 +1,46 @@
+drug_a,drug_b,ddinter_level
+acenocoumarol,ibuprofen,Unknown
+acenocoumarol,simvastatin,Unknown
+acenocoumarol,amlodipine,Unknown
+acenocoumarol,levothyroxine,Unknown
+acenocoumarol,calcium carbonate,absent
+acenocoumarol,cholecalciferol,absent
+acenocoumarol,omeprazole,Unknown
+acenocoumarol,amitriptyline,absent
+acenocoumarol,clarithromycin,Unknown
+ibuprofen,simvastatin,Unknown
+amlodipine,ibuprofen,Moderate
+ibuprofen,levothyroxine,Unknown
+calcium carbonate,ibuprofen,absent
+cholecalciferol,ibuprofen,absent
+ibuprofen,omeprazole,Unknown
+amitriptyline,ibuprofen,Unknown
+clarithromycin,ibuprofen,Unknown
+amlodipine,simvastatin,Major
+levothyroxine,simvastatin,Minor
+calcium carbonate,simvastatin,absent
+cholecalciferol,simvastatin,absent
+omeprazole,simvastatin,Moderate
+amitriptyline,simvastatin,Unknown
+clarithromycin,simvastatin,Major
+amlodipine,levothyroxine,Unknown
+amlodipine,calcium carbonate,Moderate
+amlodipine,cholecalciferol,absent
+amlodipine,omeprazole,Unknown
+amitriptyline,amlodipine,absent
+amlodipine,clarithromycin,Moderate
+calcium carbonate,levothyroxine,Moderate
+cholecalciferol,levothyroxine,absent
+levothyroxine,omeprazole,Moderate
+amitriptyline,levothyroxine,Moderate
+clarithromycin,levothyroxine,Unknown
+calcium carbonate,cholecalciferol,absent
+calcium carbonate,omeprazole,absent
+amitriptyline,calcium carbonate,absent
+calcium carbonate,clarithromycin,absent
+cholecalciferol,omeprazole,absent
+amitriptyline,cholecalciferol,absent
+cholecalciferol,clarithromycin,absent
+amitriptyline,omeprazole,Unknown
+clarithromycin,omeprazole,Minor
+amitriptyline,clarithromycin,Moderate

@@ -1,0 +1,149 @@
+# Reguli de orar pentru solverul de program (B4).
+# with_food: empty_stomach | before_meal | with_meal | after_meal | any
+# preferred_time: morning | evening | bedtime | same_time_daily | none   (preferință, nu constrângere dură)
+# min_separation: constrângere dură; other = INN sau prefix ATC; direction = before (acesta înaintea celuilalt) | either
+# verified: true = verificat în RCP-ul românesc (link în source); false = din cunoștințe generale despre RCP, de verificat.
+# Scris de Claude, 12.11.2026; de revizuit de echipă.
+
+version: 1
+rules:
+  - inn: levothyroxine
+    atc: H03AA01
+    with_food: empty_stomach
+    minutes_before_breakfast: 30
+    preferred_time: morning
+    min_separation:
+      - { other: calcium carbonate, hours: 4, direction: before }   # DDInter: „cel puțin 4 ore”; prospectul Euthyrox: minimum 2 ore
+      - { other: A12A, hours: 4, direction: before }                # suplimente de calciu
+      - { other: B03A, hours: 4, direction: before }                # fier
+      - { other: A02A, hours: 4, direction: before }                # antiacide
+    instruction: "pe stomacul gol, cu jumătate de pahar cu apă, cu cel puțin o jumătate de oră înainte de micul dejun"
+    source: "RCP Euthyrox, 4.2 (anm.ro/_/_RCP/RCP_7542_16.04.15.pdf); separarea de calciu: DDInter 2.0"
+    verified: true
+
+  - inn: simvastatin
+    atc: C10AA01
+    with_food: any
+    preferred_time: evening
+    instruction: "seara, o singură dată pe zi"
+    source: "RCP Simvastatin Terapia / Simvacard, 4.2 (anm.ro/_/_RCP/RCP_13196_26.05.20.pdf, RCP_1759_30.07.09.pdf)"
+    verified: true
+
+  - inn: omeprazole
+    atc: A02BC01
+    with_food: before_meal
+    preferred_time: morning
+    instruction: "dimineața, de preferat înainte de micul dejun, înghițită întreagă cu jumătate de pahar cu apă"
+    source: "RCP Omeprazol Rompharm, 4.2 (anm.ro/_/_RCP/RCP_9294_08.09.16.pdf)"
+    verified: true
+
+  - inn: calcium carbonate
+    atc: A12AA04
+    with_food: with_meal
+    preferred_time: none
+    min_separation:
+      - { other: levothyroxine, hours: 4, direction: either }
+      - { other: J01MA, hours: 2, direction: either }               # fluorochinolone (ciprofloxacină)
+      - { other: J01AA, hours: 2, direction: either }               # tetracicline
+      - { other: M05BA, hours: 1, direction: either }               # bifosfonați (alendronat)
+    instruction: "la masă"
+    source: "RCP-uri pentru carbonat de calciu + colecalciferol; de verificat pe produsul demo"
+    verified: false
+
+  - inn: acenocoumarol
+    atc: B01AA07
+    with_food: any
+    preferred_time: same_time_daily
+    default_time: evening
+    instruction: "în fiecare zi la aceeași oră, doza stabilită de medic după INR"
+    source: "RCP Sintrom, 4.2: de verificat (ora serii e o convenție a aplicației, nu o cerință)"
+    verified: false
+
+  - inn: amlodipine
+    atc: C08CA01
+    with_food: any
+    preferred_time: morning
+    instruction: "o dată pe zi, cu sau fără mâncare"
+    source: "RCP amlodipină, 4.2: de verificat"
+    verified: false
+
+  - inn: amitriptyline
+    atc: N06AA09
+    with_food: any
+    preferred_time: bedtime
+    instruction: "seara, la culcare (dă somnolență)"
+    source: "RCP amitriptilină, 4.2: de verificat"
+    verified: false
+
+  - inn: ibuprofen
+    atc: M01AE01
+    with_food: with_meal
+    preferred_time: none
+    instruction: "la masă sau imediat după, cu un pahar cu apă"
+    source: "RCP ibuprofen, 4.2: de verificat"
+    verified: false
+
+  - inn: clarithromycin
+    atc: J01FA09
+    with_food: any
+    preferred_time: none
+    interval_hours: 12
+    instruction: "la 12 ore, cu sau fără mâncare, toată cura"
+    source: "RCP claritromicină 500 mg comprimate filmate, 4.2: de verificat"
+    verified: false
+
+  - inn: metformin
+    atc: A10BA02
+    with_food: with_meal
+    preferred_time: none
+    instruction: "în timpul mesei sau imediat după"
+    source: "RCP metformin, 4.2: de verificat"
+    verified: false
+
+  - inn: furosemide
+    atc: C03CA01
+    with_food: any
+    preferred_time: morning
+    latest_time: "16:00"
+    instruction: "dimineața (nu seara, ca să nu vă trezească noaptea)"
+    source: "RCP furosemid, 4.2: de verificat"
+    verified: false
+
+  - inn: alendronic acid
+    atc: M05BA04
+    with_food: empty_stomach
+    minutes_before_breakfast: 30
+    weekly: true
+    instruction: "o dată pe săptămână, dimineața pe stomacul gol, doar cu apă plată; stați în picioare sau așezat 30 de minute"
+    source: "RCP acid alendronic, 4.2: de verificat"
+    verified: false
+
+  - inn: ciprofloxacin
+    atc: J01MA02
+    with_food: any
+    interval_hours: 12
+    min_separation:
+      - { other: A12A, hours: 2, direction: before }    # cu 2 ore înainte de calciu
+      - { other: B03A, hours: 2, direction: before }
+      - { other: A02A, hours: 2, direction: before }
+    instruction: "la 12 ore; nu cu lapte sau iaurt"
+    source: "RCP ciprofloxacină, 4.2 și 4.5: de verificat (unele RCP-uri cer 2 ore înainte sau 6 ore după calciu)"
+    verified: false
+
+  - inn: ferrous sulfate
+    atc: B03AA07
+    with_food: before_meal
+    min_separation:
+      - { other: levothyroxine, hours: 4, direction: either }
+      - { other: A12A, hours: 2, direction: either }
+    instruction: "înainte de masă, nu odată cu calciul"
+    source: "RCP-uri pentru fier oral: de verificat"
+    verified: false
+
+  - inn: prednisone
+    atc: H02AB07
+    with_food: with_meal
+    preferred_time: morning
+    instruction: "dimineața, la micul dejun"
+    source: "RCP prednison, 4.2: de verificat"
+    verified: false

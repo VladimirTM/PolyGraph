@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExtractionResult",
+  "description": "Răspunsul la POST /scan: candidați de confirmat, nesalvați. Plan, secțiunile 5.7 și B3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["candidates", "warnings", "raw_text"],
+  "properties": {
+    "candidates": { "type": "array", "items": { "$ref": "medication_item.schema.json" } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "raw_text": { "type": ["string", "null"], "description": "textul OCR primit, unit pe linii (pentru depanare)" }
+  }
+}

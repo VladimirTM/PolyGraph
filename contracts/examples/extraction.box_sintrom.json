@@ -1,0 +1,50 @@
+{
+  "candidates": [
+    {
+      "id": "med_01",
+      "source": "datamatrix",
+      "product": {
+        "brand": "Sintrom",
+        "strength_text": "4 mg",
+        "form": "comprimate",
+        "gtin": "05949000000014",
+        "pack_size": 30,
+        "expiry": "2028-03-31",
+        "batch": "AB123"
+      },
+      "substances": [
+        {
+          "dci": "ACENOCUMAROLUM",
+          "inn": "acenocoumarol",
+          "atc": "B01AA07",
+          "strength_mg": 4.0
+        }
+      ],
+      "dosage": {
+        "raw": "1/2 cp seara",
+        "pattern": {
+          "morning": 0,
+          "noon": 0,
+          "evening": 0.5,
+          "bedtime": 0
+        },
+        "as_needed": false,
+        "with_food": "any"
+      },
+      "prescriber": {
+        "name": null,
+        "specialty": "cardiologie"
+      },
+      "start_date": "2025-03-01",
+      "end_date": null,
+      "photo_url": "/media/med_01.jpg",
+      "match": {
+        "method": "exact_brand",
+        "confidence": 0.97,
+        "needs_review": false
+      }
+    }
+  ],
+  "warnings": [],
+  "raw_text": "Sintrom\n4 mg\nAcenocumarol"
+}

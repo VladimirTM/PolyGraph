@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ShareLink",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "share_token",
+    "url",
+    "expires_at"
+  ],
+  "properties": {
+    "share_token": {
+      "type": "string",
+      "minLength": 16
+    },
+    "url": {
+      "type": "string"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

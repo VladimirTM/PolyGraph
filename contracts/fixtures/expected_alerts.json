@@ -1,0 +1,818 @@
+{
+  "today": "2026-11-14",
+  "compare_on": [
+    "kind",
+    "severity",
+    "med_ids",
+    "basis"
+  ],
+  "without_med_09": [
+    {
+      "id": "al_ddi_med_01_med_02",
+      "kind": "ddi",
+      "severity": "major",
+      "med_ids": [
+        "med_01",
+        "med_02"
+      ],
+      "title": "Risc crescut de sângerare",
+      "patient_text": "Două dintre pastile, luate împreună, pot crește riscul de sângerare. Am anunțat-o pe Ana.",
+      "detail": "Acenocumarol (Sintrom) + ibuprofen (Nurofen): antiinflamatoarele cresc efectul anticoagulant și riscul de sângerare. Și criteriul Beers 2023: AINS de evitat împreună cu un anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "Discutați cu medicul cardiolog sau cu farmacistul înainte de următoarea doză de Nurofen. Anunțați medicul la vânătăi sau sângerări neobișnuite.",
+      "action": "contact_doctor",
+      "route_to": [
+        "patient",
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: acenocoumarol + ibuprofen (DDInter: warfarină + ibuprofen = Major)",
+        "url": "https://ddinter2.scbdd.com/server/interact/10470/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_03_med_04",
+      "kind": "ddi",
+      "severity": "major",
+      "med_ids": [
+        "med_03",
+        "med_04"
+      ],
+      "title": "Doza de simvastatină e prea mare lângă amlodipină",
+      "patient_text": "Două dintre pastile trebuie verificate de medic. Am anunțat-o pe Ana.",
+      "detail": "Amlodipina crește concentrația de simvastatină (risc de dureri și slăbiciune musculară). Cu amlodipină, doza zilnică de simvastatină nu trebuie să depășească 20 mg; Maria ia 40 mg.",
+      "recommendation": "Discutați cu medicul de familie doza de simvastatină potrivită lângă amlodipină.",
+      "action": "contact_doctor",
+      "route_to": [
+        "patient",
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: amlodipine + simvastatin = Major; RCP simvastatină 4.5",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_elderly_pim_med_02_beers-nsaid-chronic",
+      "kind": "elderly_pim",
+      "severity": "major",
+      "med_ids": [
+        "med_02"
+      ],
+      "title": "Antiinflamator (AINS) luat de mult timp la vârstnic",
+      "patient_text": "Una dintre pastilele pentru durere trebuie discutată cu medicul. Am anunțat-o pe Ana.",
+      "detail": "La peste 65 de ani, AINS luate pe termen lung cresc riscul de sângerare digestivă, de afectare a rinichilor și de probleme cardiace.",
+      "recommendation": "Discutați cu medicul de familie dacă există o alternativă pentru durere (de ex. paracetamol) și dacă e nevoie de protecție gastrică.",
+      "action": "contact_doctor",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "beers",
+        "ref": "AGS Beers 2023, tabelul 2 (beers-nsaid-chronic)",
+        "url": null
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_elderly_pim_med_08_beers-tricyclic-antidepressants",
+      "kind": "elderly_pim",
+      "severity": "major",
+      "med_ids": [
+        "med_08"
+      ],
+      "title": "Antidepresiv triciclic la vârstnic",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Amitriptilina are efect anticolinergic și sedativ puternic: confuzie, amețeală la ridicare, căderi.",
+      "recommendation": "Discutați cu medicul neurolog dacă există o alternativă mai sigură.",
+      "action": "contact_doctor",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "beers",
+        "ref": "AGS Beers 2023, tabelul 2 (beers-tricyclic-antidepressants)",
+        "url": null
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_03_grapefruit",
+      "kind": "food",
+      "severity": "major",
+      "med_ids": [
+        "med_03"
+      ],
+      "title": "Grepfrutul crește mult concentrația de simvastatină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Grepfrutul crește mult concentrația de simvastatină.",
+      "recommendation": "Evitați grepfrutul și sucul de grepfrut.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: grapefruit",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_anticholinergic_med_08",
+      "kind": "anticholinergic",
+      "severity": "moderate",
+      "med_ids": [
+        "med_08"
+      ],
+      "title": "Încărcare anticolinergică: scor 3",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Scorul ACB total este 3 (amitriptilină). Un scor de 3 sau mai mare crește riscul de confuzie, căderi și declin cognitiv.",
+      "recommendation": "Discutați la revizuirea tratamentului dacă se poate reduce încărcarea anticolinergică.",
+      "action": "ask_pharmacist",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "acb",
+        "ref": "ACB Scale 2012 (Regenstrief)",
+        "url": null
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_01_med_05",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_01",
+        "med_05"
+      ],
+      "title": "Euthyrox-ul poate crește efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Hormonii tiroidieni pot crește efectul anticoagulant, mai ales la schimbarea dozei. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "La orice schimbare a dozei de Euthyrox, întrebați medicul dacă e nevoie de un INR.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: acenocoumarol + levothyroxine (DDInter: warfarină + levotiroxină = Moderate)",
+        "url": "https://ddinter2.scbdd.com/server/interact/100196/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_01_med_07",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_01",
+        "med_07"
+      ],
+      "title": "Omeprazolul poate crește efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Inhibitorii de pompă de protoni au fost asociați ocazional cu creșterea efectului anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "La începerea sau la renunțarea la omeprazol, întrebați medicul dacă e nevoie de un INR.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: acenocoumarol + omeprazole (DDInter: warfarină + omeprazol = Moderate)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_02_med_04",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_02",
+        "med_04"
+      ],
+      "title": "Ibuprofenul poate slăbi efectul amlodipinei",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Antiinflamatoarele pot crește tensiunea arterială și scad efectul unor medicamente pentru tensiune.",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: amlodipine + ibuprofen = Moderate",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_03_med_07",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_03",
+        "med_07"
+      ],
+      "title": "Simvastatină + omeprazol",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Omeprazolul poate crește ușor concentrația de simvastatină.",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: omeprazole + simvastatin = Moderate",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_04_med_06",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_04",
+        "med_06"
+      ],
+      "title": "Calciul poate scădea efectul amlodipinei",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Suplimentele de calciu pot reduce efectul blocantelor canalelor de calciu.",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: amlodipine + calcium carbonate = Moderate",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_05_med_06",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_05",
+        "med_06"
+      ],
+      "title": "Calciul scade absorbția Euthyrox-ului",
+      "patient_text": "Euthyrox-ul și calciul se iau la ore diferite. Programul de azi ține cont de asta.",
+      "detail": "Calciul scade absorbția levotiroxinei. Separarea de cel puțin 4 ore e respectată în programul zilnic.",
+      "recommendation": "Păstrați cel puțin 4 ore între Euthyrox și calciu.",
+      "action": "separate_times",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: levothyroxine + calcium carbonate (DDInter Moderate)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_05_med_07",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_05",
+        "med_07"
+      ],
+      "title": "Omeprazolul poate scădea absorbția Euthyrox-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Omeprazolul modifică aciditatea gastrică și poate scădea absorbția levotiroxinei.",
+      "recommendation": "Întrebați medicul endocrinolog dacă e nevoie de un control al hormonilor tiroidieni (TSH).",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: levothyroxine + omeprazole (DDInter Moderate)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_05_med_08",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_05",
+        "med_08"
+      ],
+      "title": "Euthyrox + amitriptilină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Asocierea poate crește riscul de aritmii și de stimulare a sistemului nervos.",
+      "recommendation": "Anunțați medicul la palpitații sau agitație.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: levothyroxine + amitriptyline (DDInter Moderate)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_elderly_pim_med_07_beers-ppi-long-term",
+      "kind": "elderly_pim",
+      "severity": "moderate",
+      "med_ids": [
+        "med_07"
+      ],
+      "title": "Protector gastric (IPP) luat de mai mult de 8 săptămâni",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Pe termen lung, IPP sunt asociate cu infecții, pierdere osoasă și fracturi.",
+      "recommendation": "Întrebați medicul de familie dacă mai e nevoie de el; pentru unele boli e totuși indicat.",
+      "action": "ask_pharmacist",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "beers",
+        "ref": "AGS Beers 2023, tabelul 2 (beers-ppi-long-term)",
+        "url": null
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_01_alcohol",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_01"
+      ],
+      "title": "Alcoolul în exces poate crește efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Alcoolul în exces poate crește efectul Sintrom-ului.",
+      "recommendation": "Evitați cantitățile mari de alcool.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: alcohol",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_01_vitamin_k",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_01"
+      ],
+      "title": "Alimentele bogate în vitamina K (legume cu frunze verzi) scad efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Alimentele bogate în vitamina K (legume cu frunze verzi) scad efectul Sintrom-ului.",
+      "recommendation": "Mâncați constant, fără schimbări bruște de dietă; anunțați medicul la schimbări mari.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: vitamin_k",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_02_alcohol",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_02"
+      ],
+      "title": "Alcoolul cu ibuprofen crește riscul de sângerare digestivă",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Alcoolul cu ibuprofen crește riscul de sângerare digestivă.",
+      "recommendation": "Evitați alcoolul cât luați Nurofen.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: alcohol",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_03_alcohol",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_03"
+      ],
+      "title": "Alcoolul în cantități mari, cu simvastatină, crește riscul de afectare a ficatului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Alcoolul în cantități mari, cu simvastatină, crește riscul de afectare a ficatului.",
+      "recommendation": "Evitați cantitățile mari de alcool.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: alcohol",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_05_fiber",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_05"
+      ],
+      "title": "Fibrele alimentare pot scădea absorbția Euthyrox-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Fibrele alimentare pot scădea absorbția Euthyrox-ului.",
+      "recommendation": "Luați Euthyrox-ul mereu la aceeași oră și în aceeași relație cu masa.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: fiber",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_05_soy",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_05"
+      ],
+      "title": "Produsele din soia pot scădea absorbția Euthyrox-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Produsele din soia pot scădea absorbția Euthyrox-ului.",
+      "recommendation": "Luați Euthyrox-ul mereu la aceeași oră și în aceeași relație cu masa.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: soy",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_08_alcohol",
+      "kind": "food",
+      "severity": "moderate",
+      "med_ids": [
+        "med_08"
+      ],
+      "title": "Alcoolul accentuează somnolența dată de amitriptilină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Alcoolul accentuează somnolența dată de amitriptilină.",
+      "recommendation": "Evitați alcoolul.",
+      "action": "avoid_food",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: alcohol",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_01_med_03",
+      "kind": "ddi",
+      "severity": "minor",
+      "med_ids": [
+        "med_01",
+        "med_03"
+      ],
+      "title": "Simvastatina poate crește ușor efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Simvastatina poate crește ușor răspunsul anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
+      "action": "monitor",
+      "route_to": [
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: acenocoumarol + simvastatin (DDInter: warfarină + simvastatină = Minor)",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_03_med_05",
+      "kind": "ddi",
+      "severity": "minor",
+      "med_ids": [
+        "med_03",
+        "med_05"
+      ],
+      "title": "Simvastatină + Euthyrox",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Interacțiune minoră.",
+      "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
+      "action": "monitor",
+      "route_to": [
+        "pharmacist"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: levothyroxine + simvastatin = Minor",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    }
+  ],
+  "added_with_med_09": [
+    {
+      "id": "al_ddi_med_03_med_09",
+      "kind": "ddi",
+      "severity": "critical",
+      "med_ids": [
+        "med_03",
+        "med_09"
+      ],
+      "title": "Antibioticul nou nu se asociază cu simvastatina",
+      "patient_text": "Antibioticul nou trebuie verificat de medic înainte de prima pastilă. Am anunțat-o pe Ana.",
+      "detail": "Claritromicina (Fromilid) crește mult concentrația de simvastatină: risc de miopatie și rabdomioliză. Asocierea este contraindicată în RCP-ul simvastatinei și al claritromicinei.",
+      "recommendation": "Discutați cu medicul ORL care a prescris antibioticul sau cu farmacistul înainte de prima doză.",
+      "action": "contact_doctor",
+      "route_to": [
+        "patient",
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: simvastatin + clarithromycin (RCP: contraindicat)",
+        "url": "https://ddinter2.scbdd.com/server/drug-detail/DDInter1675/"
+      },
+      "basis": "curated",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_01_med_09",
+      "kind": "ddi",
+      "severity": "major",
+      "med_ids": [
+        "med_01",
+        "med_09"
+      ],
+      "title": "Antibioticul nou poate crește efectul Sintrom-ului",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Claritromicina poate crește mult efectul anticoagulant. Evaluat prin analogie cu warfarina (aceeași clasă); de confirmat de farmacist.",
+      "recommendation": "Discutați cu medicul cardiolog sau cu farmacistul dacă e nevoie de un INR în timpul curei de antibiotic.",
+      "action": "contact_doctor",
+      "route_to": [
+        "caregiver",
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_ddi.csv: acenocoumarol + clarithromycin (DDInter: warfarină + claritromicină = Major)",
+        "url": "https://ddinter2.scbdd.com/server/interact/68158/"
+      },
+      "basis": "class_analogy",
+      "analogy": {
+        "via": "warfarină",
+        "atc4": "B01AA"
+      },
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_04_med_09",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_04",
+        "med_09"
+      ],
+      "title": "Amlodipină + claritromicină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Claritromicina poate crește concentrația de amlodipină (amețeală, glezne umflate).",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: amlodipine + clarithromycin = Moderate",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_08_med_09",
+      "kind": "ddi",
+      "severity": "moderate",
+      "med_ids": [
+        "med_08",
+        "med_09"
+      ],
+      "title": "Amitriptilină + claritromicină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Asocierea poate crește concentrația de amitriptilină și riscul de tulburări de ritm.",
+      "recommendation": "Discutați cu farmacistul la următoarea vizită.",
+      "action": "monitor",
+      "route_to": [
+        "caregiver"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: amitriptyline + clarithromycin = Moderate",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_ddi_med_07_med_09",
+      "kind": "ddi",
+      "severity": "minor",
+      "med_ids": [
+        "med_07",
+        "med_09"
+      ],
+      "title": "Omeprazol + claritromicină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Interacțiune minoră.",
+      "recommendation": "Fără acțiune necesară; de știut la revizuirea tratamentului.",
+      "action": "monitor",
+      "route_to": [
+        "pharmacist"
+      ],
+      "source": {
+        "db": "ddinter",
+        "ref": "DDInter: clarithromycin + omeprazole = Minor",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "id": "al_food_med_09_grapefruit",
+      "kind": "food",
+      "severity": "minor",
+      "med_ids": [
+        "med_09"
+      ],
+      "title": "Grepfrutul cu claritromicină",
+      "patient_text": "Am notat ceva de discutat cu farmacistul. Nu e nimic urgent.",
+      "detail": "Grepfrutul poate modifica concentrația de claritromicină.",
+      "recommendation": "În general, evitați grepfrutul și sucul de grepfrut.",
+      "action": "avoid_food",
+      "route_to": [
+        "pharmacist"
+      ],
+      "source": {
+        "db": "curated",
+        "ref": "kb/curated_dfi.csv: grapefruit",
+        "url": "https://ddinter2.scbdd.com/"
+      },
+      "basis": "direct",
+      "analogy": null,
+      "status": "open",
+      "resolution": null
+    }
+  ]
+}

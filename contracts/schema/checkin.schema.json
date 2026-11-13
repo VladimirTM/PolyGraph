@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CheckIn",
+  "description": "Un check-in vocal transcris pe telefon și interpretat determinist. Plan, secțiunea 5.5.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "at",
+    "transcript",
+    "intent",
+    "symptoms",
+    "correlations",
+    "escalate",
+    "reply_text"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ci_[a-z0-9_]+$"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "transcript": {
+      "type": "string"
+    },
+    "intent": {
+      "enum": [
+        "symptom_report",
+        "can_i_take",
+        "which_pill_now",
+        "other"
+      ]
+    },
+    "symptoms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "label",
+          "severity"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[a-z_]+$",
+            "description": "doar coduri din contracts/symptoms.md (verificat de validate.py)"
+          },
+          "label": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "mild",
+              "moderate",
+              "severe"
+            ],
+            "title": "SymptomSeverity"
+          }
+        }
+      }
+    },
+    "correlations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "symptom",
+          "med_ids",
+          "basis"
+        ],
+        "properties": {
+          "symptom": {
+            "type": "string",
+            "pattern": "^[a-z_]+$"
+          },
+          "med_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^med_[a-z0-9_]+$"
+            },
+            "minItems": 1
+          },
+          "basis": {
+            "type": "string",
+            "pattern": "^(alert:al_.+|adverse_effects\\.yaml)$"
+          }
+        }
+      }
+    },
+    "escalate": {
+      "type": "boolean"
+    },
+    "reply_text": {
+      "type": "string",
+      "description": "din template, nu text liber de LLM"
+    }
+  }
+}

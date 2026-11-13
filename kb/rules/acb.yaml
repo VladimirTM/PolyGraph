@@ -1,0 +1,26 @@
+# Anticholinergic Cognitive Burden (ACB) Scale, actualizarea din 2012.
+# Sursa: Aging Brain Care / Regenstrief Institute (© 2008, 2012); lista preluată din copia publicată de
+#   NHS Derbyshire Medicines Management („Drugs on the ACB scale”).
+# Licență: utilizarea scalei e supusă termenilor Regenstrief (permisiune la acb@agingbraincare.org).
+#   OK pentru prototipul de hackathon; pentru produs, permisiune scrisă.
+# Interpretare: scorul total = suma scorurilor; total ≥ 3 = risc crescut (confuzie, căderi, declin cognitiv).
+# Doar substanțele relevante pentru România; numele INN în engleză (ca în DDInter), potrivire după INN.
+
+version: 1
+threshold_alert: 3
+scores:
+  3: [amitriptyline, clomipramine, imipramine, doxepin, nortriptyline, trimipramine, desipramine,
+      chlorphenamine, clemastine, diphenhydramine, hydroxyzine, promethazine, meclozine, mepyramine,
+      chlorpromazine, clozapine, perphenazine, promazine, trifluoperazine,
+      paroxetine,
+      oxybutynin, solifenacin, tolterodine, trospium, darifenacin, flavoxate,
+      atropine, scopolamine, dicycloverine, propantheline,
+      benzatropine, trihexyphenidyl, procyclidine, orphenadrine]
+  2: [amantadine, carbamazepine, oxcarbazepine, cyproheptadine, pethidine, pimozide, cyclobenzaprine,
+      levomepromazine, loxapine]
+  1: [alprazolam, diazepam, clorazepate, haloperidol, trazodone, bupropion, fluvoxamine,
+      atenolol, metoprolol, captopril, nifedipine, hydralazine, isosorbide, digoxin, dipyridamole,
+      disopyramide, furosemide, triamterene, warfarin,
+      codeine, morphine, fentanyl,
+      prednisone, prednisolone, hydrocortisone, beclometasone,
+      ranitidine, cimetidine, loperamide, colchicine, theophylline, quinine, timolol]

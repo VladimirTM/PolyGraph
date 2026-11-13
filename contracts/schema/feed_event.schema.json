@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FeedEvent",
+  "description": "Un eveniment din tab-ul Noutăți al aparținătorului (GET /feed).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "at",
+    "type",
+    "severity",
+    "title",
+    "body",
+    "med_ids",
+    "alert_id",
+    "checkin_id"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ev_[a-z0-9_]+$"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "type": {
+      "enum": [
+        "alert_new",
+        "dose_missed",
+        "checkin",
+        "pharmacist_verified"
+      ],
+      "title": "FeedEventType"
+    },
+    "severity": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "alert.schema.json#/$defs/severity"
+        }
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "med_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "alert_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "checkin_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
