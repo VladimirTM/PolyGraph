@@ -1,5 +1,7 @@
 import json
+import unicodedata
 from contextlib import nullcontext
+from hashlib import sha256
 from io import BytesIO
 from pathlib import Path
 from time import perf_counter
@@ -31,7 +33,8 @@ def kb():
 
 
 @pytest.fixture
-def client(kb):
+def client(kb, tmp_path, monkeypatch):
+    monkeypatch.setenv("PG_MEDIA_DIR", str(tmp_path / "media"))
     main.configure(Store(":memory:"), kb)
     main.reset_demo()
     with TestClient(main.app) as client:
@@ -136,7 +139,7 @@ def test_demo_prescription(client):
     )
     (candidate,) = result["candidates"]
     assert candidate["substances"][0]["atc"] == "J01FA09"
-    assert candidate["prescriber"] == {"name": "Ionescu Andrei", "specialty": "orl"}
+    assert candidate["prescriber"] == {"name": "Ionescu Andrei", "specialty": "ORL"}
     assert list(candidate["dosage"]["pattern"].values()) == [1, 0, 1, 0]
     assert candidate["dosage"]["with_food"] == "after_meal"
     assert candidate["product"]["pack_size"] == 14
@@ -198,6 +201,8 @@ def test_gtin_is_learned_on_confirmation_and_image_fallback(client):
     (first,) = post_scan(client, "Sintrom 4 mg", picture=picture)["candidates"]
     assert first["product"]["gtin"] == CASES[0]["expected"]["gtin"]
     assert first["match"]["method"] == "exact_brand"
+    assert first["product"]["brand"] == "Sintrom"
+    assert first["product"]["strength_text"] == "4 mg"
     assert not post_scan(client, code=raw)["candidates"]
     assert client.post(MEDS, headers=HEADERS, json=first).status_code == 201
 
@@ -258,3 +263,104 @@ def test_gemini_does_not_retry(tmp_path, monkeypatch):
     monkeypatch.setattr(gemini, "urlopen", busy)
     assert gemini.extract_image(b"image", "box") == []
     assert calls == [8]
+
+
+@pytest.mark.parametrize(
+    ("name", "brand", "strength", "form", "atc", "gtin", "expiry"),
+    [
+        ("nurofen_box", "Nurofen", "400 mg", "comprimate filmate", "M01AE01", "05949000000021", "2027-09-30"),
+        ("sintrom_box_fara_cod", "Sintrom", "4 mg", "comprimate", "B01AA07", None, None),
+        ("sintrom_expirat_box", "Sintrom", "4 mg", "comprimate", "B01AA07", "05949000000014", "2024-01-31"),
+        ("fromilid_prescription", "Fromilid", "500 mg", "comprimate filmate", "J01FA09", None, None),
+    ],
+)
+def test_iphone_ocr(client, caplog, monkeypatch, name, brand, strength, form, atc, gtin, expiry):
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.setattr(match, "extract_image", lambda *_: pytest.fail("Scanarea OCR a apelat Gemini"))
+    caplog.set_level("INFO")
+    capture = json.loads((ROOT / "demo/ocr" / f"{name}.json").read_text())
+    data = {**capture, "ocr_lines": json.dumps(capture["ocr_lines"])}
+    response = client.post(SCAN, headers=HEADERS, data=data)
+    assert response.status_code == 200, response.text
+    result = response.json()
+    assert not contracts.schema_errors("extraction", result)
+    (candidate,) = result["candidates"]
+    product = candidate["product"]
+    assert (product["brand"], product["strength_text"], product["form"]) == (brand, strength, form)
+    assert (product["gtin"], product["expiry"]) == (gtin, expiry)
+    assert [sub["atc"] for sub in candidate["substances"]] == [atc]
+    assert candidate["match"]["method"] == "exact_brand"
+    assert candidate["match"]["needs_review"] is False
+    assert candidate["photo_url"] is None
+    assert "route=ocr_match" in caplog.text
+    if name == "fromilid_prescription":
+        assert candidate["dosage"]["pattern"] == {"morning": 1, "noon": 0, "evening": 1, "bedtime": 0}
+        assert candidate["dosage"]["with_food"] == "after_meal"
+        assert candidate["prescriber"]["specialty"] == "ORL"
+    if name == "sintrom_box_fara_cod":
+        fixture = json.loads((ROOT / "contracts/fixtures/demo_patient.json").read_text())
+        sintrom = next(med["product"] for med in fixture["meds"] if med["id"] == "med_01")
+        assert draft_key(product) == draft_key(sintrom) == "sintrom 4 mg"
+
+
+def draft_key(product):
+    name = product["brand"].strip(" \t")
+    if not name:
+        return ""
+    text = unicodedata.normalize("NFD", f"{name} {product['strength_text'] or ''}".casefold())
+    return " ".join("".join(ch for ch in text if not unicodedata.combining(ch)).split())
+
+
+@pytest.mark.parametrize(
+    ("raw", "error"),
+    [
+        ("]d20105949000000014\r\n", None),
+        ("0105949000000014" + "99XYZ", "not_gs1"),
+        ("010594900000001417281301", "invalid_expiry"),
+    ],
+)
+def test_gs1_ios_extra_cases(raw, error):
+    if error:
+        with pytest.raises(ValueError, match=f"^{error}$"):
+            parse_gs1(raw)
+    else:
+        assert parse_gs1(raw) == {"gtin": "05949000000014", "expiry": None, "batch": None, "serial": None}
+
+
+def test_gtin_probe_miss(client, caplog):
+    caplog.set_level("INFO")
+    response = client.post(SCAN, headers=HEADERS, data={"kind": "box", "datamatrix": "0105949000000014"})
+    assert response.status_code == 200
+    assert response.json()["candidates"] == []
+    assert response.json()["warnings"] == [match.MANUAL]
+    assert "route=gtin_miss" in caplog.text
+
+
+def test_scan_media(client, tmp_path):
+    out = BytesIO()
+    Image.new("RGB", (4, 4)).save(out, format="JPEG")
+    picture = out.getvalue()
+    url = f"/media/{sha256(picture).hexdigest()}.jpg"
+    (candidate,) = post_scan(client, "Sintrom 4 mg", "Acenocumarol", picture=picture)["candidates"]
+    assert candidate["photo_url"] == url
+    response = client.get(url)
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/jpeg"
+    assert response.content == picture
+    path = tmp_path / "media" / url.split("/")[-1]
+    before = path.stat().st_mtime_ns
+    (again,) = post_scan(client, "Sintrom 4 mg", "Acenocumarol", picture=picture)["candidates"]
+    assert again["photo_url"] == url
+    assert path.stat().st_mtime_ns == before
+    assert list(path.parent.iterdir()) == [path]
+
+
+def test_scan_rejects_large_media(client, tmp_path):
+    response = client.post(
+        SCAN,
+        headers=HEADERS,
+        data={"kind": "box"},
+        files={"image": ("test.jpg", bytes(main.MAX_SCAN_IMAGE + 1), "image/jpeg")},
+    )
+    assert response.status_code == 413
+    assert not (tmp_path / "media").exists()
