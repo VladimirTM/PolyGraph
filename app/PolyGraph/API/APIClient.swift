@@ -14,7 +14,7 @@ enum ScanKind: String {
 }
 
 /// O linie de text citită pe telefon (Vision), în ordinea de citire; `height` = înălțimea relativă (0–1).
-struct OCRLine: Codable {
+nonisolated struct OCRLine: Codable, Equatable, Sendable {
     let text: String
     let height: Double
 }

@@ -1,0 +1,93 @@
+{
+  "kind" : "prescription",
+  "ocr_lines" : [
+    {
+      "height" : 0.03273711267953339,
+      "text" : "REȚETĂ MEDICALĂ"
+    },
+    {
+      "height" : 0.019596310884228973,
+      "text" : "Medic prescriptor"
+    },
+    {
+      "height" : 0.015988371824843473,
+      "text" : "Dr. Ionescu Andrei"
+    },
+    {
+      "height" : 0.019433274090362218,
+      "text" : "Medic specialist ORL (otorinolaringologie) ."
+    },
+    {
+      "height" : 0.019947365665089922,
+      "text" : "Cabinet medical ORL, Timișoara"
+    },
+    {
+      "height" : 0.01497284821183964,
+      "text" : "Pacient"
+    },
+    {
+      "height" : 0.017554322349982,
+      "text" : "Popescu Maria"
+    },
+    {
+      "height" : 0.015988371824843473,
+      "text" : "Vârsta: 78 de ani"
+    },
+    {
+      "height" : 0.018898863602145877,
+      "text" : "Diagnostic: infecție acută a căilor respiratorii superioare"
+    },
+    {
+      "height" : 0.01861186298522588,
+      "text" : "Rp./"
+    },
+    {
+      "height" : 0.022370012091898372,
+      "text" : "Fromilid 500 mg comprimate filmate"
+    },
+    {
+      "height" : 0.016324062877871914,
+      "text" : "DCI: Claritromicină"
+    },
+    {
+      "height" : 0.019379242155543208,
+      "text" : "Cantitate: 1 cutie x 14 comprimate"
+    },
+    {
+      "height" : 0.018949832708688552,
+      "text" : "D.S.: 1 comprimat dimineața și 1 comprimat seara"
+    },
+    {
+      "height" : 0.01934703690829842,
+      "text" : "(1-0-1), timp de 7 zile"
+    },
+    {
+      "height" : 0.02055622732769047,
+      "text" : "După mese, cu un pahar cu apă."
+    },
+    {
+      "height" : 0.016633403344483044,
+      "text" : "Nr. 0000123 / 14.11.2026"
+    },
+    {
+      "height" : 0.014606942865263317,
+      "text" : "Data prescrierii: 14.11.2026"
+    },
+    {
+      "height" : 0.016324062877871803,
+      "text" : "Semnătura și parafa medicului:"
+    },
+    {
+      "height" : 0.017572667030786526,
+      "text" : "DOCUMENT FICTIV, DOAR PENTRU DEMONSTRAȚIE"
+    },
+    {
+      "height" : 0.013870859665046087,
+      "text" : "Nu este o retetă validă și nu poate fi eliberat în farmacie."
+    },
+    {
+      "height" : 0.017389622103634594,
+      "text" : "Toate datele (medic, pacient, număr) sunt inventate pentru prototipul PolyGraph."
+    }
+  ]
+}

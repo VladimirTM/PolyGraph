@@ -1,0 +1,30 @@
+{
+  "datamatrix" : "010594900000002121XYZ987654\u001d1727093010L2026A",
+  "kind" : "box",
+  "ocr_lines" : [
+    {
+      "height" : 0.03215996045914915,
+      "text" : "Nurofen"
+    },
+    {
+      "height" : 0.02213711492599013,
+      "text" : "400 mg"
+    },
+    {
+      "height" : 0.01955648641737673,
+      "text" : "Ibuprofen"
+    },
+    {
+      "height" : 0.02041805074328462,
+      "text" : "24 comprimate filmate"
+    },
+    {
+      "height" : 0.013807711147126756,
+      "text" : "EXP 09/2027 LOT L2026A"
+    },
+    {
+      "height" : 0.007440476190476275,
+      "text" : "CUTIE DE TEST • nu e un medicament real"
+    }
+  ]
+}

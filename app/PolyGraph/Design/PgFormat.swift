@@ -11,7 +11,7 @@ enum PgFormat {
     }
 
     /// „2026-11-14”, ziua locală
-    static func isoDay(_ date: Date) -> String {
+    nonisolated static func isoDay(_ date: Date) -> String {
         let parts = Calendar.current.dateComponents([.year, .month, .day], from: date)
         return String(format: "%04ld-%02ld-%02ld", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
     }
