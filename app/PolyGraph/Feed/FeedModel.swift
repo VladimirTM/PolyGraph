@@ -71,7 +71,7 @@ final class FeedModel {
                 pendingNew.insert(contentsOf: fresh, at: 0)
             }
         }
-        let serious = fresh.filter(Self.isSerious)
+        let serious = fresh.filter { Self.isSerious($0) }
         guard !serious.isEmpty else { return }
         alarmCount += 1
         serious.forEach(notify)

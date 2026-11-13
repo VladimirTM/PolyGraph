@@ -34,7 +34,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | ✅ | Acum, Ziua de azi, „Am luat”, TTS, notificări; `make check-ios` verde, încercat pe iPhone; „Spuneți-mi cum vă simțiți” vine cu A5 |
 | B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | ✅ | `/schedule`, `/checkins` reale; B4 gata (`/schedule`, `/doses`), B5 gata (`/checkins`, `/feed`); X1 (can_i_take → what-if) și Whisper rămân condiționale |
 | **S3** (MVP complet) | amândoi | W19 | S 21:30 | ⬜ | |
-| A5 check-in vocal + Noutăți | Dev A | W19–W23 | S 21:30–D 02:00 | 🟡 | scris pe `feature/a5-voice-caregiver`; rămân `make check-ios` și T-A5-03 pe două iPhone-uri; bonusul X1 (`can_i_take`) nefăcut |
+| A5 check-in vocal + Noutăți | Dev A | W19–W23 | S 21:30–D 02:00 | 🟡 | scris pe `feature/a5-voice-caregiver`, `make check-ios` verde; rămâne T-A5-03 pe două iPhone-uri; bonusul X1 (`can_i_take`) nefăcut |
 | B6 pagina farmacistului + tipărire | Dev B | W19–W23 | S 21:30–D 02:00 | 🟡 | `/share` real: pagina, „Am verificat” → alertă + Noutăți, `/print` în 2 pagini A4, `/graph?embed=1`; rămâne T-B6-04 (manual pe iPhone) |
 | Q3 review (noaptea) | agent | somn | D 02:00–08:00 | ⬜ | triere 15 min |
 | A6 QR, modul demo · B7 demo hardening | A · B | W23–W24.5 | D 08:00–09:30 | ⬜ | + fix-urile blocker din Q3 |
@@ -873,8 +873,8 @@ Nu face: push prin server (APNs); polling-ul ajunge pentru demo.
 ~~~
 
 **Teste**
-- [x] T-A5-01 Unit: detectorul de liniște oprește după 2 s sub prag și nu oprește la o pauză de 1 s sau înainte să se fi vorbit. *(`PolyGraphTests/VoiceFeedTests.swift`, `SilenceDetectorTests`; de confirmat cu `make check-ios`)*
-- [x] T-A5-02 Unit: feed-ul deduplică evenimentele la polling repetat (același `id`). *(`FeedModelTests`; de confirmat cu `make check-ios`)*
+- [x] T-A5-01 Unit: detectorul de liniște oprește după 2 s sub prag și nu oprește la o pauză de 1 s sau înainte să se fi vorbit. *(`PolyGraphTests/VoiceFeedTests.swift`, `SilenceDetectorTests`; 13.11.2026: `make check-ios` verde)*
+- [x] T-A5-02 Unit: feed-ul deduplică evenimentele la polling repetat (același `id`). *(`FeedModelTests`; 13.11.2026: `make check-ios` verde)*
 - [ ] T-A5-03 Manual: check-in-ul demo pe două telefoane, de 3 ori la rând, în zgomotul sălii; timpul până la notificare notat.
 
 ---
