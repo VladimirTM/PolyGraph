@@ -61,6 +61,15 @@ struct SettingsView: View {
                     Text("Pacient: un singur ecran, cu butoane mari. Aparținător: lista, alertele, graful și noutățile.")
                 }
 
+                if settings.role == .senior {
+                    Section {
+                        Toggle("Citește cu voce tare la deschidere", isOn: $settings.speakOnOpen)
+                            .accessibilityIdentifier("settings.speakOnOpenToggle")
+                    } footer: {
+                        Text("Ecranul „Acum” spune ce pastile urmează. Butonul cu difuzor le citește oricând.")
+                    }
+                }
+
                 Section {
                     Toggle("Mod demo", isOn: $settings.demoMode)
                         .accessibilityIdentifier("settings.demoModeToggle")

@@ -10,7 +10,7 @@
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e închis** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9) și completarea cu OCR-ul real din A2): toate cele patru capturi din `demo/ocr/` trec prin `ocr_match` fără Gemini. `make demo-b3` verifică fluxul cap-coadă pe date sintetice. **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e în `main`** ([PR #13](https://github.com/VladimirTM/PolyGraph/pull/13)): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_pharmacist`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. **A2 e gata** ([PR #15](https://github.com/VladimirTM/PolyGraph/pull/15)): cutie (DataMatrix + poză) și rețetă (camera de documente), OCR pe telefon, `/scan`, sheet-ul de confirmare cu câmpurile „verificați” și avertizări de expirare / duplicat, camera falsă `PG_FAKE_SCAN`; `make check-ios` verde, încercat pe iPhone cu cutiile de test din `demo/datamatrix/`; rămân cutiile fizice în sală (T-A2-03). **B5 e în `main`** ([PR #16](https://github.com/VladimirTM/PolyGraph/pull/16)) cu rutele reale `/checkins` și `/feed`. `make check` trece cu 247 de teste cu `kb.sqlite` construit. **A3 e gata** (modul aparținător: listă pe medici cu „Anulează”, alerte cu zoom, ACB, graf radial local, detaliu + editare). **B6 e în `main`** ([PR #21](https://github.com/VladimirTM/PolyGraph/pull/21)) și apoi **reorientat spre medicul de familie** (`feature/b6-doctor-portal`): portalul `/portal` cu login prin cod, lista pacienților, fișa cu decizie + notă pe alertă (apare pe alertă și în Noutăți), reconcilierea de tipărit (2 pagini A4) și QR-ul care adaugă pacientul în lista medicului; farmacistul a ieșit din contracte și din textele motorului; `make check` are 266 de teste; rămâne T-B6-04 (manual pe iPhone). **Urmează:** Dev A pornește A4. Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (13.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e închis** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9) și completarea cu OCR-ul real din A2): toate cele patru capturi din `demo/ocr/` trec prin `ocr_match` fără Gemini. `make demo-b3` verifică fluxul cap-coadă pe date sintetice. **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e în `main`** ([PR #13](https://github.com/VladimirTM/PolyGraph/pull/13)): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_doctor`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. **A2 e gata** ([PR #15](https://github.com/VladimirTM/PolyGraph/pull/15)): cutie (DataMatrix + poză) și rețetă (camera de documente), OCR pe telefon, `/scan`, sheet-ul de confirmare cu câmpurile „verificați” și avertizări de expirare / duplicat, camera falsă `PG_FAKE_SCAN`; `make check-ios` verde, încercat pe iPhone cu cutiile de test din `demo/datamatrix/`; rămân cutiile fizice în sală (T-A2-03). **B5 e în `main`** ([PR #16](https://github.com/VladimirTM/PolyGraph/pull/16)) cu rutele reale `/checkins` și `/feed`. `make check` trece cu 247 de teste cu `kb.sqlite` construit. **A3 e gata** (modul aparținător: listă pe medici cu „Anulează”, alerte cu zoom, ACB, graf radial local, detaliu + editare). **B6 e în `main`** ([PR #21](https://github.com/VladimirTM/PolyGraph/pull/21)) și apoi **reorientat spre medicul de familie** (`feature/b6-doctor-portal`): portalul `/portal` cu login prin cod, lista pacienților, fișa cu decizie + notă pe alertă (apare pe alertă și în Noutăți), reconcilierea de tipărit (2 pagini A4) și QR-ul care adaugă pacientul în lista medicului; farmacistul a ieșit din contracte și din textele motorului; `make check` are 266 de teste; rămâne T-B6-04 (manual pe iPhone). **A4 e gata** ( „Acum” cu cronologia de puncte, cardurile cu poze, „AM LUAT” / „Mai târziu” / „Am sărit” cu guard de 1 s, bifa care zboară, „Anulează” 5 s, vocea `ro-RO`, notificările locale, cardul calm pentru alertele pacientului, „Ziua de azi” cu momentele deschise la atingere); `make check-ios` verde, încercat pe iPhone cu backend-ul real, inclusiv la textul maxim. **Urmează:** A5. Actualizați coloana „Status” la fiecare sync point.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
@@ -31,7 +31,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | A3 medicamente, alerte, graf | Dev A | W8–W12 (+ integrare W12–W14) | S 09:00–16:00 | ✅ | modul aparținător; `make check-ios` verde, graful pe iPhone fără internet în 427 ms; „Arată medicului” (QR) rămâne pentru A6 |
 | B3 extracția (OCR → catalog, GS1, cache) | Dev B | W12–W14 | S 14:00–16:00 | ✅ | `/scan` real |
 | **S2** + Q2 | amândoi | W14 | S 16:00 | ⬜ | fluxul real cap-coadă |
-| A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | ⬜ | Acum, Ziua de azi, „Am luat”, TTS, notificări |
+| A4 modul senior | Dev A | W14–W19 | S 16:00–21:30 | ✅ | Acum, Ziua de azi, „Am luat”, TTS, notificări; `make check-ios` verde, încercat pe iPhone; „Spuneți-mi cum vă simțiți” vine cu A5 |
 | B4 solverul de program + B5 simptomele | Dev B | W14–W19 | S 16:00–21:30 | ✅ | `/schedule`, `/checkins` reale; B4 gata (`/schedule`, `/doses`), B5 gata (`/checkins`, `/feed`); X1 (can_i_take → what-if) și Whisper rămân condiționale |
 | **S3** (MVP complet) | amândoi | W19 | S 21:30 | ⬜ | |
 | A5 check-in vocal + Noutăți | Dev A | W19–W23 | S 21:30–D 02:00 | ⬜ | |
@@ -160,7 +160,6 @@ Regulă: un bug găsit în demo primește întâi un test (sau o intrare în `ex
 | **Pacientul** | vârstnic cu 5–10 medicamente de la medici diferiți | „Modul senior”: doar programul de azi, poza cutiei la fiecare doză, buton mare „Am luat”, asistent vocal |
 | **Aparținătorul** | fiica / fiul, adesea în alt oraș | tot: lista, graful, alertele detaliate, aderența, check-in-urile vocale; primește alertele grave |
 | **Medicul de familie** | cabinetul | portal web cu lista pacienților care i-au partajat tratamentul (prin QR); pe fiecare alertă decide „Menține / Modific la consultație / Trimit la specialist” + notă, care ajung la familie; „Reconcilierea medicației” de tipărit |
-| **Medicul de familie** | coordonatorul îngrijirii | aceeași fișă web + „Reconcilierea medicației” de tipărit (sau salvat ca PDF) pentru consultație |
 
 ### 1.2 Feature-uri MVP (intră sigur în demo)
 
@@ -791,12 +790,15 @@ Nu face: modul senior, vocea.
 **Responsabil:** Dev A · **Depinde de:** A1; B4 pentru programul real (până atunci `expected_schedule.json` din mock) · **Durată:** 5 h · **Branch:** `feature/a4-senior-mode`
 
 **Checklist**
-- [ ] `NowView`: ora mare, momentul, dozele cu pozele cutiilor; suprafețe opace
-- [ ] Trei `SeniorButton`: „Am luat” / „Mai târziu” / „Am sărit”, cu guard de 1 s
-- [ ] **„Am luat” cu bifa care zboară în cronologie** + `.sensoryFeedback(.success)` + anulare 5 s
-- [ ] `DayView`: cronologia momentelor
-- [ ] TTS `AVSpeechSynthesizer` cu vocea `ro-RO`
-- [ ] Notificări locale (`UNCalendarNotificationTrigger`) la fiecare moment
+- [x] `NowView`: ora mare, momentul, dozele cu pozele cutiilor; suprafețe opace *(13.11.2026: `Senior/NowView.swift`, `SeniorComponents.swift`)*
+- [x] Trei `SeniorButton`: „Am luat” / „Mai târziu” / „Am sărit”, cu guard de 1 s *(„Mai târziu” = reamintire peste 15 min, doar pe telefon)*
+- [x] **„Am luat” cu bifa care zboară în cronologie** + `.sensoryFeedback(.success)` + anulare 5 s *(`DoseLog`; cu Reduce Motion doar `.opacity`)*
+- [x] `DayView`: cronologia momentelor *(atingerea unui rând deschide `NowView(pinnedTime:)`)*
+- [x] TTS `AVSpeechSynthesizer` cu vocea `ro-RO` *(`Voice/Speaker.swift`: Enhanced/Premium dacă există, rate 0.45, `.duckOthers`; citire la deschidere dezactivabilă din Setări)*
+- [x] Notificări locale (`UNCalendarNotificationTrigger`) la fiecare moment *(`Senior/Reminders.swift`: azi + mâine, refăcute la orice schimbare a programului sau a confirmărilor; permisiunea cerută din „Acum”, cu motivul pe card)*
+- [x] Card calm pentru alertele cu `route_to` ∋ `patient` („Am înțeles” le ascunde până la o alertă nouă)
+- [x] Previews pentru `NowView` la `.large`, `.xxxLarge`, `.accessibility3`, light și dark *(`Senior/SeniorPreviews.swift`)*
+- [ ] SeniorButton „Spuneți-mi cum vă simțiți” (vine cu A5, odată cu ecranul de check-in)
 
 ~~~text
 [WORKFLOW] Branch: feature/a4-senior-mode.
@@ -830,9 +832,9 @@ Nu face: microfonul (A5), modul aparținător.
 ~~~
 
 **Teste**
-- [ ] T-A4-01 Unit: alegerea „momentului curent” pentru 6 ore ale zilei (înainte de trezire, între momente, după culcare).
-- [ ] T-A4-02 Unit: „Am luat” apelat de două ori în 300 ms → un singur set de `POST /doses`; „Anulează” trimite `pending`.
-- [ ] T-A4-03 Manual: Previews la `.accessibility3` fără text tăiat; o persoană care nu a văzut aplicația confirmă momentul fără explicații.
+- [x] T-A4-01 Unit: alegerea „momentului curent” pentru 6 ore ale zilei (înainte de trezire, între momente, după culcare). *(`PolyGraphTests/SeniorTests.swift`, `CurrentMomentTests`; 13.11.2026: `make check-ios` verde)*
+- [x] T-A4-02 Unit: „Am luat” apelat de două ori în 300 ms → un singur set de `POST /doses`; „Anulează” trimite `pending`. *(`DoseLogTests`; 13.11.2026: `make check-ios` verde)*
+- [x] T-A4-03 Manual: Previews la `.accessibility3` fără text tăiat; o persoană care nu a văzut aplicația confirmă momentul fără explicații. *(13.11.2026: pe iPhone cu `DEMO_MODE=1 make dev`; dubla apăsare → 2 `POST /doses` pentru 2 doze, „Anulează” → încă 2; „Ziua de azi” tăiată la textul maxim, reparată)*
 
 ---
 
@@ -886,7 +888,7 @@ Citește .claude/skills/apple-design/SKILL.md (§14, §16, §17) și docs/DESIGN
 
 Obiectiv: aplicația e gata de scenă.
 
-1. ShareSheet (.sheet, detents [.medium]): POST /share → QR generat cu CIFilter.qrCodeGenerator() (scalat fără interpolare, 260 pt, pe fundal alb și în dark mode), „Valabil până duminică, 15:00”, ShareLink cu url-ul. În modul senior: doar QR-ul și „Arătați acest cod la farmacie”, butonul în DayView.
+1. ShareSheet (.sheet, detents [.medium]): POST /share → QR generat cu CIFilter.qrCodeGenerator() (scalat fără interpolare, 260 pt, pe fundal alb și în dark mode), „Valabil până duminică, 15:00”, ShareLink cu url-ul. În modul senior: doar QR-ul și „Arătați acest cod medicului de familie”, butonul în DayView. Scanat de medicul autentificat în portal, codul îl adaugă pe pacient în lista lui.
 2. Settings → Mod demo: „Resetează pacientul demo” (POST /demo/reset), „Adaugă rețeta ORL” (POST /meds cu med_09_fromilid.json din bundle), „Simulează doză ratată” (POST /demo/missed-dose).
 3. Stări goale (ContentUnavailableView) cu o propoziție și o acțiune; erorile ca text inline în română, cu „Încearcă din nou”.
 4. Icon și nume „PolyGraph”.
@@ -1283,7 +1285,7 @@ Reguli: fără constatări vagi („ar putea fi mai frumos”); fiecare constata
 
 ## 7. Scenariul demo (3 minute, două telefoane + laptop)
 
-Telefonul 1 = Maria (modul senior). Telefonul 2 = Ana (aparținător). Laptopul = farmacia (pagina din QR), proiectat pe ecran.
+Telefonul 1 = Maria (modul senior). Telefonul 2 = Ana (aparținător). Laptopul = cabinetul medicului de familie (portalul), proiectat pe ecran.
 
 | Timp | Ce se întâmplă | Ce spunem |
 |---|---|---|
@@ -1308,7 +1310,7 @@ Plan B pentru fiecare pas: scanarea pică → butonul „Adaugă rețeta ORL” 
 3. **Soluția:** poză → graf → alerte deterministe → program simplu → voce → familia și medicul de familie în buclă.
 4. **Demo** (secțiunea 7).
 5. **Cum e construit:** diagrama din 2.1 cu regula „LLM doar la margini”; DDInter 2.0 + nomenclatorul RO + Beers / STOPP / ACB; solverul; designul pentru vârstnici (un singur ecran, butoane mari, fără gesturi, Reduce Motion / Dynamic Type respectate).
-6. **Impact și model:** familia (abonament mic), farmaciile (serviciu de revizuire a medicației, diferențiator pentru lanțuri), medicii de familie (fișa de reconciliere, timp câștigat). Pași următori: date licențiate comercial, pilot cu o farmacie din Timișoara, integrare cu rețeta electronică.
+6. **Impact și model:** familia (abonament mic), medicii de familie (portalul și fișa de reconciliere: timp câștigat la consultație, OTC-urile pe care altfel nu le vede). Pași următori: date licențiate comercial, pilot cu un cabinet de medicină de familie din Timișoara, integrare cu rețeta electronică.
 7. **Responsabil:** nu diagnosticăm, nu schimbăm doze; GDPR (date de sănătate, partajare cu token care expiră); drumul spre conformitate MDR (după Regula 11 din MDR, un software care dă informații pentru decizii terapeutice e, probabil, cel puțin clasa IIa; de confirmat cu un specialist în reglementare).
 
 Întrebări probabile de la juriu (de pregătit răspunsul în 2 fraze): „De unde știți că alertele sunt corecte?” · „Ce faceți cu alert fatigue?” (severități, minor ascuns, routing pe roluri) · „Licența datelor?” · „De ce n-ar face asta farmacia direct?” · „Cum convingeți un vârstnic să folosească telefonul?” (familia face setup-ul; seniorul are un singur ecran și vocea).
@@ -1326,7 +1328,7 @@ Plan B pentru fiecare pas: scanarea pică → butonul „Adaugă rețeta ORL” 
 | Licența DDInter (CC BY-NC-SA) nu permite produs comercial | pitch, slide 6: date licențiate comercial după hackathon | amândoi |
 | LLM vision lent / fără credite / fără internet | cache pe hash (B3, B7), timeouts, completare manuală | B |
 | Recunoașterea vocală iOS în română (calitate, zgomot de sală, disponibilitate pe telefon) | testată la pregătire; dacă e slabă, Whisper (B5, punctul 6); în demo, microfonul aproape de gură; fallback text | A |
-| Nimeni din echipă nu știe Swift; codul îl scriu agenții | secțiunea „Cum lucrați cu agenții” (0): build automat după fiecare modificare, teste pe iPhone la fiecare sync point, folder sincronizat în loc de `project.pbxproj`; dacă A1–A2 depășesc cu > 3 h, se taie primul graful din app (rămâne în pagina farmacistului), apoi X-urile | amândoi |
+| Nimeni din echipă nu știe Swift; codul îl scriu agenții | secțiunea „Cum lucrați cu agenții” (0): build automat după fiecare modificare, teste pe iPhone la fiecare sync point, folder sincronizat în loc de `project.pbxproj`; dacă A1–A2 depășesc cu > 3 h, se taie primul graful din app (rămâne în portalul medicului), apoi X-urile | amândoi |
 | VisionKit `DataScannerViewController` indisponibil pe un model de iPhone | verificat la pregătire (`isSupported`); fallback: poza + zxing-cpp pe server | A |
 | Semnarea în Xcode pe două Team-uri diferite | P0: `Signing.local.xcconfig` cu bundle id local per persoană (ca la NeuroTrack) | A |
 | Vocea TTS ro-RO lipsește sau sună rău pe iPhone | A4, verificat devreme; fallback: doar text mare | A |
@@ -1388,7 +1390,7 @@ Logistică:
 
 - Date de interacțiuni licențiate comercial; validarea alertelor cu un farmacist clinician.
 - Integrare cu rețeta electronică (SIUI / PIAS) pentru import automat în loc de poze.
-- Neo4j pentru graful populațional (ce combinații produc cele mai multe alerte în farmaciile partenere).
+- Neo4j pentru graful populațional (ce combinații produc cele mai multe alerte la pacienții cabinetelor partenere).
 - Push real (APNs), conturi și consimțământ GDPR complet, audit log; Android doar dacă pilotul o cere.
 - Dozele individualizate (INR pentru anticoagulante, funcția renală) doar prin medic, niciodată automat.
 
