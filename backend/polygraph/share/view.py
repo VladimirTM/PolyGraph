@@ -1,4 +1,5 @@
-"""B6: datele paginii farmacistului / medicului și ale fișei de tipărit. Funcții pure; rutele sunt în polygraph/api/main.py."""
+"""B6: datele portalului medicului de familie (lista de pacienți, fișa, fișa de tipărit).
+Funcții pure; rutele sunt în polygraph/api/main.py."""
 
 from __future__ import annotations
 
@@ -37,6 +38,7 @@ SOURCE_LABEL = {
     "schedule": "Programul calculat de PolyGraph",
     "app": "PolyGraph",
 }
+DECISION_LABEL = {"keep": "Menține", "change_at_visit": "Modific la consultație", "refer_specialist": "Trimit la specialist"}
 # întrebări pentru consultație; niciuna nu spune „opriți” sau o doză
 QUESTION = {
     "ddi": "{meds}: se menține asocierea și ce monitorizare propuneți?",
@@ -118,7 +120,8 @@ def alert_view(alert: Json, names: dict[str, str]) -> Json:
         "meds": [names.get(m, m) for m in alert["med_ids"]],
         "source_label": SOURCE_LABEL.get(source["db"], source["db"]),
         "grave": alert["severity"] in GRAVE,
-        "verified": alert["status"] == "verified_by_pharmacist",
+        "reviewed": alert["status"] == "reviewed_by_doctor",
+        "decision_label": DECISION_LABEL.get((res or {}).get("decision") or "", None),
         "resolution_at": ro_moment(res["at"]) if res else None,
     }
 
@@ -210,7 +213,7 @@ def page_context(
     names = {m["id"]: med_name(m) for m in meds}
     alerts = sorted(
         (alert_view(a, names) for a in analysis["alerts"]),
-        key=lambda a: (SEV_RANK[a["severity"]], a["status"] == "verified_by_pharmacist"),
+        key=lambda a: (SEV_RANK[a["severity"]], a["status"] == "reviewed_by_doctor"),
     )
     grave = [a for a in alerts if a["grave"]]
     doctors = {(prescriber(m) or "").lower() for m in active} - {""}
@@ -243,15 +246,37 @@ def page_context(
     }
 
 
-def verify_event(alert: Json, note: str, at: str, suffix: str) -> Json:
-    """Evenimentul din Noutăți (A5) pentru o alertă verificată de farmacist."""
+def patient_card(patient: Json, meds: list[Json], analysis: Json, checkins: list[Json], today: date) -> Json:
+    """Rândul unui pacient din lista medicului: cele nerevizuite și semnalele familiei îl urcă în listă."""
+    active = [m for m in meds if is_active(m, today)]
+    grave = [a for a in analysis["alerts"] if a["severity"] in GRAVE]
+    open_grave = [a for a in grave if a["status"] != "reviewed_by_doctor"]
+    recent = recent_checkins(checkins, today)
+    escalated = [c for c in recent if c.get("escalate")]
     return {
-        "id": f"ev_verify_{suffix}",
+        "patient": patient,
+        "age": today.year - patient["birth_year"] if patient.get("birth_year") else None,
+        "meds": len(active),
+        "grave": len(grave),
+        "open_grave": len(open_grave),
+        "open_titles": [a["title"] for a in sorted(open_grave, key=lambda a: SEV_RANK[a["severity"]])][:2],
+        "acb": analysis["acb_total"],
+        "escalated": len(escalated),
+        "last_checkin": recent[0]["when"] if recent else None,
+        "sort": (-len(escalated), -len(open_grave), patient.get("name") or ""),
+    }
+
+
+def review_event(alert: Json, decision: str, note: str, at: str, suffix: str) -> Json:
+    """Evenimentul din Noutăți (A5) pentru o alertă revizuită de medicul de familie."""
+    label = DECISION_LABEL[decision]
+    return {
+        "id": f"ev_review_{suffix}",
         "at": at,
-        "type": "pharmacist_verified",
+        "type": "doctor_reviewed",
         "severity": alert["severity"],
-        "title": f"Farmacistul a verificat: {alert['title']}",
-        "body": note or "Fără notă.",
+        "title": f"Medicul de familie a revizuit: {alert['title']}",
+        "body": f"Decizie: {label}." + (f" {note}" if note else ""),
         "med_ids": alert["med_ids"],
         "alert_id": alert["id"],
         "checkin_id": None,

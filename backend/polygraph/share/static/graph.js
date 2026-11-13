@@ -1,4 +1,4 @@
-// PolyGraph · graful terapeutic (B6), folosit de pagina farmacistului și de WKWebView-ul din aplicație (A3).
+// PolyGraph · graful terapeutic (B6), folosit de portalul medicului de familie și de WKWebView-ul din aplicație.
 // Culorile vin din variabilele CSS, deci urmează light / dark / contrast mare ca restul paginii.
 (function () {
   "use strict";
@@ -101,7 +101,7 @@
       animate: false,
       padding: 12,
     },
-    // pe pagina farmacistului graful nu fură derularea paginii
+    // în fișa pacientului graful nu fură derularea paginii
     userZoomingEnabled: !page,
     userPanningEnabled: !page,
     boxSelectionEnabled: false,

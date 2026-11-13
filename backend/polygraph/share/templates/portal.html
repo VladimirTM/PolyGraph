@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Pacienții mei · Portalul medicului de familie{% endblock %}
+{% block body_class %}portal{% endblock %}
+{% block body %}
+<div class="scroll-sentinel" aria-hidden="true"></div>
+<header class="topbar" data-topbar>
+  <div class="topbar-inner">
+    <div>
+      <h1 class="page-title">Pacienții mei</h1>
+      <p class="disclaimer">{{ doctor.name }} · Portalul medicului de familie</p>
+    </div>
+    <form method="post" action="/portal/logout"><button class="btn btn-secondary" type="submit">Ieșire</button></form>
+  </div>
+</header>
+
+<main class="content">
+  {% set pending = cards | sum(attribute="open_grave") %}
+  <p class="summary-line lead">{% if pending %}{{ pending }} {{ "alertă gravă" if pending == 1 else "alerte grave" }} de revizuit{% else %}Totul e revizuit.{% endif %}</p>
+
+  <ul class="patients">
+    {% for c in cards %}
+    <li>
+      <a class="patient-card{% if c.escalated %} is-escalated{% endif %}" href="/portal/patients/{{ c.patient.id }}">
+        <div class="patient-main">
+          <p class="patient-name">{{ c.patient.name }}{% if c.age %}, {{ c.age }} de ani{% endif %}</p>
+          <p class="small muted">{{ c.meds }} medicamente · ACB {{ c.acb }}{% if c.last_checkin %} · ultimul check-in {{ c.last_checkin }}{% endif %}</p>
+          {% if c.open_titles %}<p class="patient-why">{{ c.open_titles | join(" · ") }}</p>{% endif %}
+        </div>
+        <div class="patient-badges">
+          {% if c.escalated %}<span class="badge sev-major">Semnalat de familie</span>{% endif %}
+          {% if c.open_grave %}<span class="badge sev-major">{{ c.open_grave }} de revizuit</span>
+          {% elif c.grave %}<span class="badge ok">Revizuit</span>
+          {% else %}<span class="badge">Fără alerte grave</span>{% endif %}
+        </div>
+      </a>
+    </li>
+    {% else %}
+    <li class="muted">Încă nu aveți pacienți în portal.</li>
+    {% endfor %}
+  </ul>
+
+  <p class="small muted hint">Un pacient nou intră în listă când scanați codul QR din aplicația familiei, cât timp sunteți autentificat aici.</p>
+</main>
+<script src="/static/share/share.js" defer></script>
+{% endblock %}

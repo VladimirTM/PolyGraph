@@ -1,12 +1,13 @@
 """Persistența aplicației: SQLite `app.sqlite` (pacienți, medicamente, doze, check-in-uri, Noutăți, starea alertelor,
-link-uri de partajare, cache GTIN). Obiectele de contract se țin ca JSON; analiza nu se salvează, se recalculează la cerere
-și se îmbină cu `alert_state` (status / resolution puse de aparținător sau de farmacist).
+link-uri de partajare, medicii de familie din portal, cache GTIN). Obiectele de contract se țin ca JSON; analiza nu se
+salvează, se recalculează la cerere și se îmbină cu `alert_state` (status / resolution puse de aparținător sau de medic).
 
 Calea: PG_APP_DB (implicit backend/app.sqlite, gitignored); „:memory:” pentru teste.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import secrets
@@ -47,6 +48,15 @@ CREATE TABLE IF NOT EXISTS feed_events(
     data TEXT NOT NULL, PRIMARY KEY (patient_id, id)
 );
 CREATE TABLE IF NOT EXISTS gtin_cache(gtin TEXT PRIMARY KEY, product TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS doctors(id TEXT PRIMARY KEY, name TEXT NOT NULL, code_hash TEXT NOT NULL UNIQUE);
+CREATE TABLE IF NOT EXISTS doctor_sessions(
+    token TEXT PRIMARY KEY, doctor_id TEXT NOT NULL REFERENCES doctors(id) ON DELETE CASCADE, expires_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS doctor_patients(
+    doctor_id TEXT NOT NULL REFERENCES doctors(id) ON DELETE CASCADE,
+    patient_id TEXT NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    linked_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')), PRIMARY KEY (doctor_id, patient_id)
+);
 """
 
 
@@ -194,6 +204,45 @@ class Store:
         row = self._q("SELECT patient_id, expires_at FROM share_tokens WHERE token = ?", (token,))
         return (row[0][0], row[0][1]) if row else None
 
+    # ---------------------------------------------------------------- portalul medicului de familie (B6)
+
+    def upsert_doctor(self, doctor_id: str, name: str, code: str) -> None:
+        self._x(
+            "INSERT INTO doctors(id, name, code_hash) VALUES (?, ?, ?)"
+            " ON CONFLICT(id) DO UPDATE SET name = excluded.name, code_hash = excluded.code_hash",
+            (doctor_id, name, _code_hash(code)),
+        )
+
+    def doctor_by_code(self, code: str) -> Json | None:
+        row = self._q("SELECT id, name FROM doctors WHERE code_hash = ?", (_code_hash(code),))
+        return {"id": row[0][0], "name": row[0][1]} if row else None
+
+    def create_session(self, doctor_id: str, expires_at: str) -> str:
+        token = secrets.token_urlsafe(24)
+        self._x("INSERT INTO doctor_sessions(token, doctor_id, expires_at) VALUES (?, ?, ?)", (token, doctor_id, expires_at))
+        return token
+
+    def session_doctor(self, token: str) -> tuple[Json, str] | None:
+        """(medicul, expires_at) pentru sesiune, fără verificarea expirării (o face apelantul)."""
+        row = self._q(
+            "SELECT d.id, d.name, s.expires_at FROM doctor_sessions s JOIN doctors d ON d.id = s.doctor_id WHERE s.token = ?",
+            (token,),
+        )
+        return ({"id": row[0][0], "name": row[0][1]}, row[0][2]) if row else None
+
+    def delete_session(self, token: str) -> None:
+        self._x("DELETE FROM doctor_sessions WHERE token = ?", (token,))
+
+    def link_patient(self, doctor_id: str, pid: str) -> None:
+        self._x("INSERT OR IGNORE INTO doctor_patients(doctor_id, patient_id) VALUES (?, ?)", (doctor_id, pid))
+
+    def doctor_patient_ids(self, doctor_id: str) -> list[str]:
+        rows = self._q("SELECT patient_id FROM doctor_patients WHERE doctor_id = ? ORDER BY linked_at, rowid", (doctor_id,))
+        return [r[0] for r in rows]
+
+    def doctor_has_patient(self, doctor_id: str, pid: str) -> bool:
+        return bool(self._q("SELECT 1 FROM doctor_patients WHERE doctor_id = ? AND patient_id = ?", (doctor_id, pid)))
+
     # ---------------------------------------------------------------- starea alertelor
 
     def alert_states(self, pid: str) -> dict[str, Json]:
@@ -207,6 +256,10 @@ class Store:
             "INSERT OR REPLACE INTO alert_state(patient_id, alert_id, status, resolution) VALUES (?, ?, ?, ?)",
             (pid, alert_id, status, _dump(resolution) if resolution else None),
         )
+
+
+def _code_hash(code: str) -> str:
+    return hashlib.sha256(code.strip().encode()).hexdigest()
 
 
 def _dump(obj: Any) -> str:
