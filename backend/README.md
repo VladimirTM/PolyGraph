@@ -22,3 +22,17 @@ curl -H 'X-Patient-Token: demo-token' localhost:8000/v1/patients/pat_demo/analys
 `POST /v1/patients/{id}/scan` primește `kind`, `ocr_lines`, `image` și `datamatrix` conform contractului. Ruta întoarce candidați de verificat. Confirmarea prin `POST /meds` poate memora un GTIN valid împreună cu produsul verificat în catalog.
 
 Potrivirea OCR și DataMatrix funcționează local. Pentru rezerva Gemini, configurează `GEMINI_API_KEY` și, opțional, `GEMINI_MODEL` în mediu sau în `.env`. Cu această configurare, dacă potrivirea locală e insuficientă și cererea include o imagine, backend-ul poate trimite imaginea către Gemini. Rezultatul structurat este memorat local în `demo/llm_cache`. `make demo-warm` pregătește cache-ul din fotografiile demo din `demo/photos` și `demo/rx`.
+
+## Demo pe scenă (B7)
+
+```bash
+make demo                                   # DEMO_MODE=1 pe 0.0.0.0:8000, fără reload; IP-ul local + QR cu baseURL
+make demo-check                             # R4: scenariul din PLAN.md §7 în proces, cu Gemini oprit
+make demo-check URL=http://127.0.0.1:8000   # același scenariu pe serverul din make demo (la final îl resetează)
+make demo-warm                              # cu internet, înainte de scenă: cache-ul Gemini (poze + transcrieri)
+```
+
+- `POST /demo/reset` recreează și istoricul: dozele din ultimele 7 zile (toate „Am luat”, mai puțin 2 ratate, care apar în Noutăți) și un check-in vechi fără simptome; ziua de azi rămâne neatinsă. `POST /demo/missed-dose` pune în Noutăți dozele neconfirmate ale ultimului moment trecut.
+- Un medicament nou care aduce alerte `major` / `critical` (în afară de mâncare) creează evenimente `alert_new` în Noutăți.
+- Gemini are un termen total (`polygraph/deadline.py`): 8 s la scanare (decizia din 13.11.2026), 5 s la check-in; după termen rămâne calea deterministă sau completarea manuală. Răspunsurile la check-in se păstrează și ele în `demo/llm_cache`.
+- Logurile din terminal (`SCAN`, `ALERTĂ`, `CHECK-IN`, `DOZĂ`, `DEMO`) spun ce cale a decis și din ce sursă vine fiecare alertă.
