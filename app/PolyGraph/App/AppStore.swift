@@ -25,6 +25,8 @@ final class AppStore {
     private(set) var shareToken: String?
     /// ștergerea cu „Anulează” din lista de medicamente
     @ObservationIgnored private(set) var deletions = DeleteUndoQueue()
+    /// „Am luat” / „Am sărit” din modul senior
+    @ObservationIgnored private(set) var doseLog = DoseLog()
 
     init(settings: AppSettings = AppSettings(), debug: DebugEnvironment = .current) {
         self.settings = settings
@@ -32,6 +34,9 @@ final class AppStore {
         clock = debug.now.map { FixedClock(now: $0) as any AppClock } ?? SystemClock()
         deletions = DeleteUndoQueue { [weak self] medID in
             try await self?.deleteMed(id: medID)
+        }
+        doseLog = DoseLog { [weak self] dose in
+            try await self?.recordDose(dose)
         }
     }
 
@@ -95,6 +100,9 @@ final class AppStore {
             settings.signIn(patientID: created.id, token: created.patientToken)
             shareToken = nil
             patient = created.patient
+            // pacientul demo pornește de la zero: nimic confirmat, alertele de pacient din nou nevăzute
+            doseLog.clear()
+            settings.seenPatientAlertIDs = []
         } catch {
             Log.app.error("demo/reset a eșuat: \(String(describing: error), privacy: .public)")
             settings.signIn(patientID: AppSettings.demoPatientID, token: AppSettings.demoToken)
@@ -104,6 +112,8 @@ final class AppStore {
 
     func signOut() {
         deletions.cancelAll()
+        doseLog.clear()
+        Reminders.cancelAll()
         settings.signOut()
         patient = nil
         meds = []
@@ -126,6 +136,7 @@ final class AppStore {
             analysis = try await api.getAnalysis(patientID: id)
             schedule = try await api.getSchedule(patientID: id, date: scheduleDate)
             lastError = nil
+            doseLog.retryUnsent()
         } catch {
             report(error)
         }
@@ -175,6 +186,35 @@ final class AppStore {
         await reloadAnalysis()
     }
 
+    // MARK: - Modul senior
+
+    func recordDose(_ dose: Dose) async throws {
+        let id = try requirePatientID()
+        _ = try await api.recordDose(patientID: id, dose)
+    }
+
+    /// Alertele trimise și pacientului, la care încă n-a apăsat „Am înțeles”.
+    var unseenPatientAlerts: [Alert] {
+        (analysis?.alerts ?? []).filter {
+            $0.routeTo.contains(.patient) && !settings.seenPatientAlertIDs.contains($0.id)
+        }
+    }
+
+    func markPatientAlertsSeen() {
+        settings.seenPatientAlertIDs.formUnion(unseenPatientAlerts.map(\.id))
+    }
+
+    /// Reface notificările după program și confirmări (doar pe telefonul pacientului).
+    func rescheduleReminders() async {
+        guard settings.role == .senior, let schedule, await Reminders.isAuthorized() else { return }
+        let planned = Reminders.plan(
+            schedule: schedule,
+            names: { self.med(id: $0)?.product.brand ?? "" },
+            isDone: { self.doseLog.isDone($0, day: schedule.date) },
+            now: clock.now)
+        await Reminders.replaceAll(with: planned)
+    }
+
     // MARK: - Alerte și partajare
 
     func acknowledge(alertID: String) {
@@ -189,6 +229,17 @@ final class AppStore {
         shareToken = link.shareToken
         return link.shareToken
     }
+
+    #if DEBUG
+    /// Doar pentru Xcode Previews: date fixe, fără server.
+    func usePreviewData(patient: Patient?, meds: [MedicationItem], schedule: Schedule?, analysis: Analysis? = nil) {
+        self.patient = patient
+        self.meds = meds
+        self.schedule = schedule
+        self.analysis = analysis
+        didBootstrap = true
+    }
+    #endif
 
     // MARK: - Ajutătoare
 

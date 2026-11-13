@@ -28,6 +28,9 @@ final class AppSettings {
         static let patientID = "pg.patientID"
         static let patientToken = "pg.patientToken"
         static let demoMode = "pg.demoMode"
+        static let speakOnOpen = "pg.speakOnOpen"
+        static let remindersAsked = "pg.remindersAsked"
+        static let seenPatientAlerts = "pg.seenPatientAlerts"
     }
 
     @ObservationIgnored private let defaults: UserDefaults
@@ -52,6 +55,21 @@ final class AppSettings {
         didSet { defaults.set(demoMode, forKey: Key.demoMode) }
     }
 
+    /// Modul senior citește momentul cu voce tare la deschidere.
+    var speakOnOpen: Bool {
+        didSet { defaults.set(speakOnOpen, forKey: Key.speakOnOpen) }
+    }
+
+    /// Am întrebat deja de notificări (o singură dată, cu motivul spus pe ecran).
+    var remindersAsked: Bool {
+        didSet { defaults.set(remindersAsked, forKey: Key.remindersAsked) }
+    }
+
+    /// Alertele pentru pacient la care a apăsat „Am înțeles”.
+    var seenPatientAlertIDs: Set<String> {
+        didSet { defaults.set(Array(seenPatientAlertIDs).sorted(), forKey: Key.seenPatientAlerts) }
+    }
+
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         baseURLString = defaults.string(forKey: Key.baseURL) ?? Self.defaultBaseURL
@@ -59,6 +77,9 @@ final class AppSettings {
         patientID = defaults.string(forKey: Key.patientID)
         patientToken = defaults.string(forKey: Key.patientToken)
         demoMode = defaults.bool(forKey: Key.demoMode)
+        speakOnOpen = defaults.object(forKey: Key.speakOnOpen) as? Bool ?? true
+        remindersAsked = defaults.bool(forKey: Key.remindersAsked)
+        seenPatientAlertIDs = Set(defaults.stringArray(forKey: Key.seenPatientAlerts) ?? [])
     }
 
     var isSignedIn: Bool { patientID != nil && patientToken != nil }
@@ -73,6 +94,7 @@ final class AppSettings {
     func signOut() {
         patientID = nil
         patientToken = nil
+        seenPatientAlertIDs = []
     }
 
     /// Acceptă și „192.168.1.10:8000” scris fără schemă, cum îl tastează omul.
