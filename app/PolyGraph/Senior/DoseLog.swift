@@ -4,9 +4,12 @@ import Observation
 /// Ce a confirmat pacientul azi: „Am luat”, „Am sărit”, „Mai târziu” și „Anulează”.
 /// Starea se schimbă imediat pe telefon (și rămâne după repornire), iar POST /doses pleacă în spate;
 /// serverul e idempotent pe med_id + scheduled_at, deci retrimiterea nu dublează nimic.
+/// Ce n-a ajuns la server stă în `UserDefaults` și se retrimite la 30 s, la revenirea în aplicație
+/// și la reîncărcare, chiar după repornirea telefonului (Q3-07).
 @Observable
 final class DoseLog {
     static let undoWindow: Duration = .seconds(5)
+    static let retryInterval: Duration = .seconds(30)
 
     /// Ultima confirmare, cât încă se poate anula din banner.
     struct Undo: Equatable {
@@ -29,25 +32,39 @@ final class DoseLog {
     @ObservationIgnored private let guarded: GuardedAction
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let undoDelay: Duration
+    @ObservationIgnored private let retryDelay: Duration
     @ObservationIgnored private var undoTimer: Task<Void, Never>?
-    @ObservationIgnored private var unsent: [Dose] = []
+    @ObservationIgnored private var retryTimer: Task<Void, Never>?
+    @ObservationIgnored private var unsent: [Dose] = [] {
+        didSet { persistUnsent() }
+    }
     @ObservationIgnored private var isSending = false
 
     private static let storageKey = "pg.doseLog"
+    private static let unsentKey = "pg.doseLog.unsent"
 
     init(
         defaults: UserDefaults = .standard,
         undoDelay: Duration = DoseLog.undoWindow,
+        retryDelay: Duration = DoseLog.retryInterval,
         guarded: GuardedAction = GuardedAction(interval: GuardedAction.seniorInterval),
         send: @escaping (Dose) async throws -> Void = { _ in }
     ) {
         self.defaults = defaults
         self.undoDelay = undoDelay
+        self.retryDelay = retryDelay
         self.guarded = guarded
         self.send = send
         let stored = defaults.dictionary(forKey: Self.storageKey) as? [String: String] ?? [:]
         statuses = stored.compactMapValues(DoseStatus.init(rawValue:))
+        if let data = defaults.data(forKey: Self.unsentKey),
+           let doses = try? JSONCoding.decoder.decode([Dose].self, from: data) {
+            unsent = doses
+        }
     }
+
+    /// Confirmări care încă n-au ajuns la server.
+    var unsentCount: Int { unsent.count }
 
     static func key(day: String, time: String, medID: String) -> String {
         "\(day)T\(time)|\(medID)"
@@ -122,16 +139,19 @@ final class DoseLog {
         return until
     }
 
-    /// Retrimite ce n-a ajuns la server (apelat la reîncărcare).
-    func retryUnsent() {
-        guard !unsent.isEmpty else { return }
-        post([])
+    /// Retrimite ce n-a ajuns la server (la reîncărcare, la revenirea în aplicație și la 30 s).
+    @discardableResult
+    func retryUnsent() -> Task<Void, Never>? {
+        guard !unsent.isEmpty else { return nil }
+        return post([])
     }
 
     /// La deconectare sau la pacientul demo refăcut: nimic din ziua veche nu mai contează.
     func clear() {
         undoTimer?.cancel()
         undoTimer = nil
+        retryTimer?.cancel()
+        retryTimer = nil
         undo = nil
         statuses = [:]
         snoozes = [:]
@@ -192,14 +212,44 @@ final class DoseLog {
                 try await send(dose)
                 unsent.removeFirst()
                 lastError = nil
+            } catch let error where Self.isPermanent(error) {
+                // serverul a refuzat doza (ex. medicamentul a fost șters): retrimiterea n-ar ajuta,
+                // iar restul cozii nu trebuie să aștepte după ea
+                unsent.removeFirst()
             } catch {
                 lastError = (error as? LocalizedError)?.errorDescription ?? "Nu am putut trimite confirmarea."
+                scheduleRetry()
                 return
             }
         }
+        retryTimer?.cancel()
+        retryTimer = nil
+    }
+
+    private func scheduleRetry() {
+        retryTimer?.cancel()
+        retryTimer = Task { [weak self, retryDelay] in
+            try? await Task.sleep(for: retryDelay)
+            guard !Task.isCancelled else { return }
+            self?.retryUnsent()
+        }
+    }
+
+    /// 4xx (în afară de 408 / 429): cererea e greșită, nu rețeaua.
+    private static func isPermanent(_ error: Error) -> Bool {
+        guard case .http(let status, _) = error as? APIError else { return false }
+        return (400..<500).contains(status) && status != 408 && status != 429
     }
 
     private func persist() {
         defaults.set(statuses.mapValues(\.rawValue), forKey: Self.storageKey)
+    }
+
+    private func persistUnsent() {
+        if unsent.isEmpty {
+            defaults.removeObject(forKey: Self.unsentKey)
+        } else if let data = try? JSONCoding.encoder.encode(unsent) {
+            defaults.set(data, forKey: Self.unsentKey)
+        }
     }
 }

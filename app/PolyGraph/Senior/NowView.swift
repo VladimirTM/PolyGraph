@@ -5,6 +5,7 @@ import SwiftUI
 struct NowView: View {
     @Environment(AppStore.self) private var store
     @Environment(\.pgReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     /// `nil`: momentul curent, care avansează după „Am luat”; altfel momentul ales din „Ziua de azi”
     let pinnedTime: String?
@@ -52,7 +53,6 @@ struct NowView: View {
         let moment = displayedMoment(now: now)
         return ScrollView {
             VStack(alignment: .leading, spacing: Spacing.l) {
-                notices
                 if let schedule = store.schedule {
                     header(schedule: schedule, moment: moment, now: now)
                     if let moment {
@@ -65,6 +65,11 @@ struct NowView: View {
                         }
                         .id(moment.time)
                         .transition(cardTransition)
+                        // la textul de accesibilitate bara de jos ține doar „Am luat”; restul vine după pastile
+                        if splitsActions, showsActions(moment: moment, now: now) {
+                            secondaryActions(moment: moment, vertical: true)
+                                .transition(.opacity)
+                        }
                     } else {
                         dayDone(schedule)
                             .transition(cardTransition)
@@ -76,6 +81,9 @@ struct NowView: View {
                 } else {
                     loadError
                 }
+
+                // după pastile: ce se ia e primul lucru de pe ecran, și în AX (Q3-02)
+                notices
 
                 if pinnedTime == nil {
                     SeniorButton(
@@ -115,6 +123,14 @@ struct NowView: View {
             TimelineDots(
                 moments: schedule.moments, current: moment?.time, flying: flyingCheck, namespace: flight
             ) { log.momentStatus($0, day: schedule.date) }
+
+            if log.lastError != nil {
+                Label("Confirmarea pleacă când revine internetul.", systemImage: "arrow.clockwise.icloud")
+                    .font(.system(size: textSize))
+                    .foregroundStyle(PgColor.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("now.pendingSync")
+            }
 
             if let moment {
                 HStack(alignment: .center, spacing: Spacing.s) {
@@ -159,12 +175,14 @@ struct NowView: View {
         .accessibilityIdentifier("now.speakButton")
     }
 
+    /// Nimic de luat acum: „Ați terminat” doar dacă totul e confirmat (Q3-04).
     private func dayDone(_ schedule: Schedule) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.s) {
-            Text("Ați terminat pastilele de azi.")
+        let end = dayEnd(schedule)
+        return VStack(alignment: .leading, spacing: Spacing.s) {
+            Text(SeniorDay.dayEndTitle(end))
                 .font(.system(size: titleSize, weight: .semibold))
-            if let first = schedule.moments.first {
-                Text("Mâine, primele sunt la ora \(first.time).")
+            if let tomorrow = SeniorDay.tomorrowLine(schedule.moments) {
+                Text(tomorrow)
                     .font(.system(size: textSize))
             }
         }
@@ -176,20 +194,24 @@ struct NowView: View {
             RoundedRectangle(cornerRadius: Radius.seniorCard, style: .continuous)
                 .fill(PgColor.calmCard))
         .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("now.dayDone")
+        .accessibilityIdentifier(end == .empty ? "now.empty" : "now.dayDone")
     }
 
+    /// Eroarea se repară cu un buton mare, nu cu un gest (2.4.2, Q3-05).
     private var loadError: some View {
-        VStack(alignment: .leading, spacing: Spacing.s) {
+        VStack(alignment: .leading, spacing: Spacing.m) {
             Text("Nu am putut încărca programul.")
                 .font(.system(size: titleSize, weight: .semibold))
-            Text("Trageți ecranul în jos ca să încercăm din nou.")
-                .font(.system(size: textSize))
+                .foregroundStyle(PgColor.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("now.error")
+            SeniorButton(
+                "Încearcă din nou", systemImage: "arrow.clockwise", prominence: .secondary,
+                identifier: "now.retryButton"
+            ) {
+                Task { await store.refreshAll() }
+            }
         }
-        .foregroundStyle(PgColor.textPrimary)
-        .fixedSize(horizontal: false, vertical: true)
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("now.error")
     }
 
     @ViewBuilder
@@ -211,36 +233,68 @@ struct NowView: View {
     @ViewBuilder
     private func bottomBar(moment: Moment?, now: Date) -> some View {
         let day = store.schedule?.date ?? ""
-        VStack(spacing: Spacing.s) {
-            if let undo = log.undo, pinnedTime == nil || undo.time == pinnedTime {
-                UndoBanner(status: undo.status, onUndo: undoLast)
-                    .transition(.opacity)
-            } else if let moment, log.momentStatus(moment, day: day) == .open,
-                      SeniorDay.isDue(moment, nowMinutes: SeniorDay.minutes(of: now)) {
-                actionButtons(moment: moment, now: now)
-                    .transition(.opacity)
-            } else if let moment, pinnedTime != nil, log.momentStatus(moment, day: day) != .open {
-                Label(
-                    log.momentStatus(moment, day: day) == .taken ? "Le-ați luat." : "Le-ați sărit.",
-                    systemImage: log.momentStatus(moment, day: day) == .taken ? "checkmark.circle.fill" : "minus.circle")
-                    .font(.system(size: textSize, weight: .semibold))
-                    .foregroundStyle(PgColor.textPrimary)
-                    .frame(maxWidth: .infinity, minHeight: ControlHeight.senior)
-                    .accessibilityIdentifier("now.doneLabel")
+        let showsUndo = log.undo.map { pinnedTime == nil || $0.time == pinnedTime } ?? false
+        let showsButtons = moment.map { showsActions(moment: $0, now: now) } ?? false
+        let showsDone = moment.map { pinnedTime != nil && log.momentStatus($0, day: day) != .open } ?? false
+        // fără nimic de arătat, nici bara: altfel rămâne o cutie goală peste carduri
+        if showsUndo || showsButtons || showsDone {
+            VStack(spacing: Spacing.s) {
+                if let undo = log.undo, showsUndo {
+                    UndoBanner(status: undo.status, onUndo: undoLast)
+                        .transition(.opacity)
+                } else if let moment, showsButtons {
+                    actionButtons(moment: moment)
+                        .transition(.opacity)
+                } else if let moment {
+                    Label(
+                        log.momentStatus(moment, day: day) == .taken ? "Le-ați luat." : "Le-ați sărit.",
+                        systemImage: log.momentStatus(moment, day: day) == .taken
+                            ? "checkmark.circle.fill" : "minus.circle")
+                        .font(.system(size: textSize, weight: .semibold))
+                        .foregroundStyle(PgColor.textPrimary)
+                        .frame(maxWidth: .infinity, minHeight: ControlHeight.senior)
+                        .accessibilityIdentifier("now.doneLabel")
+                }
             }
+            .padding(.horizontal, Spacing.m)
+            .padding(.vertical, Spacing.s)
+            .frame(maxWidth: .infinity)
+            .background(PgColor.background)
+            .pgAnimation(.pgStandard, value: log.undo)
         }
-        .padding(.horizontal, Spacing.m)
-        .padding(.vertical, Spacing.s)
-        .background(PgColor.background)
-        .pgAnimation(.pgStandard, value: log.undo)
     }
 
-    private func actionButtons(moment: Moment, now: Date) -> some View {
+    /// La textul de accesibilitate, trei butoane fixe de 72 pt ar acoperi pastila (Q3-02).
+    private var splitsActions: Bool { typeSize.isAccessibilitySize }
+
+    /// Butoanele apar doar pentru un moment neconfirmat care e la ora lui, și nu cât e „Anulează” pe ecran.
+    private func showsActions(moment: Moment, now: Date) -> Bool {
+        guard let day = store.schedule?.date else { return false }
+        if let undo = log.undo, pinnedTime == nil || undo.time == pinnedTime { return false }
+        return log.momentStatus(moment, day: day) == .open
+            && SeniorDay.isDue(moment, nowMinutes: SeniorDay.minutes(of: now))
+    }
+
+    private func actionButtons(moment: Moment) -> some View {
         VStack(spacing: Spacing.s) {
-            SeniorButton("AM LUAT", systemImage: "checkmark", identifier: "now.takenButton") {
+            SeniorButton("Am luat", systemImage: "checkmark", identifier: "now.takenButton") {
                 act(.taken, moment: moment)
             }
             .accessibilityLabel("Am luat. Confirmă că ați luat \(medNames(moment)).")
+            if !splitsActions {
+                secondaryActions(moment: moment, vertical: false)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func secondaryActions(moment: Moment, vertical: Bool) -> some View {
+        if vertical {
+            VStack(spacing: Spacing.s) {
+                laterButton(moment: moment)
+                skippedButton(moment: moment)
+            }
+        } else {
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: Spacing.s) {
                     laterButton(moment: moment)
@@ -280,7 +334,9 @@ struct NowView: View {
         }
         guard recorded else { return }
         if status == .taken { takenCount += 1 }
-        Speaker.shared.speak(SeniorDay.afterAction(status, next: nextOpen(after: moment, in: schedule)))
+        let allDone = schedule.moments.allSatisfy { log.isDone($0, day: schedule.date) }
+        Speaker.shared.speak(
+            SeniorDay.afterAction(status, next: nextOpen(after: moment, in: schedule), allDone: allDone))
         if flyingCheck != nil { landCheck() }
         Task { await store.rescheduleReminders() }
     }
@@ -385,7 +441,12 @@ struct NowView: View {
             return "\(med?.product.brand ?? "Un medicament"), \(quantity), \(dose.instruction)."
         }
         let due = moment.map { SeniorDay.isDue($0, nowMinutes: SeniorDay.minutes(of: now)) } ?? false
-        return SeniorDay.momentSpeech(moment, doseLines: lines, due: due)
+        let end = store.schedule.map { dayEnd($0) } ?? .allDone
+        return SeniorDay.momentSpeech(moment, doseLines: lines, due: due, dayEnd: end)
+    }
+
+    private func dayEnd(_ schedule: Schedule) -> DayEnd {
+        SeniorDay.dayEnd(schedule.moments) { log.isDone($0, day: schedule.date) }
     }
 
     /// „Euthyrox, Omeprazol”

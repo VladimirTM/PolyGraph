@@ -181,6 +181,11 @@ final class ReviewTour: ReviewTestCase {
                defaults: remindersCard ? ["pg.remindersAsked": "NO"] : [:])
         expect("now.clock", timeout: 10)
         expect("now.takenButton", timeout: 3)
+        // Q3-02: ora și prima pastilă se văd fără scroll, și în AX. Cardul cu poza e mai înalt decât ecranul,
+        // deci contează doar începutul lui (numele), nu mijlocul.
+        if let dose = first(prefix: "now.dose."), dose.frame.isEmpty || dose.frame.minY + 120 > app.frame.maxY {
+            markAbsent("\(dose.identifier) pe primul ecran")
+        }
         step("now", audit: true)
         app.swipeUp()
         step("nowScrolled")

@@ -39,6 +39,12 @@ final class GuardedAction {
         self.uptime = uptime
     }
 
+    /// Ignoră atingerile din următorul `interval`, ca și cum acțiunea tocmai ar fi rulat:
+    /// pentru un buton care apare sub degetul care încă apasă (Q3-03).
+    func arm() {
+        lastRun = uptime()
+    }
+
     /// Rulează `action` dacă nu a mai rulat în ultimul `interval`; întoarce dacă a rulat.
     @discardableResult
     func callAsFunction(_ action: () -> Void) -> Bool {

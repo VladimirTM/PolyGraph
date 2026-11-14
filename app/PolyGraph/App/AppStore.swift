@@ -10,6 +10,7 @@ final class AppStore {
     let settings: AppSettings
     let clock: any AppClock
     @ObservationIgnored private let debug: DebugEnvironment
+    @ObservationIgnored private let session: URLSession
 
     private(set) var patient: Patient?
     private(set) var meds: [MedicationItem] = []
@@ -31,10 +32,17 @@ final class AppStore {
     /// tab-ul Noutăți al aparținătorului
     @ObservationIgnored private(set) var feed = FeedModel()
 
-    init(settings: AppSettings = AppSettings(), debug: DebugEnvironment = .current) {
+    /// `clock` și `session` sunt pentru teste (ceasul care trece de miezul nopții, serverul simulat).
+    init(
+        settings: AppSettings = AppSettings(),
+        debug: DebugEnvironment = .current,
+        clock: (any AppClock)? = nil,
+        session: URLSession = .shared
+    ) {
         self.settings = settings
         self.debug = debug
-        clock = debug.now.map { FixedClock(now: $0) as any AppClock } ?? SystemClock()
+        self.session = session
+        self.clock = clock ?? debug.now.map { FixedClock(now: $0) as any AppClock } ?? SystemClock()
         deletions = DeleteUndoQueue { [weak self] medID in
             try await self?.deleteMed(id: medID)
         }
@@ -50,7 +58,7 @@ final class AppStore {
     }
 
     var api: APIClient {
-        APIClient(baseURL: settings.baseURL, token: settings.patientToken)
+        APIClient(baseURL: settings.baseURL, token: settings.patientToken, session: session)
     }
 
     func med(id: String) -> MedicationItem? {
@@ -151,6 +159,13 @@ final class AppStore {
         } catch {
             report(error)
         }
+    }
+
+    /// După miezul nopții (sau la revenirea a doua zi) programul de pe ecran e al zilei de ieri (Q3-06).
+    /// Cu `PG_NOW` ceasul e fix, deci ziua nu se schimbă niciodată.
+    func refreshIfNewDay() async {
+        guard let schedule, schedule.date != PgFormat.isoDay(clock.now) else { return }
+        await refreshAll()
     }
 
     func reloadAnalysis() async {
@@ -301,9 +316,10 @@ final class AppStore {
 
     // MARK: - Ajutătoare
 
-    /// Cu `PG_NOW`, programul cerut e al zilei fixate; altfel serverul alege „azi” (ora României).
-    private var scheduleDate: String? {
-        debug.now.map(PgFormat.isoDay)
+    /// Ziua după ceasul aplicației (cu `PG_NOW`, ziua fixată), aceeași cu care „Acum” alege momentul:
+    /// după miezul nopții telefonul cere ziua nouă, nu ce crede serverul că e „azi”.
+    private var scheduleDate: String {
+        PgFormat.isoDay(clock.now)
     }
 
     private func requirePatientID() throws -> String {

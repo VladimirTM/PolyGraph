@@ -188,3 +188,211 @@ struct SeniorWordsTests {
         #expect(planned.last?.body == "med_01, med_02, med_03, med_08")
     }
 }
+
+// MARK: - Q3F1
+
+/// Q3-04: „Ați terminat” doar când chiar s-a confirmat tot.
+@MainActor
+struct DayEndTests {
+    @Test func emptyAllDoneAndNothingNow() throws {
+        let moments = try demoSchedule().moments
+        #expect(SeniorDay.dayEnd([], isDone: { _ in true }) == .empty)
+        #expect(SeniorDay.dayEnd(moments, isDone: { _ in true }) == .allDone)
+        // 23:59 fără nicio confirmare
+        #expect(SeniorDay.dayEnd(moments, isDone: { _ in false }) == .nothingNow)
+        #expect(SeniorDay.dayEnd(moments, isDone: { $0.time != "07:00" }) == .nothingNow)
+    }
+
+    @Test func wordsOnScreenAndInVoiceMatch() throws {
+        let moments = try demoSchedule().moments
+        #expect(SeniorDay.dayEndTitle(.empty) == "Nu aveți pastile în program.")
+        #expect(SeniorDay.dayEndTitle(.nothingNow) == "Pentru azi nu mai e nimic de luat acum.")
+        #expect(SeniorDay.momentSpeech(nil, doseLines: [], due: false, dayEnd: .nothingNow)
+            == "Pentru azi nu mai e nimic de luat acum.")
+        #expect(SeniorDay.momentSpeech(nil, doseLines: [], due: false, dayEnd: .empty)
+            == "Nu aveți pastile în program.")
+        #expect(SeniorDay.afterAction(.taken, next: nil, allDone: false)
+            == "Foarte bine. Pentru azi nu mai e nimic de luat acum.")
+        #expect(SeniorDay.tomorrowLine(moments) == "Mâine, primele sunt la ora 07:00.")
+        #expect(SeniorDay.tomorrowLine([]) == nil)
+    }
+}
+
+/// Q3-03: „Anulează” apare sub degetul care a apăsat „Am sărit” și ignoră atingerile din primele 800 ms.
+@MainActor
+struct UndoGuardTests {
+    private final class FakeUptime {
+        var value: TimeInterval = 100
+    }
+
+    @Test func armedGuardIgnoresTheTapsThatArriveWithTheBanner() {
+        let uptime = FakeUptime()
+        let guarded = GuardedAction(interval: UndoBanner.armDelay, uptime: { uptime.value })
+        var undone = 0
+        guarded.arm()
+        uptime.value += 0.1
+        #expect(guarded({ undone += 1 }) == false)
+        uptime.value += 0.5
+        #expect(guarded({ undone += 1 }) == false)
+        uptime.value += 0.3
+        #expect(guarded({ undone += 1 }) == true)
+        #expect(undone == 1)
+    }
+}
+
+/// T-Q3F1-05: o confirmare care n-a plecat rămâne după repornire și se retrimite aceeași.
+@MainActor
+struct DoseQueueTests {
+    private final class Recorder {
+        var doses: [Dose] = []
+    }
+
+    private let day = "2026-11-14"
+
+    private func morning() throws -> Moment {
+        try #require(try demoSchedule().moments.first { $0.time == "07:30" })
+    }
+
+    @Test func failedSendIsRetriedAfterARestart() async throws {
+        let defaults = try #require(UserDefaults(suiteName: "pg.test.\(UUID().uuidString)"))
+        let moment = try morning()
+        let offline = DoseLog(defaults: defaults, retryDelay: .seconds(3600)) { _ in
+            throw APIError.network(URLError(.notConnectedToInternet))
+        }
+        _ = await offline.record(.taken, moment: moment, day: day)?.value
+        #expect(offline.lastError != nil)
+        #expect(offline.unsentCount == 2)
+
+        let recorder = Recorder()
+        let reopened = DoseLog(defaults: defaults, retryDelay: .seconds(3600)) { recorder.doses.append($0) }
+        #expect(reopened.unsentCount == 2)
+        _ = await reopened.retryUnsent()?.value
+
+        #expect(recorder.doses.map(\.medid) == ["med_07", "med_04"])
+        #expect(recorder.doses.allSatisfy { $0.status == .taken })
+        let at = try #require(SeniorDay.scheduledAt(day: day, time: "07:30"))
+        #expect(recorder.doses.map(\.scheduledAt) == [at, at])
+        #expect(reopened.unsentCount == 0)
+        #expect(reopened.lastError == nil)
+        // coada goală nu mai rămâne pe disc
+        #expect(DoseLog(defaults: defaults).unsentCount == 0)
+    }
+
+    @Test func aRejectedDoseDoesNotBlockTheQueue() async throws {
+        let defaults = try #require(UserDefaults(suiteName: "pg.test.\(UUID().uuidString)"))
+        let moment = try morning()
+        let recorder = Recorder()
+        let log = DoseLog(defaults: defaults, retryDelay: .seconds(3600)) { dose in
+            if dose.medid == "med_07" { throw APIError.http(status: 404, detail: nil) }
+            recorder.doses.append(dose)
+        }
+        _ = await log.record(.taken, moment: moment, day: day)?.value
+        #expect(recorder.doses.map(\.medid) == ["med_04"])
+        #expect(log.unsentCount == 0)
+        #expect(log.lastError == nil)
+    }
+}
+
+/// T-Q3F1-06: după miezul nopții, „Acum” cere programul zilei noi.
+@MainActor
+struct MidnightRefreshTests {
+    private final class MovingClock: AppClock {
+        var now: Date
+        init(now: Date) { self.now = now }
+    }
+
+    private func local(_ day: String, _ time: String) throws -> Date {
+        try #require(SeniorDay.scheduledAt(day: day, time: time))
+    }
+
+    @Test func afterMidnightTheScheduleIsTheNewDay() async throws {
+        let responses = try StubServer.Responses(
+            patient: ContractFiles.data("examples/patient.demo.json"),
+            meds: ContractFiles.data("examples/medication_item.sintrom.json"),
+            analysis: ContractFiles.data("examples/analysis.demo.json"),
+            schedule: ContractFiles.data("fixtures/expected_schedule.json"))
+        StubServer.start(responses)
+        defer { StubServer.stop() }
+
+        let defaults = try #require(UserDefaults(suiteName: "pg.test.\(UUID().uuidString)"))
+        let settings = AppSettings(defaults: defaults)
+        settings.baseURLString = "http://stub.polygraph.test"
+        settings.signIn(patientID: "pat_demo", token: "demo-token")
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [StubServer.self]
+        let clock = MovingClock(now: try local("2026-11-14", "23:59"))
+        let store = AppStore(
+            settings: settings, debug: DebugEnvironment(), clock: clock,
+            session: URLSession(configuration: configuration))
+
+        await store.refreshAll()
+        #expect(store.schedule?.date == "2026-11-14")
+        await store.refreshIfNewDay()
+        #expect(StubServer.scheduleRequests == 1)
+
+        clock.now = try local("2026-11-15", "00:01")
+        await store.refreshIfNewDay()
+        #expect(store.schedule?.date == "2026-11-15")
+        #expect(StubServer.scheduleRequests == 2)
+    }
+}
+
+/// Serverul simulat pentru AppStore: răspunde din contracts/, iar /schedule întoarce ziua cerută.
+nonisolated final class StubServer: URLProtocol {
+    nonisolated struct Responses {
+        let patient: Data
+        let meds: Data
+        let analysis: Data
+        let schedule: Data
+    }
+
+    nonisolated(unsafe) private static var responses: Responses?
+    nonisolated(unsafe) private(set) static var scheduleRequests = 0
+
+    static func start(_ responses: Responses) {
+        self.responses = responses
+        scheduleRequests = 0
+    }
+
+    static func stop() {
+        responses = nil
+    }
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        let (status, body) = Self.reply(to: request)
+        let url = request.url ?? URL(fileURLWithPath: "/")
+        let response = HTTPURLResponse(
+            url: url, statusCode: status, httpVersion: "HTTP/1.1",
+            headerFields: ["Content-Type": "application/json"])
+        if let response {
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        }
+        client?.urlProtocol(self, didLoad: body)
+        client?.urlProtocolDidFinishLoading(self)
+    }
+
+    override func stopLoading() {}
+
+    private static func reply(to request: URLRequest) -> (Int, Data) {
+        guard let responses, let url = request.url else { return (500, Data()) }
+        let path = url.path()
+        if path.hasSuffix("/schedule") {
+            scheduleRequests += 1
+            let day = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?.first { $0.name == "date" }?.value
+            guard var json = try? JSONSerialization.jsonObject(with: responses.schedule) as? [String: Any] else {
+                return (500, Data())
+            }
+            if let day { json["date"] = day }
+            return (200, (try? JSONSerialization.data(withJSONObject: json)) ?? Data())
+        }
+        if path.hasSuffix("/meds") { return (200, Data("[".utf8) + responses.meds + Data("]".utf8)) }
+        if path.hasSuffix("/analysis") { return (200, responses.analysis) }
+        if path.hasSuffix("/doses") { return (500, Data()) }
+        if path.contains("/v1/patients/") { return (200, responses.patient) }
+        return (404, Data())
+    }
+}

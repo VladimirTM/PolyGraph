@@ -76,37 +76,48 @@ struct QuantityIcon: View {
 }
 
 /// Un medicament din moment: poza cutiei pe toată lățimea, numele, cât și cum. Un singur element VoiceOver.
+/// La textul de accesibilitate numele vine înaintea pozei, ca ora și pastila să încapă pe primul ecran (Q3-02).
 struct DoseCard: View {
     let dose: DoseElement
     let med: MedicationItem?
     let photoURL: URL?
 
+    @Environment(\.dynamicTypeSize) private var typeSize
     @ScaledMetric(relativeTo: .title) private var nameSize: CGFloat = 28
     @ScaledMetric(relativeTo: .title2) private var textSize: CGFloat = 22
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            photo
-            VStack(alignment: .leading, spacing: Spacing.xs) {
-                Text(med?.product.brand ?? "Medicament")
-                    .font(.system(size: nameSize, weight: .semibold))
-                HStack(alignment: .firstTextBaseline, spacing: Spacing.xs) {
-                    QuantityIcon(qty: dose.qty)
-                    Text(SeniorDay.quantityWords(dose.qty, form: med?.product.form))
-                }
-                .font(.system(size: textSize, weight: .medium))
-                Text(SeniorDay.sentence(dose.instruction))
-                    .font(.system(size: textSize))
+            if typeSize.isAccessibilitySize {
+                details
+                photo
+            } else {
+                photo
+                details
             }
-            .foregroundStyle(PgColor.textPrimary)
-            .fixedSize(horizontal: false, vertical: true)
-            .padding(Spacing.l)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(PgColor.surface)
         .clipShape(RoundedRectangle(cornerRadius: Radius.seniorCard, style: .continuous))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("now.dose.\(dose.medid)")
+    }
+
+    private var details: some View {
+        VStack(alignment: .leading, spacing: Spacing.xs) {
+            Text(med?.product.brand ?? "Medicament")
+                .font(.system(size: nameSize, weight: .semibold))
+            HStack(alignment: .firstTextBaseline, spacing: Spacing.xs) {
+                QuantityIcon(qty: dose.qty)
+                Text(SeniorDay.quantityWords(dose.qty, form: med?.product.form))
+            }
+            .font(.system(size: textSize, weight: .medium))
+            Text(SeniorDay.sentence(dose.instruction))
+                .font(.system(size: textSize))
+        }
+        .foregroundStyle(PgColor.textPrimary)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(Spacing.l)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var photo: some View {
@@ -191,11 +202,16 @@ struct ReminderAskCard: View {
 }
 
 /// Bannerul mare de după „Am luat” / „Am sărit”, cu „Anulează” 5 s.
+/// „Anulează” apare exact unde era butonul apăsat, deci ignoră atingerile din primele 800 ms:
+/// a doua atingere rapidă pe „Am sărit” nu mai anulează ce a făcut prima (Q3-03).
 struct UndoBanner: View {
+    static let armDelay: TimeInterval = 0.8
+
     let status: DoseStatus
     let onUndo: () -> Void
 
     @ScaledMetric(relativeTo: .title2) private var textSize: CGFloat = 22
+    @State private var guarded = GuardedAction(interval: UndoBanner.armDelay)
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.s) {
@@ -205,7 +221,7 @@ struct UndoBanner: View {
                 .foregroundStyle(PgColor.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
             SeniorButton("Anulează", systemImage: "arrow.uturn.backward", prominence: .secondary,
-                         identifier: "now.undoButton", action: onUndo)
+                         identifier: "now.undoButton") { guarded(onUndo) }
         }
         .padding(Spacing.m)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -214,5 +230,6 @@ struct UndoBanner: View {
                 .fill(PgColor.calmCard))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("now.undoBanner")
+        .onAppear { guarded.arm() }
     }
 }

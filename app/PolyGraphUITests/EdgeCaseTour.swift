@@ -83,12 +83,16 @@ final class EdgeCaseTour: ReviewTestCase {
         step("afterLater", audit: true)
         burst("now.skippedButton", taps: 3)
         pause(0.8)
+        // Q3-03: atingerile 2 și 3 cad pe „Anulează” abia apărut și sunt ignorate
+        expect("now.undoBanner", timeout: 2)
         step("afterSkipped")
     }
 
     func testTakenUndoTakenAndExpiry() {
         launch("undoCycle", role: .senior, now: Self.today(at: "07:05"))
         tap("now.takenButton", timeout: 10)
+        // „Anulează” ignoră atingerile din primele 800 ms (Q3-03)
+        pause(1)
         tap("now.undoButton", timeout: 3)
         pause(0.6)
         step("undone")
@@ -143,9 +147,11 @@ final class EdgeCaseTour: ReviewTestCase {
         app.terminate()
         launch("deleteAllSenior", role: .senior, reset: false, now: Self.today(at: "07:05"))
         pause(2)
+        expect("now.empty", timeout: 5)
         step("emptyNow", audit: true)
         if tap("now.dayButton", timeout: 5) {
             pause(1)
+            expect("day.empty", timeout: 3)
             step("emptyDay", audit: true)
         }
     }
@@ -348,6 +354,8 @@ final class EdgeCaseTour: ReviewTestCase {
         setBaseURL("http://127.0.0.1:9")
         tap("now.takenButton")
         pause(1)
+        // Q3-07: confirmarea rămâne de trimis și se spune, calm
+        expect("now.pendingSync", timeout: 5)
         step("takenOffline", audit: true)
         pause(6)
         step("afterUndoWindowOffline")
@@ -359,6 +367,7 @@ final class EdgeCaseTour: ReviewTestCase {
         setBaseURL(Self.baseURL)
         app.swipeDown()
         pause(3)
+        if element("now.pendingSync").exists { markAbsent("now.pendingSync dispărut după revenire") }
         step("recovered")
     }
 
@@ -366,11 +375,14 @@ final class EdgeCaseTour: ReviewTestCase {
         let down = ["PG_BASE_URL": "http://127.0.0.1:9"]
         launch("downSenior", role: .senior, reset: false, now: Self.today(at: "07:05"), env: down)
         pause(4)
+        // Q3-05: eroarea se repară cu un buton, nu cu un gest
+        expect("now.retryButton", timeout: 3)
         step("now")
         if tap("now.dayButton", timeout: 3) {
             pause(2)
+            expect("day.retryButton", timeout: 3)
             step("day", audit: true)
-            app.navigationBars.buttons.firstMatch.tap()
+            tap("day.backButton", timeout: 3)
         }
         if tap("now.checkInButton", timeout: 3) {
             step("checkin")
