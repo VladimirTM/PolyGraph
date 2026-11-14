@@ -10,6 +10,7 @@
 #   CONFIGS="Light Dark AX Motion Contrast" doar câteva variante
 #   ONLY="testDay testFeed"                 doar câteva teste din ReviewTour
 #   NO_VIDEO=1                              fără video și cadre pentru „Am luat” / microfon
+#   AUDIT=0                                 fără auditul de accesibilitate (doar la depanarea unui test)
 #   PORT=8000                               portul de la care se caută porturi libere
 set -uo pipefail
 
@@ -103,7 +104,7 @@ BUNDLE_ID=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$APP_PATH/Inf
 for i in "${!UDIDS[@]}"; do
     # Schema e autogenerată, deci `-testPlan Review` nu e disponibil: test plan-ul devine un .xctestrun
     "${PY[@]}" xctestrun "$BUILT" app/Review.xctestplan "$DERIVED/Build/Products/Review-$Q-$((i + 1)).xctestrun" \
-        "PG_BASE_URL=http://127.0.0.1:${PORTS[$i]}" || die "Nu pot genera .xctestrun din Review.xctestplan"
+        "PG_BASE_URL=http://127.0.0.1:${PORTS[$i]}" "PG_REVIEW_AUDIT=${AUDIT:-1}" || die "Nu pot genera .xctestrun din Review.xctestplan"
     xcrun simctl install "${UDIDS[$i]}" "$APP_PATH"
     xcrun simctl privacy "${UDIDS[$i]}" grant microphone "$BUNDLE_ID" 2>/dev/null
 done

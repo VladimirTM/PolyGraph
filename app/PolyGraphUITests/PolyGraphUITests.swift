@@ -262,9 +262,11 @@ class ReviewTestCase: XCTestCase {
     }
 
     /// Fiecare variantă verifică ce schimbă ea (auditul complet costă câteva secunde pe ecran);
-    /// Motion randează la fel ca Light, deci nu se auditează.
+    /// Motion randează la fel ca Light, deci nu se auditează. Cu `PG_REVIEW_AUDIT=0` (`make review AUDIT=0`),
+    /// la depanarea unui test, nu se auditează nimic.
     static var auditTypes: XCUIAccessibilityAuditType? {
-        switch variant {
+        if ProcessInfo.processInfo.environment["PG_REVIEW_AUDIT"] == "0" { return nil }
+        return switch variant {
         case "Dark", "Contrast": .contrast
         case "AX": [.dynamicType, .textClipped, .hitRegion]
         case "Motion": nil

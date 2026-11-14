@@ -19,8 +19,9 @@ Durata măsurată la Q0 (Mac cu 10 nuclee și 16 GB, 3 simulatoare iPhone 18 Pro
 |---|---|
 | `SIMS=3` | câte simulatoare în paralel (3 e maximul rezonabil pe un Mac cu 16 GB; 5 au dus load-ul la 350); `SIMS=1` = secvențial |
 | `CONFIGS="Light Dark AX Motion Contrast"` | doar câteva variante (de ex. `CONFIGS=Light` pentru o verificare rapidă) |
-| `ONLY="testDay testFeed"` | doar câteva teste din `ReviewTour` (de ex. fluxurile noi peste noapte) |
+| `ONLY="testDay testFeed"` | doar câteva teste din `ReviewTour` (de ex. fluxurile atinse de fix-uri, la Q2) |
 | `NO_VIDEO=1` | fără video și cadre |
+| `AUDIT=0` | fără `performAccessibilityAudit` (~2 s pe fiecare element nerezolvat); doar la depanare, nu la un review |
 | `PORT=8000` | portul de la care se caută porturi libere |
 
 ## Ce produce
@@ -49,6 +50,19 @@ Durata măsurată la Q0 (Mac cu 10 nuclee și 16 GB, 3 simulatoare iPhone 18 Pro
 
 Testele sunt tolerante: un identificator care nu apare (ecran neterminat, identificator suprascris) e notat „absent” și testul merge mai departe; nu pică. Identificatorii sunt cei din docs/DESIGN.md („Convenții de implementare”). Un test nou: o metodă în `ReviewTour` care cheamă `launch(...)` și `step(...)`.
 
-## Rularea nesupravegheată
+## Cum iterezi (citește înainte să rulezi turul)
 
-`.claude/settings.json` pre-aprobă comenzile turului (`make`, `xcodebuild`, `xcrun`, `ffmpeg`, `git`, `gh pr`, `curl` pe localhost, `run.sh`), ca o rulare de noapte să nu se oprească așteptând o aprobare. Pentru Gemini CLI, echivalentul se pune local, doar în acest repo (nu e în git): `.gemini/settings.json` cu `"tools": {"allowed": ["run_shell_command(make)", "run_shell_command(xcodebuild)", "run_shell_command(xcrun)", "run_shell_command(ffmpeg)", "run_shell_command(git)", "run_shell_command(curl)"]}`, sau pornirea cu `gemini --approval-mode=yolo` din folderul repo-ului. Înainte: laptopul la priză, `caffeinate -dimsu &`.
+Turul complet (17 teste × 5 variante) ține 12–15 min. **Se rulează complet o singură dată**: la review (Q1, Q4) sau ca verificare finală după o modificare a turului. La Q0 s-au pierdut ~80 min pe 7 rulări complete, câte una după fiecare test reparat.
+
+- Un test pică sau îl modifici: rulezi doar testul acela, într-o singură variantă, fără video și fără audit:
+  `make review Q=dbg ONLY="testDay" CONFIGS=Light NO_VIDEO=1 AUDIT=0` (1–2 min). Varianta în care pică o adaugi în `CONFIGS` abia după ce merge în Light.
+- Mai multe teste reparate: le rulezi împreună cu `ONLY="…"`, tot fără audit.
+- La final: o singură rulare completă, `make review Q=QN`.
+- Review după fix-uri (Q2, Q3): doar fluxurile atinse, `make review Q=Q2 ONLY="…" CONFIGS="Light AX" NO_VIDEO=1`, cu audit. Video doar dacă fix-ul atinge „Am luat” sau inelul microfonului.
+- Agentul de review nu repornește turul dacă `.review/QN/` există deja: îl rulează omul o dată, agentul doar citește rezultatele.
+
+## Aprobările
+
+`.claude/settings.json` pre-aprobă comenzile turului (`make`, `xcodebuild`, `xcrun`, `ffmpeg`, `git`, `gh pr`, `curl` pe localhost, `run.sh`), ca turul să nu se oprească așteptând o aprobare cât omul lucrează în paralel. Pentru Gemini CLI, echivalentul se pune local, doar în acest repo (nu e în git): `.gemini/settings.json` cu `"tools": {"allowed": ["run_shell_command(make)", "run_shell_command(xcodebuild)", "run_shell_command(xcrun)", "run_shell_command(ffmpeg)", "run_shell_command(git)", "run_shell_command(curl)"]}`.
+
+Review-urile rulează doar de zi, cu cineva lângă Mac (decizie 13.11.2026, docs/PLAN.md „Planul Q de zi”): fără `caffeinate`, fără rulări peste noapte. Laptopul la priză.

@@ -31,7 +31,6 @@
       "Bash(git branch:*)",
       "Bash(gh pr view:*)",
       "Bash(gh pr list:*)",
-      "Bash(caffeinate:*)",
       "Bash(lsof:*)",
       "Read(.review/**)"
     ]
