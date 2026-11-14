@@ -16,12 +16,11 @@ from typing import Any
 
 from polygraph.engine import new_alerts
 from polygraph.extract.display import display_brand
+from polygraph.extract.ocr_match import ORAL
 from polygraph.kb import SEV_RANK, Kb, norm
 from polygraph.voice.correlate import dative
 
 Json = dict[str, Any]
-# formele luate pe gură înaintea gelurilor și a fiolelor: „un Ketonal” e de obicei o capsulă, nu crema
-ORAL = ("compr", "caps", "draj", "pulb", "sol. orala", "sirop", "plic")
 
 
 SERIOUS = ("critical", "major")

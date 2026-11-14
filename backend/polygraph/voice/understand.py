@@ -124,10 +124,34 @@ def _sentences(text: str) -> list[list[str]]:
 def _negated(tokens: list[str], start: int, end: int, synonym: str) -> bool:
     if synonym.split()[0] == "nu":
         return False
-    return "nu" in tokens[max(0, start - 1) : end]
+    return "nu" in tokens[max(0, start - 2) : end]  # „nu am amețeli”: negația poate sta înaintea lui „am”
 
 
 CLAUSE_BREAK = {"si", "dar", "iar", "apoi"}
+WORD_THRESHOLD = 80
+
+
+def _word_match(syn: str, word: str) -> bool:
+    """Un cuvânt al sinonimului față de un cuvânt rostit: întreg, nu doar începutul lui. Se acceptă o literă greșită
+    de dictare sau o terminație adăugată („vânătăile”), dar nu alt cuvânt cu aceeași rădăcină („mâncare” nu e
+    „mâncărime”)."""
+    if len(syn) <= 3:
+        return True  # „mă”, „mi”, „e”: dictarea le scrie în mai multe feluri
+    if word.startswith(syn) or (syn.startswith(word) and len(syn) - len(word) <= 1):
+        return True
+    return abs(len(syn) - len(word)) <= 1 and fuzz.ratio(syn, word) >= WORD_THRESHOLD
+
+
+def _words_match(syn: list[str], window: list[str]) -> bool:
+    """Fiecare cuvânt al sinonimului are, în ordine, un cuvânt întreg corespunzător în fereastră."""
+    j = 0
+    for word in syn:
+        while j < len(window) and not _word_match(word, window[j]):
+            j += 1
+        if j == len(window):
+            return False
+        j += 1
+    return True
 
 
 def _severity(tokens: list[str], start: int, end: int) -> str:
@@ -164,6 +188,8 @@ def find_symptoms(text: str) -> list[Symptom]:
                         window = " ".join(tokens[i : i + w])
                         if len(syn) <= SHORT:
                             score = 100 if syn in window.split() or syn == window else 0
+                        elif not _words_match(syn.split(), tokens[i : i + w]):
+                            score = 0
                         else:
                             score = int(fuzz.ratio(syn, window))
                         if score >= THRESHOLD and not _negated(tokens, i, i + w, syn):
@@ -226,12 +252,24 @@ def _med_names(med: Json) -> list[str]:
     return [n for n in names if len(n) >= 4]
 
 
+ARTICLES = ("ului", "ul", "lui", "le")
+
+
+def bare(word: str) -> str:
+    """Fără articolul hotărât lipit la sfârșit: „sindromul” → „sindrom”, „aspirinei” rămâne (nu e în listă)."""
+    for suffix in ARTICLES:
+        if word.endswith(suffix) and len(word) - len(suffix) >= 4:
+            return word[: -len(suffix)]
+    return word
+
+
 def _patient_match(tok: str, meds: list[Json]) -> tuple[int, Json] | None:
     best: tuple[int, Json] | None = None
+    keys = {phonetic(tok), phonetic(bare(tok))}
     for med in meds:
         for name in _med_names(med):
             score = int(fuzz.ratio(tok, name))
-            if phonetic(tok) == phonetic(name):
+            if phonetic(name) in keys:
                 score = max(score, 90)  # dictarea scrie „sindrom” pentru Sintrom
             if score >= 80 and (best is None or score > best[0]):
                 brand = (med.get("product") or {}).get("brand")

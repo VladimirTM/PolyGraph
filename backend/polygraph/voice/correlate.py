@@ -99,13 +99,21 @@ def dative(name: str | None) -> str:
 
 
 MAX_ADVICE = 2
+QUESTIONS = {"can_i_take", "which_pill_now"}
+
+
+def unwell_hint(caregiver: str | None) -> str:
+    """Fraza pentru un check-in fără simptome: „spuneți-i Anei”, nu „Ana” (Q3-18)."""
+    who = dative(caregiver) if caregiver else "cuiva apropiat"
+    return f"Dacă nu vă simțiți bine, spuneți-i {who} sau medicului."
 
 
 def reply_text(
     u: Understanding, correlations: list[Json], escalate: bool, caregiver: str | None, can_take: str | None = None
 ) -> str:
     """`can_take`: răspunsul X1 (polygraph/voice/can_i_take.py) pentru un medicament din catalog, dacă există."""
-    parts = ["Mulțumesc."]
+    # „Mulțumesc.” doar când pacientul a spus cum se simte; la o întrebare, direct răspunsul.
+    parts = [] if u.intent in QUESTIONS and not u.symptoms else ["Mulțumesc."]
     if escalate:
         parts.append(f"I-am trimis {dative(caregiver)} ce mi-ați spus.")
     # Întâi semnele de alarmă, apoi simptomele legate de o alertă, apoi restul, în ordinea spusă.
@@ -124,8 +132,7 @@ def reply_text(
     elif u.intent == "which_pill_now":
         parts.append("Pe ecranul „Acum” scrie ce pastilă urmează.")
     elif not u.symptoms:
-        who = caregiver or "cuiva apropiat"
-        parts.append(f"Dacă nu vă simțiți bine, spuneți-i {who} sau medicului.")
+        parts.append(unwell_hint(caregiver))
     return " ".join(parts)
 
 

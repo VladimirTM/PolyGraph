@@ -9,11 +9,11 @@ Singurele coduri pe care le poate produce `POST /checkins` (`CheckIn.symptoms[].
 | cod | etichetă | sinonime | red_flag | sfat |
 |---|---|---|---|---|
 | dizziness_orthostatic | amețeală la ridicare | mi se învârte capul când mă ridic; mă ia cu amețeală când mă scol; amețesc când mă ridic din pat; mi se face negru în fața ochilor când mă ridic | nu | Ridicați-vă încet din pat: întâi stați puțin pe marginea patului. |
-| dizziness | amețeală | amețeală; mi se învârte capul; sunt amețită; mă clatin | nu | Stați jos până trece și beți puțină apă. |
+| dizziness | amețeală | amețeală; amețeli; amețesc; am amețeală; mi se învârte capul; sunt amețită; mă clatin | nu | Stați jos până trece și beți puțină apă. |
 | bruising | vânătăi | vânătăi; am niște vânătăi; mi s-a învinețit mâna; pete vinete pe piele | nu | Arătați vânătăile medicului la următoarea vizită. |
 | bleeding_gums | sângerare la gingii | îmi sângerează gingiile; sânge când mă spăl pe dinți; gingiile sângerează | nu | Spuneți medicului care vă urmărește tratamentul. |
 | nosebleed | sângerare din nas | îmi curge sânge din nas; sângerez din nas; mi-a curs sânge pe nas | nu | Stați aplecat ușor în față și apăsați nasul 10 minute. |
-| black_stool | scaun negru | scaun negru; scaunul e negru ca smoala; am avut scaun negru | da | Sunați-l acum pe medic sau la 112 dacă vă simțiți slăbită. |
+| black_stool | scaun negru | scaun negru; scaunul e negru ca smoala; am avut scaun negru | da | Sunați-l acum pe medic sau la 112 dacă vă simțiți fără putere. |
 | blood_in_urine | sânge în urină | urina e roșie; sânge în urină; fac pipi cu sânge | da | Sunați-vă medicul astăzi. |
 | vomiting_blood | vărsături cu sânge | am vomitat sânge; vărsătură cu sânge; vărsătură ca zațul de cafea | da | Sunați la 112. |
 | fall | cădere | am căzut; m-am împiedicat și am căzut; am alunecat și am căzut; am picat jos | da | Dacă v-ați lovit la cap sau vă doare ceva tare, sunați la 112. |
@@ -23,7 +23,7 @@ Singurele coduri pe care le poate produce `POST /checkins` (`CheckIn.symptoms[].
 | muscle_pain | dureri musculare | mă dor mușchii; dureri în mușchi; mă dor picioarele fără motiv; am febră musculară | nu | Spuneți medicului dacă durerea e puternică sau urina e închisă la culoare. |
 | muscle_weakness | slăbiciune musculară | nu am putere în picioare; mi-au slăbit mâinile; mă simt fără vlagă în mușchi | nu | Spuneți medicului care v-a dat pastila pentru colesterol. |
 | dark_urine | urină închisă la culoare | urina e foarte închisă; fac pipi ca ceaiul negru; urina e maro | da | Sunați-vă medicul astăzi. |
-| nausea | greață | mi-e greață; mi-e rău de la stomac; îmi vine să vomit | nu | Mâncați ușor și beți apă în înghițituri mici. |
+| nausea | greață | mi-e greață; greață; am greață; grețuri; mi-e rău de la stomac; îmi vine să vomit | nu | Mâncați ușor și beți apă în înghițituri mici. |
 | vomiting | vărsături | am vomitat; am dat afară; vărs | nu | Beți apă puțin câte puțin; dacă nu trece, sunați medicul. |
 | stomach_pain | durere de stomac | mă doare stomacul; mă arde la stomac; am arsuri | nu | Spuneți medicului, mai ales dacă luați pastile pentru durere. |
 | diarrhea | diaree | am diaree; merg des la toaletă; scaun moale | nu | Beți multe lichide. |

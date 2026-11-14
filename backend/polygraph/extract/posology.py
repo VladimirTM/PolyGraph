@@ -6,6 +6,7 @@ from fractions import Fraction
 from polygraph.kb import norm
 
 SLOTS = ("morning", "noon", "evening", "bedtime")
+MAX_UNITS = 10  # mai mult de atâtea comprimate la o priză e o citire greșită
 TIMES = (r"dimineata", r"la pranz|amiaza|la amiaza", r"seara", r"la culcare|inainte de culcare")
 AMOUNT = r"(?:\d{1,3}\s*/\s*\d{1,3}|\d{1,3}(?:[.,]\d{1,3})?)"
 PATTERN = re.compile(rf"(?<![\w/.,-])({AMOUNT})\s*[-–]\s*({AMOUNT})\s*[-–]\s*({AMOUNT})(?:\s*[-–]\s*({AMOUNT}))?(?![\w/-])")
@@ -43,10 +44,11 @@ def parse_posology(raw: str | None) -> tuple[dict, bool]:
             if match:
                 amounts[slot] = match[1]
     try:
-        dosage["pattern"].update(
-            {slot: float(Fraction(value.replace(" ", "").replace(",", "."))) for slot, value in amounts.items() if value}
-        )
+        values = {slot: float(Fraction(value.replace(" ", "").replace(",", "."))) for slot, value in amounts.items() if value}
     except (ValueError, ZeroDivisionError):
         return dosage, True
+    if any(v > MAX_UNITS for v in values.values()):
+        return dosage, True  # „12-0-0”: nu e o posologie, câmpul rămâne gol și e marcat „verificați”
+    dosage["pattern"].update(values)
     # Frecvența singură nu indică orele de administrare.
     return dosage, not amounts and not as_needed
