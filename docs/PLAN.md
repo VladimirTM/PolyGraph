@@ -20,6 +20,11 @@
 5. **Deschise după X1 (14.11.2026):**
    - al doilea iPhone nu se conectează din aplicație (`-1009`, „offline”), deși Safari ajunge la `/health` și Local Network e pornit: de aflat cauza din linia completă `unsatisfied (…)` din consola Xcode înainte de D1; rezerva sigură pentru scenă e hotspot-ul Mac-ului (`make demo` afișează primul `bridge100`);
    - ✅ `.claude/skills/apple-design/SKILL.md` lipsea din repo, deși `CLAUDE.md`, `AGENTS.md` și `docs/DESIGN.md` trimit la el: readus neschimbat (commit `4061b67` din emilkowalski/skills, cu `LICENSE`, MIT) în `chore/restante-dupa-x1`.
+6. ✅ **Paginile web refăcute (14.11.2026, `chore/restante-dupa-x1`, `backend/polygraph/share/`):**
+   - **fișa pacientului** (`templates/page.html`, `view.py`, `static/share.css`, `static/share.js`): rezumatul în 4 cifre mari, posologia în cuvinte (`plain_posology`: „1-0-1” → „1 dimineața, 1 seara”), detaliile tehnice (DCI, ATC, mecanism, sursa completă, analogia de clasă) după butonul „i” și cele 22 de alerte moderate strânse sub „Arată cele 22 de alerte”;
+   - **pagina de prezentare** la `/` (`templates/home.html`, în locul răspunsului text simplu): cum funcționează, rolurile (pacienți, familii, medici de familie), ce verificăm, „inteligența artificială doar la margini” și adresa serverului pentru aplicație, pe care o deschide QR-ul din `make demo`;
+   - **logo-ul și favicon-ul** (`static/logo.svg`): iconița din `app/PolyGraph/Assets.xcassets/AppIcon` redesenată vectorial, cu varianta dark;
+   - **portalul medicului** (`templates/portal.html`, `templates/login.html`, `portal_summary` în `view.py`): data, 4 cifre pentru toți pacienții, grupurile „De revizuit” / „Fără nimic urgent”, cardul „Adăugați un pacient” și autentificarea ca un card centrat cu logo-ul.
 
 Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 
