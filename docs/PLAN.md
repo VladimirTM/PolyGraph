@@ -1742,8 +1742,10 @@ Criterii de acceptare: aceeași doză ratată arată „joi, 12 nov., 14:00” �
 3. La Q4: turul de bază + `make review Q=Q4e TOUR=EdgeCaseTour CONFIGS="Light AX" NO_VIDEO=1`; fiecare constatare din Q3 primește starea închisă / deschisă / regresie în `docs/reviews/Q4.md`.
 
 **Teste**
-- [ ] T-Q3F6-01 `make review Q=dbg CONFIGS=Dark ONLY="testSeniorNowMorning testCaregiverAlertsAndDetail testGraph"`: toate capturile sunt dark.
-- [ ] T-Q3F6-02 `testDeleteUndoAndDeleteAll`: „Anulează” readuce Sintrom (`meds.row.med_01` după undo).
+- [x] T-Q3F6-01 `make review Q=dbg CONFIGS=Dark ONLY="testSeniorNowMorning testCaregiverAlertsAndDetail testGraph"`: toate capturile sunt dark.
+- [x] T-Q3F6-02 `testDeleteUndoAndDeleteAll`: „Anulează” readuce Sintrom (`meds.row.med_01` după undo).
+
+> Verificat pe 14.11.2026 (`test/q3f6-review-tour`, Xcode 27.2, iPhone 18 Pro, iOS 27.2, `SIMS=1`). T-Q3F6-02: `make review Q=q3f6-delete TOUR=EdgeCaseTour ONLY="testDeleteUndoAndDeleteAll" CONFIGS=Light NO_VIDEO=1 SIMS=1`, 9 capturi, nimic absent; `med_01` lipsește la „deleted” și revine la „undone”, auditat după „Anulează”. T-Q3F6-01: cu `Q=q3f6-dark` în loc de `dbg`; prima rulare (Dark separat după `simctl ui appearance dark`) a dat tot 8 capturi Light. Diagnosticul: simulatorul salvează aspectul fără să redeseneze interfața (Settings rămâne light până la reboot), deci `run.sh` repornește simulatorul după fiecare schimbare de aspect / contrast (`set_ui`). A doua rulare: 8 / 8 capturi dark (luminozitate medie 29–97 din 255, față de 221–244), 2 probleme de contrast în loc de 17. Rămâne: `EdgeCaseTour.testSeniorHugeTextDark` comută cu `XCUIDevice.appearance` în test, deci capturile lui ies Light. Turul Q4 (punctul 3) rulează la testarea finală; `docs/reviews/Q4.md` are scheletul cu toate constatările din Q3.
 
 ---
 
