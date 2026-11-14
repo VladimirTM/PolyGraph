@@ -6,6 +6,8 @@ struct DayView: View {
     @Environment(AppStore.self) private var store
     @Environment(\.dynamicTypeSize) private var typeSize
     let onOpenMoment: (String) -> Void
+    /// „Înapoi la Acum”: ieșire de 72 pt, nu doar butonul de înapoi de 44 pt sau swipe (Q3-25)
+    var onBack: () -> Void = {}
     @State private var isSharing = false
 
     @ScaledMetric(relativeTo: .title) private var titleSize: CGFloat = 28
@@ -17,6 +19,9 @@ struct DayView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.m) {
                 if let schedule = store.schedule {
+                    if schedule.moments.isEmpty {
+                        emptyDay
+                    }
                     ForEach(schedule.moments) { moment in
                         row(moment, day: schedule.date)
                     }
@@ -25,18 +30,21 @@ struct DayView: View {
                         .controlSize(.large)
                         .frame(maxWidth: .infinity, minHeight: ControlHeight.senior)
                 } else {
-                    Text("Nu am putut încărca programul. Trageți ecranul în jos ca să încercăm din nou.")
-                        .font(.system(size: textSize))
-                        .foregroundStyle(PgColor.textPrimary)
-                        .accessibilityIdentifier("day.error")
+                    loadError
+                }
+                // codul nu se poate arăta medicului cât programul nu s-a încărcat
+                if store.schedule != nil || store.isLoading {
+                    SeniorButton(
+                        "Arată medicului", systemImage: "qrcode", prominence: .secondary,
+                        identifier: "day.shareButton"
+                    ) {
+                        isSharing = true
+                    }
+                    .padding(.top, Spacing.s)
                 }
                 SeniorButton(
-                    "Cod pentru medicul de familie", systemImage: "qrcode", prominence: .secondary,
-                    identifier: "day.shareButton"
-                ) {
-                    isSharing = true
-                }
-                .padding(.top, Spacing.s)
+                    "Înapoi la Acum", systemImage: "chevron.backward", prominence: .secondary,
+                    identifier: "day.backButton", action: onBack)
             }
             .padding(Spacing.m)
         }
@@ -46,6 +54,36 @@ struct DayView: View {
         .sheet(isPresented: $isSharing) {
             ShareSheet(audience: .senior)
                 .environment(store)
+        }
+    }
+
+    private var emptyDay: some View {
+        Text(SeniorDay.dayEndTitle(.empty))
+            .font(.system(size: titleSize, weight: .semibold))
+            .foregroundStyle(PgColor.textPrimary)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(Spacing.l)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: Radius.seniorCard, style: .continuous)
+                    .fill(PgColor.calmCard))
+            .accessibilityIdentifier("day.empty")
+    }
+
+    /// Eroarea se repară cu un buton mare, nu cu un gest (2.4.2, Q3-05).
+    private var loadError: some View {
+        VStack(alignment: .leading, spacing: Spacing.m) {
+            Text("Nu am putut încărca programul.")
+                .font(.system(size: titleSize, weight: .semibold))
+                .foregroundStyle(PgColor.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("day.error")
+            SeniorButton(
+                "Încearcă din nou", systemImage: "arrow.clockwise", prominence: .secondary,
+                identifier: "day.retryButton"
+            ) {
+                Task { await store.refreshAll() }
+            }
         }
     }
 

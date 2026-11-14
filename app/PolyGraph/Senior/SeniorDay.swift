@@ -8,6 +8,16 @@ enum MomentStatus: Equatable {
     case skipped
 }
 
+/// Ce arată „Acum” când nu mai e niciun moment de luat (Q3-04).
+enum DayEnd: Equatable {
+    /// programul n-are niciun moment (nu sunt medicamente)
+    case empty
+    /// toate momentele zilei au fost luate sau sărite
+    case allDone
+    /// au rămas momente neconfirmate, dar le-a trecut ora
+    case nothingNow
+}
+
 /// Regulile modului senior, fără UI: ce moment e „acum”, ora unei doze, cuvintele pentru cantitate și voce.
 enum SeniorDay {
     /// Cât rămâne „curent” un moment neconfirmat după ora lui.
@@ -94,9 +104,28 @@ enum SeniorDay {
         return minute == 0 ? "ora \(hour)" : "ora \(hour) și \(minute)"
     }
 
+    /// „Ați terminat” doar când chiar s-a confirmat tot; altfel un text neutru, fără îndemn la doza ratată.
+    static func dayEnd(_ moments: [Moment], isDone: (Moment) -> Bool) -> DayEnd {
+        if moments.isEmpty { return .empty }
+        return moments.allSatisfy(isDone) ? .allDone : .nothingNow
+    }
+
+    static func dayEndTitle(_ end: DayEnd) -> String {
+        switch end {
+        case .empty: "Nu aveți pastile în program."
+        case .allDone: "Ați terminat pastilele de azi."
+        case .nothingNow: "Pentru azi nu mai e nimic de luat acum."
+        }
+    }
+
+    /// „Mâine, primele sunt la ora 07:00.”; nimic când programul e gol
+    static func tomorrowLine(_ moments: [Moment]) -> String? {
+        moments.first.map { "Mâine, primele sunt la ora \($0.time)." }
+    }
+
     /// Ce citește vocea la deschidere și la butonul de difuzor.
-    static func momentSpeech(_ moment: Moment?, doseLines: [String], due: Bool) -> String {
-        guard let moment else { return "Ați terminat pastilele de azi." }
+    static func momentSpeech(_ moment: Moment?, doseLines: [String], due: Bool, dayEnd: DayEnd = .allDone) -> String {
+        guard let moment else { return dayEndTitle(dayEnd) }
         let head = due
             ? "\(moment.label). Pastilele de la \(spokenClock(moment.time))."
             : "Următoarele pastile sunt la \(spokenClock(moment.time)), \(moment.label.lowercased())."
@@ -104,9 +133,11 @@ enum SeniorDay {
     }
 
     /// „Foarte bine. Următoarele pastile sunt la ora 13.”
-    static func afterAction(_ status: DoseStatus, next: Moment?) -> String {
+    static func afterAction(_ status: DoseStatus, next: Moment?, allDone: Bool = true) -> String {
         let first = status == .taken ? "Foarte bine." : "Am notat."
-        guard let next else { return "\(first) Ați terminat pastilele de azi." }
+        guard let next else {
+            return "\(first) \(dayEndTitle(allDone ? .allDone : .nothingNow))"
+        }
         return "\(first) Următoarele pastile sunt la \(spokenClock(next.time))."
     }
 
