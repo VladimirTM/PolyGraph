@@ -1,8 +1,8 @@
 import Foundation
 import SwiftUI
 
-/// Alertele pacientului (aparținător): cardul ACB, apoi câte un card pentru fiecare alertă gravă,
-/// apoi cele moderate și mâncarea, restrânse. Cardurile se deschid cu tranziție zoom.
+/// Alertele pacientului (aparținător): câte un card pentru fiecare alertă gravă, apoi cele moderate și
+/// mâncarea, restrânse, apoi cardul ACB (aceeași ordine ca fișa din portal). Cardurile se deschid cu tranziție zoom.
 struct AlertsView: View {
     let zoom: Namespace.ID
 
@@ -22,9 +22,6 @@ struct AlertsView: View {
             let sections = AlertSections(analysis.alerts)
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: Spacing.s) {
-                    if analysis.acbTotal >= 1 {
-                        AcbCard(total: analysis.acbTotal, alerts: analysis.alerts)
-                    }
                     if sections.isEmpty {
                         ContentUnavailableView(
                             "Nicio alertă",
@@ -58,6 +55,10 @@ struct AlertsView: View {
                         )
                         .accessibilityIdentifier("alerts.foodGroup")
                     }
+                    // ultimul, ca în fișa din portal: grave → moderate → mâncare → ACB (Q3-17)
+                    if analysis.acbTotal >= 1 {
+                        AcbCard(total: analysis.acbTotal, alerts: analysis.alerts)
+                    }
                     Text("Alertele minore apar doar în portalul medicului de familie.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -81,7 +82,7 @@ struct AlertsView: View {
                 Button("Încearcă din nou") {
                     Task { await store.refreshAll() }
                 }
-                .buttonStyle(.borderedProminent)
+                .pgProminentButton()
                 .accessibilityIdentifier("alerts.retryButton")
             }
             .accessibilityIdentifier("alerts.error")

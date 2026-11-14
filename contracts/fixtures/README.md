@@ -10,6 +10,7 @@ Testul de acceptare comun: A construiește UI-ul pe ele (prin `make mock`), B le
 | `expected_schedule.json` | programul zilei (5 momente) |
 | `checkin_demo.json` | check-in-ul demo: amețeală la ridicare + vânătăi → escaladare |
 | `gs1_cases.json` | 12 cazuri GS1 **sintetice** (GTIN-uri inventate, cu cifra de control corectă); codurile reale se adaugă cu `synthetic: false` după scanarea cutiilor |
+| `date_words.json` | perechi dată → text („Azi, 14:00”, „joi, 12 nov., 14:00”) pentru `PgFormat.relativeDay` (app) și `relative_day` (portal); verificate de pytest și XCTest (Q3F4) |
 
 ## Decizii luate la P0 (confirmate la S0, 13.11.2026)
 

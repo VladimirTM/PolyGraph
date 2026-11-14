@@ -4,10 +4,13 @@ import UserNotifications
 
 /// Noutățile aparținătorului: polling la 10 s pe GET /feed?since=. Evenimentele noi intră sus doar
 /// dacă lista e la început; altfel așteaptă în `pendingNew` (pastila „3 noutăți ↑”), ca lista să nu se
-/// miște sub degetul cuiva. Cele grave aduc o notificare locală și haptic.
+/// miște sub degetul cuiva. Cele grave aduc o notificare locală și haptic; peste `batchLimit` evenimente
+/// într-un lot, o singură notificare cu numărul lor (Q3-24).
 @Observable
 final class FeedModel {
     static let interval: Duration = .seconds(10)
+    /// până la atâtea evenimente noi într-un lot, câte o notificare pentru fiecare grav
+    static let batchLimit = 3
 
     /// cele mai noi primele
     private(set) var events: [FeedEvent] = []
@@ -23,13 +26,16 @@ final class FeedModel {
     @ObservationIgnored private var isPolling = false
     @ObservationIgnored private let fetch: (Date?) async throws -> [FeedEvent]
     @ObservationIgnored private let notify: (FeedEvent) -> Void
+    @ObservationIgnored private let notifyBatch: (_ total: Int, _ serious: Int) -> Void
 
     init(
         fetch: @escaping (Date?) async throws -> [FeedEvent] = { _ in [] },
-        notify: @escaping (FeedEvent) -> Void = { _ in }
+        notify: @escaping (FeedEvent) -> Void = { _ in },
+        notifyBatch: @escaping (_ total: Int, _ serious: Int) -> Void = { _, _ in }
     ) {
         self.fetch = fetch
         self.notify = notify
+        self.notifyBatch = notifyBatch
     }
 
     func event(id: String) -> FeedEvent? {
@@ -74,7 +80,11 @@ final class FeedModel {
         let serious = fresh.filter { Self.isSerious($0) }
         guard !serious.isEmpty else { return }
         alarmCount += 1
-        serious.forEach(notify)
+        if fresh.count > Self.batchLimit {
+            notifyBatch(fresh.count, serious.count)
+        } else {
+            serious.forEach(notify)
+        }
     }
 
     func setAtTop(_ value: Bool) {
@@ -111,6 +121,26 @@ enum FeedAlerts {
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         UNUserNotificationCenter.current().add(
             UNNotificationRequest(identifier: "pg.feed.\(event.id)", content: content, trigger: trigger))
+    }
+
+    /// Un lot mare (ex. 32 de check-in-uri) dă o singură notificare: „Maria: 32 de noutăți, 32 grave”.
+    static func notifyBatch(patient: String?, total: Int, serious: Int) {
+        let content = UNMutableNotificationContent()
+        content.title = summary(patient: patient, total: total, serious: serious)
+        content.body = "Deschideți Noutăți ca să le vedeți pe toate."
+        content.sound = .default
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        UNUserNotificationCenter.current().add(
+            UNNotificationRequest(identifier: "pg.feed.batch", content: content, trigger: trigger))
+    }
+
+    /// „Maria: 5 noutăți, 2 grave”, „Maria: 4 noutăți, o gravă”
+    static func summary(patient: String?, total: Int, serious: Int) -> String {
+        let grave = serious == 1 ? "o gravă" : "\(serious) grave"
+        let news = total == 1 ? "o noutate" : (1...19).contains(total % 100) ? "\(total) noutăți" : "\(total) de noutăți"
+        let text = "\(news), \(grave)"
+        guard let patient, !patient.isEmpty else { return text.prefix(1).uppercased() + text.dropFirst() }
+        return "\(patient): \(text)"
     }
 
     static func requestPermissionIfNeeded() async {

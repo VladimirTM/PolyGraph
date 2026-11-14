@@ -45,7 +45,15 @@ struct AcbCard: View {
         .accessibilityIdentifier("alerts.acbCard")
     }
 
-    private var severity: Severity { total >= 3 ? .major : .moderate }
+    /// Culoarea vine din severitatea alertei anticolinergice (în fixture e `moderate`, deci portocaliu), nu din
+    /// prag: cardul nu e roșu când alerta lui nu e gravă (Q3-17).
+    private var severity: Severity {
+        Self.severity(of: alerts)
+    }
+
+    static func severity(of alerts: [Alert]) -> Severity {
+        alerts.filter { $0.kind == .anticholinergic }.map(\.severity).min { $0.rank < $1.rank } ?? .moderate
+    }
 
     static func meaning(_ total: Int) -> String {
         total >= 3

@@ -46,12 +46,13 @@ struct ShareSheet: View {
                 .frame(maxWidth: .infinity)
             }
             .background(audience == .senior ? PgColor.background : Color(.systemGroupedBackground))
-            .navigationTitle(audience == .senior ? "Codul pentru medic" : "Arată medicului")
+            // același nume la Ana și la Maria, ca butonul care deschide foaia (regula comună din PLAN.md)
+            .navigationTitle("Arată medicului")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if audience == .caregiver {
                     ToolbarItem(placement: .confirmationAction) {
-                        Button("Gata") { dismiss() }
+                        Button { dismiss() } label: { BarConfirmLabel("Gata") }
                             .accessibilityIdentifier("share.doneButton")
                     }
                 }
@@ -121,7 +122,7 @@ struct ShareSheet: View {
         } actions: {
             if audience == .caregiver {
                 Button("Încearcă din nou") { Task { await load() } }
-                    .buttonStyle(.borderedProminent)
+                    .pgProminentButton()
                     .accessibilityIdentifier("share.retryButton")
             }
         }

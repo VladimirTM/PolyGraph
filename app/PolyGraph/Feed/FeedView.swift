@@ -15,6 +15,11 @@ struct FeedView: View {
             .navigationBarTitleDisplayMode(.large)
             .pgSettingsToolbar()
             .refreshable { await feed.poll() }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if feed.lastError != nil && !feed.events.isEmpty {
+                    StaleBanner(identifier: "feed") { await feed.poll() }
+                }
+            }
     }
 
     @ViewBuilder
@@ -77,12 +82,12 @@ struct FeedView: View {
     private func row(_ event: FeedEvent) -> some View {
         if let route = route(for: event) {
             NavigationLink(value: route) {
-                FeedCard(event: event)
+                FeedCard(event: event, now: store.clock.now)
             }
             .buttonStyle(PressableButtonStyle())
             .accessibilityIdentifier("feed.event.\(event.id)")
         } else {
-            FeedCard(event: event)
+            FeedCard(event: event, now: store.clock.now)
                 .accessibilityIdentifier("feed.event.\(event.id)")
         }
     }
@@ -120,9 +125,10 @@ struct FeedView: View {
     }
 }
 
-/// Un eveniment din Noutăți: tipul, ora, titlul, simptomele (check-in) și textul.
+/// Un eveniment din Noutăți: tipul, ziua și ora („Azi, 14:00”, ca în portal), titlul, simptomele (check-in) și textul.
 struct FeedCard: View {
     let event: FeedEvent
+    let now: Date
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
@@ -134,7 +140,7 @@ struct FeedCard: View {
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.secondary)
                 Spacer(minLength: Spacing.xs)
-                Text(PgFormat.clock(event.at))
+                Text(PgFormat.relativeDay(event.at, now: now))
                     .font(.subheadline)
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
@@ -183,7 +189,7 @@ struct CheckInEventView: View {
                         VStack(alignment: .leading, spacing: Spacing.xs) {
                             Text(event.shortTitle)
                                 .font(.title3.weight(.semibold))
-                            Text("\(PgFormat.longDay(event.at)), ora \(PgFormat.clock(event.at))")
+                            Text(PgFormat.relativeDay(event.at, now: store.clock.now))
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                             if !event.symptomLabels.isEmpty {

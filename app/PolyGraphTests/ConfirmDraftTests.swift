@@ -128,10 +128,12 @@ struct ConfirmDraftTests {
 @MainActor
 struct ScanCompletionTests {
     @Test func completionMessageNamesNewAlerts() {
-        #expect(MedsListView.completionText(ScanOutcome(savedCount: 1, newAlerts: 2)) == "Am salvat. 2 alerte noi")
-        #expect(MedsListView.completionText(ScanOutcome(savedCount: 1, newAlerts: 0)) == "Am salvat. Nicio alertă nouă")
-        #expect(MedsListView.completionText(ScanOutcome(savedCount: 3, newAlerts: 1))
-            == "Am salvat 3 medicamente. O alertă nouă")
+        #expect(MedsListView.completionText(ScanOutcome(savedCount: 1, newAlerts: NewAlerts(grave: 2)))
+            == "Am salvat. 2 alerte grave noi")
+        #expect(MedsListView.completionText(ScanOutcome(savedCount: 1, newAlerts: NewAlerts()))
+            == "Am salvat. Nicio alertă gravă nouă")
+        #expect(MedsListView.completionText(ScanOutcome(savedCount: 3, newAlerts: NewAlerts(grave: 1)))
+            == "Am salvat 3 medicamente. O alertă gravă nouă")
     }
 }
 

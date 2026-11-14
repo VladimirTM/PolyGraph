@@ -34,6 +34,12 @@ struct GraphView: View {
             )
                 .background(PgColor.background)
                 .accessibilityIdentifier("graph.web")
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    // graful de pe ecran e cel vechi: îl lăsăm, dar spunem că nu e actualizat (Q3-14)
+                    if store.lastError != nil && !store.isLoading {
+                        StaleBanner(identifier: "graph", retryIdentifier: "graph.retryButton") { await store.refreshAll() }
+                    }
+                }
                 .safeAreaInset(edge: .bottom, spacing: 0) { bottomBar }
                 .task(id: Self.usesSharePage) {
                     guard Self.usesSharePage, remoteURL == nil else { return }
@@ -49,11 +55,21 @@ struct GraphView: View {
                 .accessibilityIdentifier("graph.loading")
         } else {
             ContentUnavailableView {
-                Label("Graful apare aici", systemImage: "point.3.connected.trianglepath.dotted")
+                Label(
+                    store.lastError == nil ? "Graful apare aici" : "Nu am putut încărca graful",
+                    systemImage: store.lastError == nil ? "point.3.connected.trianglepath.dotted" : "wifi.exclamationmark")
             } description: {
                 Text(store.lastError ?? "Legăturile dintre medicamente, desenate ca o hartă.")
+            } actions: {
+                if store.lastError != nil {
+                    Button("Încearcă din nou") {
+                        Task { await store.refreshAll() }
+                    }
+                    .pgProminentButton()
+                    .accessibilityIdentifier("graph.retryButton")
+                }
             }
-            .accessibilityIdentifier("graph.empty")
+            .accessibilityIdentifier(store.lastError == nil ? "graph.empty" : "graph.error")
         }
     }
 
