@@ -601,6 +601,7 @@ def patient_context(pid: str) -> dict[str, Any]:
         lambda day: build_schedule(patient, meds, day, catalog),
         today(),
         datetime.now(TZ),
+        s.list_events(pid),
     )
 
 

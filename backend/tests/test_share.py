@@ -255,6 +255,27 @@ def test_page_shows_checkins_and_adherence(doctor):
     assert "aderență" in html and "% în ultimele 7 zile" in html
 
 
+def test_page_shows_can_i_take_answers(doctor, monkeypatch):
+    # X1: medicul vede întrebarea și răspunsul; „semnalat familiei” doar unde întrebarea a ajuns în Noutăți
+    from polygraph.voice import understand as U
+
+    monkeypatch.setattr(U, "_gemini", lambda _t: None)
+    for text in ("Pot să iau o aspirină?", "Pot să iau un paracetamol?", "Pot să iau un Algocalmin?"):
+        doctor.post(f"{P}/checkins", headers=H, json={"text": text})
+    html = doctor.get(PORTAL).text
+    section = html[html.index('id="h-checkins"') : html.index("</section>", html.index('id="h-checkins"'))]
+    blocks = section.split('<div class="checkin')[1:]
+    by_question = {q: next(b for b in blocks if q in b) for q in ("aspirină", "paracetamol", "Algocalmin")}
+    aspirin, paracetamol, algocalmin = by_question.values()
+    assert "Răspuns: Aspirin și Sintrom împreună cresc riscul de sângerare." in aspirin
+    assert "is-escalated" in aspirin and "semnalat familiei" in aspirin
+    assert "Răspuns: Paracetamol are o interacțiune moderată cu Sintrom." in paracetamol
+    assert "semnalat familiei" not in paracetamol
+    assert "Răspuns: Nu am date despre Algocalmin." in algocalmin
+    assert "semnalat familiei" in algocalmin and "is-escalated" not in algocalmin
+    assert "Mulțumesc." not in section
+
+
 # ---------------------------------------------------------------- funcții pure
 
 
