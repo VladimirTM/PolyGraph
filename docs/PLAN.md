@@ -1639,12 +1639,14 @@ Criterii de acceptare: EdgeCaseTour.testRapidLaterAndSkipped, testClockEdges (la
 ~~~
 
 **Teste**
-- [ ] T-Q3F1-01 AX și XXXL, PG_NOW=…T07:05: ora și numele primei pastile vizibile fără scroll (`onScreen(now.dose.med_05)`).
-- [ ] T-Q3F1-02 3 atingeri pe „Am sărit” → momentul e „sărit”, `now.undoBanner` vizibil, un singur `POST /doses` cu `skipped`.
-- [ ] T-Q3F1-03 23:59 fără confirmări → textul neutru; listă goală → „Nu aveți pastile în program.” în Acum și Ziua de azi.
-- [ ] T-Q3F1-04 Backend oprit → `now.retryButton` și `day.retryButton` (≥ 72 pt) reîncarcă după ce backend-ul revine.
-- [ ] T-Q3F1-05 Unit test DoseLog: trimitere eșuată → DoseLog nou pe aceleași `UserDefaults` → retrimite aceeași doză.
-- [ ] T-Q3F1-06 Unit test AppStore: ceasul trece de miezul nopții → `schedule.date` nou.
+- [x] T-Q3F1-01 AX și XXXL, PG_NOW=…T07:05: ora și numele primei pastile vizibile fără scroll (`onScreen(now.dose.med_05)`).
+- [x] T-Q3F1-02 3 atingeri pe „Am sărit” → momentul e „sărit”, `now.undoBanner` vizibil, un singur `POST /doses` cu `skipped`.
+- [x] T-Q3F1-03 23:59 fără confirmări → textul neutru; listă goală → „Nu aveți pastile în program.” în Acum și Ziua de azi.
+- [x] T-Q3F1-04 Backend oprit → `now.retryButton` și `day.retryButton` (≥ 72 pt) reîncarcă după ce backend-ul revine.
+- [x] T-Q3F1-05 Unit test DoseLog: trimitere eșuată → DoseLog nou pe aceleași `UserDefaults` → retrimite aceeași doză.
+- [x] T-Q3F1-06 Unit test AppStore: ceasul trece de miezul nopții → `schedule.date` nou.
+
+> Verificat pe 14.11.2026 (`fix/q3f1-senior`): 05 și 06 în `SeniorTests.swift` (`DoseQueueTests`, `MidnightRefreshTests`, verzi cu `-only-testing:PolyGraphTests`); 01–04 în `ReviewTour.seniorNow` (AX) și `EdgeCaseTour` (`make review Q=Q3F1-edge` / `Q3F1-ax`, fără absențe); pe iPhone: textul maxim, „Am sărit” rapid, confirmarea cu serverul oprit, reîncărcarea la revenire (Fromilid adăugat din fundal), „Arată medicului” și „Înapoi la Acum”. Tot aici: bara de jos goală nu mai lasă o bandă peste carduri.
 
 ##### Q3F2 · Vocea și scanarea pe backend
 
