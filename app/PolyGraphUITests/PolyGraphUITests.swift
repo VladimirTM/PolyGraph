@@ -38,6 +38,7 @@ class ReviewTestCase: XCTestCase {
         super.setUp()
         continueAfterFailure = true
         XCUIDevice.shared.orientation = .portrait
+        // Doar preferința: simulatorul nu redesenează fără reboot, deci Dark vine din run.sh (set_ui, Q3-I4)
         XCUIDevice.shared.appearance = Self.variant == "Dark" ? .dark : .light
         // permisiunile de sistem (notificări, cameră) apar peste aplicație în momente greu de prevăzut
         addUIInterruptionMonitor(withDescription: "permisiuni") { alert in

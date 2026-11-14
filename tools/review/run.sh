@@ -41,13 +41,24 @@ while IFS=$'\t' read -r udid name; do
 done < <("${PY[@]}" sims "$N")
 [[ ${#UDIDS[@]} -eq $N ]] || die "Nu găsesc $N simulatoare iPhone"
 
+# Simulatorul (iOS 27.2) salvează aspectul și Increase Contrast fără să redeseneze interfața pornită: fără
+# reboot, chiar și Settings rămâne light cu `appearance dark` (diagnosticul Q3F6, Q3-I4). Deci fiecare schimbare
+# e urmată de un reboot, iar bara de stare (care nu supraviețuiește reboot-ului) se fixează din nou.
+set_ui() {  # <udid> <appearance light|dark> <increase_contrast enabled|disabled>
+    local udid="$1"
+    xcrun simctl ui "$udid" appearance "$2"
+    xcrun simctl ui "$udid" increase_contrast "$3"
+    xcrun simctl shutdown "$udid" 2>/dev/null
+    xcrun simctl boot "$udid" 2>/dev/null
+    xcrun simctl bootstatus "$udid" -b >/dev/null || die "Simulatorul $udid nu repornește"
+    xcrun simctl status_bar "$udid" override --time 9:41 --batteryLevel 100 --batteryState charged \
+        --cellularBars 4 --wifiBars 3 --dataNetwork wifi
+}
+
 for udid in "${UDIDS[@]}"; do xcrun simctl boot "$udid" 2>/dev/null; done
 for udid in "${UDIDS[@]}"; do
     xcrun simctl bootstatus "$udid" -b >/dev/null || die "Simulatorul $udid nu pornește"
-    xcrun simctl status_bar "$udid" override --time 9:41 --batteryLevel 100 --batteryState charged \
-        --cellularBars 4 --wifiBars 3 --dataNetwork wifi
-    xcrun simctl ui "$udid" increase_contrast disabled
-    xcrun simctl ui "$udid" appearance light
+    set_ui "$udid" light disabled
 done
 
 # --- backend-urile -----------------------------------------------------------------------------------------
@@ -59,9 +70,11 @@ cleanup() {
     for port in "${PORTS[@]}"; do lsof -t -nP -iTCP:"$port" -sTCP:LISTEN 2>/dev/null | xargs kill 2>/dev/null; done
     for i in "${!UDIDS[@]}"; do
         xcrun simctl ui "${UDIDS[$i]}" increase_contrast disabled 2>/dev/null
+        xcrun simctl ui "${UDIDS[$i]}" appearance light 2>/dev/null
         xcrun simctl status_bar "${UDIDS[$i]}" clear 2>/dev/null
-        # clonele se opresc (memorie); simulatorul principal rămâne pornit
-        [[ $i -gt 0 ]] && xcrun simctl shutdown "${UDIDS[$i]}" 2>/dev/null
+        # clonele se opresc (memorie); simulatorul principal repornește, ca să se vadă iar light
+        xcrun simctl shutdown "${UDIDS[$i]}" 2>/dev/null
+        [[ $i -eq 0 ]] && xcrun simctl boot "${UDIDS[$i]}" 2>/dev/null
     done
 }
 trap cleanup EXIT
@@ -146,16 +159,23 @@ run_video() {  # <shard>: „Am luat” și inelul microfonului, filmate în Lig
 run_shard() {
     local i="$1" tests="${SHARD_TESTS[$1]}" plain=() c
     [[ -n "$tests" ]] || return
-    for c in "${CONFIG_LIST[@]}"; do [[ "$c" != Contrast ]] && plain+=("$c"); done
+    for c in "${CONFIG_LIST[@]}"; do [[ "$c" != Contrast && "$c" != Dark ]] && plain+=("$c"); done
     [[ ${#plain[@]} -gt 0 ]] && run_tests "$i" "$((i + 1))-main" "$tests" "${plain[@]}"
-    # Increase Contrast e o setare a simulatorului, deci Contrast rulează separat, după ce o pornim
-    if [[ " ${CONFIG_LIST[*]} " == *" Contrast "* ]]; then
-        xcrun simctl ui "${UDIDS[$i]}" increase_contrast enabled
-        run_tests "$i" "$((i + 1))-contrast" "$tests" Contrast
-        xcrun simctl ui "${UDIDS[$i]}" increase_contrast disabled
+    # Dark și Contrast sunt setări ale simulatorului (cu reboot, vezi set_ui), deci rulează separat (Q3-I4)
+    local ui=light
+    if [[ " ${CONFIG_LIST[*]} " == *" Dark "* ]]; then
+        set_ui "${UDIDS[$i]}" dark disabled; ui=dark
+        run_tests "$i" "$((i + 1))-dark" "$tests" Dark
     fi
-    # filmarea folosește testele din ReviewTour
-    if [[ $i -eq 0 && -z "${NO_VIDEO:-}" && "$TOUR" == ReviewTour ]] && command -v ffmpeg >/dev/null; then run_video "$i"; fi
+    if [[ " ${CONFIG_LIST[*]} " == *" Contrast "* ]]; then
+        set_ui "${UDIDS[$i]}" light enabled; ui=contrast
+        run_tests "$i" "$((i + 1))-contrast" "$tests" Contrast
+    fi
+    # filmarea folosește testele din ReviewTour, în Light și Motion, deci simulatorul înapoi pe light
+    if [[ $i -eq 0 && -z "${NO_VIDEO:-}" && "$TOUR" == ReviewTour ]] && command -v ffmpeg >/dev/null; then
+        [[ $ui != light ]] && set_ui "${UDIDS[$i]}" light disabled
+        run_video "$i"
+    fi
 }
 
 # --- turul -------------------------------------------------------------------------------------------------
