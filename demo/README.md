@@ -16,4 +16,4 @@ Scenariul apelează rutele FastAPI reale, cu o bază de date în memorie și che
 
 ## Demo pe scenă (B7)
 
-`make demo` pornește backend-ul pentru telefoane și afișează adresa de pus în setările aplicației. `make demo-check` rulează scenariul din `docs/PLAN.md` §7 prin API (`URL=…` pentru serverul pornit). Fotografiile din listă se iau din `photos/med_01.jpg` … `med_08.jpg` (sau `.png`); până atunci aplicația arată o imagine neutră.
+`make demo` pornește backend-ul pentru telefoane și afișează adresa de pus în setările aplicației. `make demo-check` rulează scenariul din `docs/PLAN.md` §7 prin API (`URL=…` pentru serverul pornit). Fotografiile din listă se iau din `photos/med_01.jpg` … `med_08.jpg` (doar JPEG); până atunci aplicația arată o imagine neutră.

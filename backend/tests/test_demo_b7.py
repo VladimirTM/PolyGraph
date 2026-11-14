@@ -178,3 +178,14 @@ def test_deadline_does_not_block_other_requests():
     assert within(0.5, lambda: 42, "test") == 42
     gate.set()
     assert time.perf_counter() - started < 1
+
+
+def test_reset_removes_the_old_extra_patient(client):
+    # app.sqlite-urile vechi au pacienta „Ana” (același nume ca fiica Mariei); resetul o scoate din lista medicului
+    store = main.store()
+    store.create_patient({"id": "pat_demo_ana", "name": "Ana", "birth_year": 1952, "caregiver_name": None})
+    store.link_patient("doc_demo", "pat_demo_ana")
+    main.reset_demo()
+    assert store.get_patient("pat_demo_ana") is None
+    names = [store.get_patient(pid)["name"] for pid in store.doctor_patient_ids("doc_demo")]
+    assert sorted(names) == ["Ioana", "Ion", "Maria"]

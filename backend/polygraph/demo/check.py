@@ -199,7 +199,7 @@ class Scenario:
         r = self.c.post("/portal/login", data={"code": self.code, "next": "/portal"})
         need(r.status_code == 303, f"autentificarea în portal → {r.status_code} (codul e PG_DOCTOR_CODE?)")
         page = self.get("/portal").text
-        order = [page.find(f'/portal/patients/{pid}"') for pid in ("pat_demo", "pat_demo_ion", "pat_demo_ana")]
+        order = [page.find(f'/portal/patients/{pid}"') for pid in ("pat_demo", "pat_demo_ion", "pat_demo_ioana")]
         need(-1 not in order and order == sorted(order), "Maria nu e prima în lista medicului")
         self.get(f"{P.replace('/v1', '/portal')}")
         note = "Discut la consultație înlocuirea Nurofen-ului."

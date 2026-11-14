@@ -102,9 +102,9 @@ def test_patient_list_puts_pending_alerts_first(doctor):
     assert r.status_code == 200
     html = r.text
     assert "dr. Elena Popa" in html
-    for name in ("Maria", "Ion", "Ana"):
+    for name in ("Maria", "Ion", "Ioana"):
         assert name in html
-    assert html.index("Maria, 78 de ani") < html.index("Ana, 74 de ani")
+    assert html.index("Maria, 78 de ani") < html.index("Ioana, 74 de ani")
     assert "5 de revizuit" in html
 
 

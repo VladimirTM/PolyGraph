@@ -19,7 +19,7 @@ import zxingcpp
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[3]
-PHOTO = re.compile(r"med_0[1-9]\.(jpg|png)")
+PHOTO = re.compile(r"med_0[1-8]\.jpg")  # numele din demo_patient.json (photo_url = /media/med_0N.jpg)
 
 
 def local_ips() -> list[str]:
