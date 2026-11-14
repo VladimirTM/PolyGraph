@@ -170,6 +170,14 @@ Regulă: un bug găsit în demo primește întâi un test (sau o intrare în `ex
 | **Aparținătorul** | fiica / fiul, adesea în alt oraș | tot: lista, graful, alertele detaliate, aderența, check-in-urile vocale; primește alertele grave |
 | **Medicul de familie** | cabinetul | portal web cu lista pacienților care i-au partajat tratamentul (prin QR); pe fiecare alertă decide „Menține / Modific la consultație / Trimit la specialist” + notă, care ajung la familie; „Reconcilierea medicației” de tipărit |
 
+**Cum circulă datele între roluri (clarificat pe 14.11.2026; de spus la fel în pitch și la întrebările juriului):**
+- **Cine folosește ce.** Pacientul și familia folosesc aplicația iOS. Medicul de familie nu instalează nimic: portalul e o pagină web (`/portal`), deschisă în browser pe calculatorul din cabinet sau pe telefon. Aplicația și portalul vorbesc cu același server; la hackathon, serverul e laptopul care rulează `make demo` (pe el portalul e la `http://localhost:8000/portal`, pe celelalte dispozitive din același Wi-Fi la adresa afișată de `make demo`). Într-un produs real, serverul ar avea o adresă publică.
+- **Datele ajung pe server din aplicație, nu prin QR.** Scanarea cutiilor și rețetelor, „Am luat” și check-in-urile vocale se salvează imediat pe server.
+- **Codul QR e o invitație, nu un transfer de date.** Familia (sau pacientul) îl generează din aplicație cu „Arată medicului”; conține doar linkul `/share/{token}`. Medicul îl scanează cât timp e autentificat în portal (altfel i se cere întâi codul de acces), iar pacientul intră în lista lui și rămâne acolo.
+- **Expirarea.** Tokenul din QR e valabil 72 de ore (`SHARE_TTL`): după aceea nu mai poate adăuga pacientul la nimeni, dar medicul care l-a scanat deja îl păstrează. Fiecare medic vede doar pacienții adăugați de el.
+- **După adăugare, medicul vede mereu datele la zi** (medicamente noi, alerte, check-in-uri), fără un QR nou. Decizia și nota lui pe o alertă ajung înapoi la familie, pe alertă și în Noutăți.
+- **Autentificarea medicului: cod de acces, fără cont.** În prototip există un singur medic, „dr. Elena Popa” (`doc_demo`), creat de server la pornire cu codul `medic-demo` (sau `PG_DOCTOR_CODE`); sesiunea ține 12 ore (`SESSION_TTL`). Conturile pe medic (înregistrare, parolă, eventual verificarea parafei) sunt pasul de după hackathon.
+
 ### 1.2 Feature-uri MVP (intră sigur în demo)
 
 | # | Feature | Ce face concret | Owner |
