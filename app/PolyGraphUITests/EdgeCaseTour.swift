@@ -115,14 +115,20 @@ final class EdgeCaseTour: ReviewTestCase {
     func testDeleteUndoAndDeleteAll() {
         launch("deleteAll", role: .caregiver)
         expect("meds.list", timeout: 10)
-        guard let row = first(prefix: "meds.row.", excludingSuffix: ".alert") else { return markAbsent("meds.row.*") }
+        // Sintrom (med_01) din fixture, dacă e în listă: T-Q3F6-02 verifică că „Anulează” îl readuce
+        let sintrom = element("meds.row.med_01")
+        guard let row = sintrom.waitForExistence(timeout: 5)
+            ? Optional(sintrom) : first(prefix: "meds.row.", excludingSuffix: ".alert")
+        else { return markAbsent("meds.row.*") }
         let id = String(row.identifier.dropFirst("meds.row.".count))
         deleteRow(row, id: id)
         expect("meds.undoBanner", timeout: 3)
-        step("deleted", audit: true)
+        // fără audit aici: durează câteva secunde, iar „Anulează” trebuie atins în fereastra de 5 s
+        step("deleted")
         burst("meds.undoButton", taps: 3)
         pause(0.8)
-        step("undone")
+        expect("meds.row.\(id)", timeout: 3)
+        step("undone", audit: true)
         if let again = first(prefix: "meds.row.\(id)", excludingSuffix: ".alert") { deleteRow(again, id: id) }
         pause(0.5)
         step("deletedAgain")
