@@ -10,7 +10,7 @@
 
 ## Fazele de lucru și sync point-urile (de aici vedeți unde suntem)
 
-**Unde suntem (14.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e închis** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9) și completarea cu OCR-ul real din A2): toate cele patru capturi din `demo/ocr/` trec prin `ocr_match` fără Gemini. `make demo-b3` verifică fluxul cap-coadă pe date sintetice. **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e în `main`** ([PR #13](https://github.com/VladimirTM/PolyGraph/pull/13)): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_doctor`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. **A2 e gata** ([PR #15](https://github.com/VladimirTM/PolyGraph/pull/15)): cutie (DataMatrix + poză) și rețetă (camera de documente), OCR pe telefon, `/scan`, sheet-ul de confirmare cu câmpurile „verificați” și avertizări de expirare / duplicat, camera falsă `PG_FAKE_SCAN`; `make check-ios` verde, încercat pe iPhone cu cutiile de test din `demo/datamatrix/`; rămân cutiile fizice în sală (T-A2-03). **B5 e în `main`** ([PR #16](https://github.com/VladimirTM/PolyGraph/pull/16)) cu rutele reale `/checkins` și `/feed`. `make check` trece cu 247 de teste cu `kb.sqlite` construit. **A3 e gata** (modul aparținător: listă pe medici cu „Anulează”, alerte cu zoom, ACB, graf radial local, detaliu + editare). **B6 e gata** ([PR #21](https://github.com/VladimirTM/PolyGraph/pull/21), `feature/b6-doctor-portal`): portalul medicului de familie `/portal` (login prin cod, lista pacienților, fișa cu decizie + notă pe alertă, care apare pe alertă și în Noutăți), reconcilierea de tipărit (2 pagini A4), QR-ul care adaugă pacientul în lista medicului și graful pentru WKWebView (`/share/{token}/graph?embed=1`); `make check` are 266 de teste; T-B6-04 încercat pe 14.11.2026. **A4 e gata** ( „Acum” cu cronologia de puncte, cardurile cu poze, „AM LUAT” / „Mai târziu” / „Am sărit” cu guard de 1 s, bifa care zboară, „Anulează” 5 s, vocea `ro-RO`, notificările locale, cardul calm pentru alertele pacientului, „Ziua de azi” cu momentele deschise la atingere); `make check-ios` verde, încercat pe iPhone cu backend-ul real, inclusiv la textul maxim. **A5 e gata** (check-in vocal pe telefon, Noutăți cu polling și notificări; încercat pe două iPhone-uri). **B7 e gata** (`chore/b7-demo-hardening`): `make demo` (DEMO_MODE=1, fără reload, IP-ul local + QR), `make demo-check` verde în proces și pe serverul pornit (11 pași din secțiunea 7, ~1,2 s), istoricul demo recreat la reset (7 zile, 2 doze ratate, un check-in vechi), `/demo/missed-dose` real, alertele grave noi în Noutăți, termen total pentru Gemini, loguri lizibile; `make check` are 282 de teste; T-B7-06 (Wi-Fi-ul laptopului oprit) și T-B6-04 încercate pe 14.11.2026. **A6 e gata** ([PR #25](https://github.com/VladimirTM/PolyGraph/pull/25)). **X1 e în `main`** ([PR #30](https://github.com/VladimirTM/PolyGraph/pull/30)): „Pot să iau…?” pe severități, grav și „fără date” în Noutăți, întrebarea și răspunsul în fișa din portal; `make check` are 292 de teste, `make demo-check` verde cu pasul X1. **Urmează:** Q0 / Q1 și fix-urile din app (Dev A); materialele, pitch-ul și pregătirea Q1 (Dev B, lista de mai jos); apoi S4 (feature freeze), D1 și D2. Actualizați coloana „Status” la fiecare sync point.
+**Unde suntem (14.11.2026):** S0 e trecut: P0 e în `main` ([PR #1](https://github.com/VladimirTM/PolyGraph/pull/1), [PR #2](https://github.com/VladimirTM/PolyGraph/pull/2)), CI verde, aplicația goală rulează pe ambele iPhone-uri, iar deciziile din `contracts/fixtures/README.md` sunt luate. **B1 e în `main`:** `make kb` construiește `kb/kb.sqlite` în ~1,5 s, `make check` are 72 de teste, `expected_alerts.json` are acum 27 / 6 alerte (3 adăugate prin regula de clasă), iar `app/PolyGraph/Resources/brands.txt` e gata pentru A2. **B2 e în `main`** ([PR #7](https://github.com/VladimirTM/PolyGraph/pull/7)): `polygraph.engine.analyze` dă exact `expected_alerts.json` (27 fără med_09, 33 cu med_09, aceleași id-uri și același `basis`) în ~10 ms, graful Cytoscape validează după `graph.schema.json`, iar `make dev` pornește backend-ul real (pacienți, `/meds`, `/analysis`, `/what-if`, `/kb/search`, `/demo/reset` cu `DEMO_MODE=1`) pe `app.sqlite`. **B3 e închis** ([PR #9](https://github.com/VladimirTM/PolyGraph/pull/9) și completarea cu OCR-ul real din A2): toate cele patru capturi din `demo/ocr/` trec prin `ocr_match` fără Gemini. `make demo-b3` verifică fluxul cap-coadă pe date sintetice. **A1 e în `main`** ([PR #8](https://github.com/VladimirTM/PolyGraph/pull/8)): aplicația rulează pe mock pe ambele iPhone-uri și pe simulator (`make check-ios` verde, 18 teste). **B4 e în `main`** ([PR #13](https://github.com/VladimirTM/PolyGraph/pull/13)): `GET /schedule` real dă exact `expected_schedule.json` (5 momente, Euthyrox singur prin `alone: true` în `timing.yaml`) în ~4 ms, iar pe 200 de regimuri aleatoare nicio regulă dură nu e încălcată când `unsatisfied` e gol; regulile imposibile ies în `unsatisfied` și devin alerte `timing` (`ask_doctor`); `POST /doses` e idempotent pe `med_id` + `scheduled_at`. **A2 e gata** ([PR #15](https://github.com/VladimirTM/PolyGraph/pull/15)): cutie (DataMatrix + poză) și rețetă (camera de documente), OCR pe telefon, `/scan`, sheet-ul de confirmare cu câmpurile „verificați” și avertizări de expirare / duplicat, camera falsă `PG_FAKE_SCAN`; `make check-ios` verde, încercat pe iPhone cu cutiile de test din `demo/datamatrix/`; rămân cutiile fizice în sală (T-A2-03). **B5 e în `main`** ([PR #16](https://github.com/VladimirTM/PolyGraph/pull/16)) cu rutele reale `/checkins` și `/feed`. `make check` trece cu 247 de teste cu `kb.sqlite` construit. **A3 e gata** (modul aparținător: listă pe medici cu „Anulează”, alerte cu zoom, ACB, graf radial local, detaliu + editare). **B6 e gata** ([PR #21](https://github.com/VladimirTM/PolyGraph/pull/21), `feature/b6-doctor-portal`): portalul medicului de familie `/portal` (login prin cod, lista pacienților, fișa cu decizie + notă pe alertă, care apare pe alertă și în Noutăți), reconcilierea de tipărit (2 pagini A4), QR-ul care adaugă pacientul în lista medicului și graful pentru WKWebView (`/share/{token}/graph?embed=1`); `make check` are 266 de teste; T-B6-04 încercat pe 14.11.2026. **A4 e gata** ( „Acum” cu cronologia de puncte, cardurile cu poze, „AM LUAT” / „Mai târziu” / „Am sărit” cu guard de 1 s, bifa care zboară, „Anulează” 5 s, vocea `ro-RO`, notificările locale, cardul calm pentru alertele pacientului, „Ziua de azi” cu momentele deschise la atingere); `make check-ios` verde, încercat pe iPhone cu backend-ul real, inclusiv la textul maxim. **A5 e gata** (check-in vocal pe telefon, Noutăți cu polling și notificări; încercat pe două iPhone-uri). **B7 e gata** (`chore/b7-demo-hardening`): `make demo` (DEMO_MODE=1, fără reload, IP-ul local + QR), `make demo-check` verde în proces și pe serverul pornit (11 pași din secțiunea 7, ~1,2 s), istoricul demo recreat la reset (7 zile, 2 doze ratate, un check-in vechi), `/demo/missed-dose` real, alertele grave noi în Noutăți, termen total pentru Gemini, loguri lizibile; `make check` are 282 de teste; T-B7-06 (Wi-Fi-ul laptopului oprit) și T-B6-04 încercate pe 14.11.2026. **A6 e gata** ([PR #25](https://github.com/VladimirTM/PolyGraph/pull/25)). **X1 e în `main`** ([PR #30](https://github.com/VladimirTM/PolyGraph/pull/30)): „Pot să iau…?” pe severități, grav și „fără date” în Noutăți, întrebarea și răspunsul în fișa din portal; `make check` are 292 de teste, `make demo-check` verde cu pasul X1. **Q0 e în `main`** ([PR #31](https://github.com/VladimirTM/PolyGraph/pull/31)), iar **Q3 e rulat** ([PR #32](https://github.com/VladimirTM/PolyGraph/pull/32)): 41 de constatări pe aplicație, cu planul de reparații în secțiunea „Q3 · Turul agresiv pe aplicație”, aliniat cu QA (web și backend). **Urmează:** Q3F0 (`make kb` pe Mac-ul de demo, blocker), apoi Q3F1–Q3F4 (Dev A: modul senior, aparținătorul; Dev B: vocea, scanarea, API-ul) în paralel cu QA1–QA4; materialele, pitch-ul și pregătirea Q1 (Dev B, lista de mai jos); apoi S4 (feature freeze), D1 și D2. Actualizați coloana „Status” la fiecare sync point.
 
 **Ce face Dev B cât Dev A lucrează la Q0, Q1 și fix-urile din app (14.11.2026)**, nimic nu depinde de app:
 1. ✅ **X1 pe backend** (`feature/x1-can-i-take`, [PR #30](https://github.com/VladimirTM/PolyGraph/pull/30), 14.11.2026; `polygraph/voice/can_i_take.py`, 9 teste + 1 în `test_share.py`, pas nou în `make demo-check`): „Pot să iau…?” rulat ca what-if pe regimul Mariei, cu răspunsul pe severități decis la 1.3 (grav și „fără date” ajung în Noutăți). Aplicația trimite deja textul și citește `reply_text` cu voce, deci X1 merge fără nicio schimbare în app. De spus lui Dev A: în Noutăți apar acum și evenimente `checkin` neescaladate (întrebările, cu `severity` major sau null); `FeedModel.isSerious` notifică pentru toate, inclusiv „fără date”, iar comentariul „doar când sunt escaladate” nu mai e adevărat (decizie: păstrăm notificarea pentru „fără date” sau `severity != nil`).
@@ -37,7 +37,7 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | **S0** | amândoi | W1.5 | V 19:30 | ✅ | contracte în `main`, mock pornit, Xcode pe ambele telefoane |
 | A1 schelet iOS, tokeni, client API | Dev A | W1.5–W4 | V 19:30–22:00 | ✅ | app pe mock, pe ambele iPhone-uri (`make check-ios` verde, 18 teste) |
 | B1 ingestia `kb.sqlite` + potrivirea | Dev B | W1.5–W8 | V 19:30–02:00 | ✅ | `make kb`, substanțele demo găsite |
-| Q0 infrastructura de review | agent (worktree) | în paralel cu A2 | V seara | ⬜ | `make review Q=…` |
+| Q0 infrastructura de review | agent (worktree) | în paralel cu A2 | V seara | ✅ | `make review Q=…` ([PR #31](https://github.com/VladimirTM/PolyGraph/pull/31)); `TOUR=EdgeCaseTour` din Q3 |
 | A2 scanarea (DataMatrix, poză, rețetă, confirmare) | Dev A | W4–W8 | V 22:00–02:00 | 🟡 | `make check-ios` verde, merge pe iPhone cu cutiile de test; rămân cutiile fizice în sală (T-A2-03) |
 | B2 motorul de interacțiuni + graful | Dev B | W4–W12 | V 22:00–S 13:00 | ✅ | golden test = `expected_alerts.json` |
 | **S1** | amândoi | W8 | S 02:00 | ✅ | trecut de facto (14.11.2026), fără review Q |
@@ -50,8 +50,8 @@ Legendă: ⬜ neînceput · 🔄 în lucru · ✅ gata · ⚠️ blocat / tăiat
 | **S3** (MVP complet) | amândoi | W19 | S 21:30 | ✅ | trecut de facto (14.11.2026), fără review Q |
 | A5 check-in vocal + Noutăți | Dev A | W19–W23 | S 21:30–D 02:00 | ✅ | `make check-ios` verde, încercat pe două iPhone-uri; X1 merge fără card (backend, PR #30), `reply_text` e citit cu voce |
 | B6 portalul medicului de familie + tipărire | Dev B | W19–W23 | S 21:30–D 02:00 | ✅ | portalul real (`/portal`): login cu cod, lista pacienților, fișa cu decizie + notă → alertă + Noutăți, tipărire în 2 pagini A4, QR care adaugă pacientul; `/graph?embed=1`; T-B6-04 încercat pe iPhone și la zoom 200% (14.11.2026) |
-| Q3 review (noaptea) | agent | somn | D 02:00–08:00 | ⬜ | triere 15 min |
-| A6 QR, modul demo · B7 demo hardening | A · B | W23–W24.5 | D 08:00–09:30 | 🔄 | B7 gata: `make demo`, `make demo-check` verde, istoricul demo, `/demo/missed-dose`. A6 gata (PR #25): QR pentru medic (aparținător + pacient), rețeta ORL și doza ratată în modul demo, iconița, trecerea de accesibilitate, T-A6-01/02 verzi. T-B7-06 (Wi-Fi oprit) încercat pe 14.11.2026. Rămân fix-urile blocker din Q3 |
+| Q3 review (noaptea) | agent | somn | D 02:00–08:00 | ✅ | rulat ziua, pe 14.11.2026 ([PR #32](https://github.com/VladimirTM/PolyGraph/pull/32), `docs/reviews/Q3.md`): 1 blocker, 12 major, 15 minor, 13 polish; reparațiile în etapele Q3F0–Q3F6 (după QA) |
+| A6 QR, modul demo · B7 demo hardening | A · B | W23–W24.5 | D 08:00–09:30 | 🔄 | B7 gata: `make demo`, `make demo-check` verde, istoricul demo, `/demo/missed-dose`. A6 gata (PR #25): QR pentru medic (aparținător + pacient), rețeta ORL și doza ratată în modul demo, iconița, trecerea de accesibilitate, T-A6-01/02 verzi. T-B7-06 (Wi-Fi oprit) încercat pe 14.11.2026. Rămân Q3F0 (blocker: `make kb`) și Q3F1–Q3F4 înainte de S4 |
 | **S4** feature freeze + Q4 | amândoi | W24.5 | D 09:30 | ⬜ | după S4 nu se mai scrie cod nou |
 | D1 integrare, repetiții, video de rezervă | amândoi | W24.5–W27.5 | D 09:30–12:30 | ⬜ | |
 | D2 pitch, submit | amândoi | W27.5–W30 | D 12:30–15:00 | ⬜ | |
@@ -1433,6 +1433,7 @@ Obiectiv: graful arată la fel în aplicație și în portal: același layout, a
 4. QA-05: eticheta substanței în graf și DCI-ul de pe fișă / tipărire în română (DCI-ul din nomenclator, ex. „carbonat de calciu”), cu INN-ul englezesc doar ca rezervă.
 5. QA-12: #graph { position: relative } în share.css. Eroarea de CSP de la stilul injectat de Cytoscape rămâne (inofensivă); notează în docs/DESIGN.md, la „Convenții de implementare”, de ce.
 6. Pe telefon (portalul la < 600 px), graful umple lățimea și are cel puțin 70% din înălțimea ecranului; fit cu padding 24 px.
+7. Q3-12 (din review-ul Q3): ce e grav se vede primul, pe ambele platforme. Muchiile moderate au width 1.5 și opacitate 0.4, iar cele major / critical width 4. La primul render, fit pe nodurile alertei celei mai grave (padding 48 px); „Recentrează” arată tot graful. Etichetele claselor ATC apar doar peste zoom 1.5.
 
 Criterii de acceptare: aceeași captură a grafului Mariei din aplicație (simulator) și din portal (Safari, aceeași lățime) arată aceleași poziții relative, culori și etichete; consola portalului fără erori în afară de CSP-ul Cytoscape; make check, make check-ios și make demo-check verzi.
 ~~~
@@ -1443,6 +1444,7 @@ Criterii de acceptare: aceeași captură a grafului Mariei din aplicație (simul
 - [ ] T-QA2-03 În portal: `cy.edges()` neutre au `line-color` cu transparență, nu `rgb(153,153,153)`; bordura medicamentelor nu e neagră în dark mode.
 - [ ] T-QA2-04 Tap pe muchia Sintrom–Nurofen deschide aceeași alertă în aplicație și în portal.
 - [ ] T-QA2-05 Manual: graful Mariei pe iPhone (aplicația) și în Safari pe același iPhone, light și dark, comparate una lângă alta.
+- [ ] T-QA2-06 La deschidere, muchia roșie Sintrom–Nurofen e în centrul grafului, fără etichete de clasă peste nodurile medicamentelor, în aplicație și în portal (Q3-12).
 
 ##### QA3 · Textele comune
 
@@ -1515,6 +1517,228 @@ Restul ideilor din raport (simptome legate de medicamente, programul de lipit pe
 - [ ] T-QA5-02 Funcționalitatea 2: „Fromilid” în câmp dă aceleași alerte ca `POST /what-if` și ca scenariul 2:10.
 - [ ] T-QA5-03 Funcționalitatea 3: după o decizie, „Ce s-a schimbat” se golește; un medicament nou îl umple.
 
+### Q3 · Turul agresiv pe aplicație (14.11.2026) și planul de reparații
+
+**Ce este.** Pe 14.11.2026, după X1, un agent a rulat turul complet pe simulator (`make review Q=Q3`) și un tur agresiv nou (`EdgeCaseTour`: apăsări repetate, anulări la limită, ore la marginea zilei, rețea căzută în mijlocul fluxului, check-in-uri limită, valuri de Noutăți, text uriaș + dark), plus ~80 de cereri curl pe API. QA (mai sus) verifică web-ul și backend-ul; Q3 verifică aplicația, iar constatările care țin de backend sunt puse lângă etapele QA, ca să nu se repare de două ori. Raportul complet, cu capturi, pași de reproducere și prompturi: [`docs/reviews/Q3.md`](reviews/Q3.md) ([PR #32](https://github.com/VladimirTM/PolyGraph/pull/32)).
+
+**Cum s-a testat:**
+- **Simulator, turul de bază:** 17 teste × Light / Dark / AX / Motion / Contrast, 246 de capturi, 406 probleme de audit, 17 min.
+- **Simulator, turul agresiv:** `make review Q=Q3e TOUR=EdgeCaseTour CONFIGS="Light AX" NO_VIDEO=1` (variabila `TOUR` e nouă în `run.sh`), 21 de teste, ~150 de capturi.
+- **API:** curl pe un `make demo` separat, cu bază temporară: corpuri invalide, enum-uri, id-uri inexistente, idempotență, 5–10 cereri în paralel, path traversal, portal fără sesiune, HTML / `<script>` în notă, check-in și numele cutiei, validarea răspunsurilor după scheme.
+- **Neacoperit:** iPhone fizic (VoiceOver, haptic, camera reală), „ștergere → Anulează → ștergere din nou” (fereastra de 5 s a expirat cât rula auditul; de reluat cu `AUDIT=0`), expirarea cutiilor cu `PG_NOW` (analiza folosește data serverului; verificată prin API).
+
+**Ce merge** (nu mai trebuie re-testat înainte de demo): alertele Mariei = `expected_alerts.json` (27, 31 cu Fromilid, aceeași ordine, toate cu sursă); toate răspunsurile API validează după scheme; escaparea HTML în portal, tipărire și graf; `/media` închis la path traversal; `POST /doses` idempotent și la 10 cereri în paralel; „AM LUAT” de 2 și de 5 ori → o singură doză; „Salvează” de 3 ori → un singur medicament; avertizările de duplicat și de cutie expirată înainte de salvare; Noutăți cu 34 de evenimente: pastila „↑ noutăți”, lista nu se mișcă sub deget; aplicația își revine după backend fără repornire; X1 (cu `kb.sqlite` la zi) răspunde exact ca în 1.3, fără „puteți lua” și fără nimic despre tratamentele existente.
+
+#### Constatările
+
+Coloana „Platforme”: **app** = doar aplicația; **ambele** = backend-ul trimite același lucru aplicației și portalului; **app + web** = două implementări care trebuie să spună același lucru (vezi tabelul de consistență). „= QA-nn” înseamnă că problema e deja în tabelul QA și se repară acolo.
+
+| ID | Severitate | Constatare | Platforme | Unde | Etapa |
+|---|---|---|---|---|---|
+| Q3-01 | **blocker** | `kb/kb.sqlite` de pe Mac e anterior lui X1 (fără Aspirin): „Pot să iau o aspirină?” → răspuns generic, nimic în Noutăți; `make demo-check` ROȘU; `make demo` nu avertizează | ambele | `demo/serve.py`, `make kb` | Q3F0 |
+| Q3-02 | major | „Acum” în AX / XXXL: cardul „Am observat ceva…” + cele trei butoane fixe umplu ecranul, nu se vede ce pastilă se ia; în Light, numele e sub fold | app | `Senior/NowView.swift` | Q3F1 |
+| Q3-03 | major | Dublă atingere pe „Am sărit”: a doua cade pe „Anulează” (apare sub deget), deci nu se notează nimic; serverul primește `skipped` + `pending` | app | `Senior/SeniorComponents.swift` (UndoBanner) | Q3F1 |
+| Q3-04 | major | „Ați terminat pastilele de azi.” la 23:59 fără nicio confirmare și cu lista goală; „Ziua de azi” goală fără mesaj | app | `NowView.dayDone`, `SeniorDay`, `DayView` | Q3F1 |
+| Q3-05 | major | Eroarea din „Acum” și „Ziua de azi” se repară doar prin tragere în jos (gest), contrar 2.4.2 | app | `NowView.loadError`, `DayView` | Q3F1 |
+| Q3-06 | major | Modul senior nu reîncarcă programul la revenirea în aplicație și la miezul nopții: rămâne ziua de ieri | app | `Senior/SeniorRoot.swift`, `AppStore.refreshAll` | Q3F1 |
+| Q3-07 | major | „Am luat” offline arată succes; eroarea nu apare nicăieri, iar coada `unsent` e doar în memorie (se pierde la repornire) | app | `Senior/DoseLog.swift` | Q3F1 |
+| Q3-08 | major | „Am amețeli”, „Am greață”, „Amețesc” nu produc simptome; răspunsul e generic, iar portalul nu vede nimic | ambele | `contracts/symptoms.md`, `voice/understand.py` | Q3F2 |
+| Q3-09 | major | Rețeta scrisă pe DCI („Paracetamol 500 mg”) nu dă candidat; din 3 rânduri rămân 2, cu o avertizare care nu spune care lipsește | ambele | `extract/ocr_match.py`, `match.py` | Q3F2 |
+| Q3-10 | major | `GET /feed?since=` compară strict, la secundă: un eveniment din aceeași secundă cu ultimul primit nu ajunge niciodată la familie | ambele | `api/main.py` `feed` | Q3F3 |
+| Q3-11 | major | `POST /meds` în paralel → 4 × 500 (`IntegrityError` pe `meds.id`); = QA-10 pentru cererea reluată, aici și concurența | ambele | `store.free_med_id`, `add_med` | Q3F3 (cu QA1) |
+| Q3-12 | major | Graful: rețeaua portocalie domină, iar muchia roșie Sintrom–Nurofen din scena 0:45 abia se vede; etichetele claselor peste medicamente | app + web | `graph-core.js` (QA2) | QA2 (punctul 7) |
+| Q3-13 | major | Noutăți arată doar ora („14:00”), deci dozele ratate din 12.11 par de azi; portalul are „14.11.2026, 13:25” | app + web | `Feed/FeedView.swift`, `PgFormat`, `share/view.py` | Q3F4 |
+| Q3-14 | minor | Graful fără „Încearcă din nou”; căzut în timpul fluxului, pânză goală fără mesaj | app | `Graph/GraphView.swift` | Q3F4 |
+| Q3-15 | minor | Medicamente / Noutăți offline: datele vechi rămân fără niciun semn | app | `MedsListView`, `FeedView` | Q3F4 |
+| Q3-16 | minor | Contrast insuficient (Dark, Increase Contrast) pe butoanele accent din bare: „Arată medicului”, „Gata”, „Închide”, „Renunță”, „Editează” | app + web | `Assets.xcassets` (accent), `share.css` | Q3F4 |
+| Q3-17 | minor | Cardul ACB e primul în Alerte, cu „3” și punct roșii, deși alerta e `moderate` | app | `Alerts/AlertSections.swift`, `AcbCard.swift` | Q3F4 |
+| Q3-18 | minor | „…spuneți-i Ana sau medicului” (fără dativ); apare și în fișa din portal | ambele | `voice/correlate.py` `reply_text` | Q3F2 |
+| Q3-19 | minor | „Pot să iau sindromul seara cu mâncare?” → simptomul `rash` (mâncare ≈ mâncărime), ajunge în portal; „sindromul” nu e recunoscut ca Sintrom | ambele | `voice/understand.py` | Q3F2 |
+| Q3-20 | minor | Mod demo: „Adaugă rețeta ORL” apăsat rapid → mesajul final „Fromilid e deja în listă.” (deși a mers); „Simulează doza ratată” × 3 → 3 evenimente | app + backend | `SettingsView.run`, `/demo/missed-dose` | Q3F3 + Q3F4 |
+| Q3-21 | minor | „…dacă vă simțiți slăbită” la orice pacient (gen fix) | ambele | `contracts/symptoms.md` (sfatul `black_stool`) | Q3F2 |
+| Q3-22 | minor | Onboarding în AX: întrebarea acoperită, „Pentru cinev…” | app | `OnboardingView` | Q3F5 |
+| Q3-23 | minor | Cutie ilizibilă: spinner-ul „Caut substanța activă…” rămâne lângă eroare; butoanele erorii palide | app | `ScanView` | Q3F4 |
+| Q3-24 | minor | 32 de evenimente într-un lot → 32 de notificări locale | app | `FeedModel.receive`, `FeedAlerts` | Q3F4 |
+| Q3-25 | minor | Singura ieșire din „Ziua de azi” e înapoi de 44 pt (sau swipe) | app | `DayView` | Q3F1 |
+| Q3-26 | minor | Bara de navigare translucidă în modul senior (2.4.2: suprafețe opace) | app | `SeniorRoot` | Q3F1 |
+| Q3-27 | minor | „Am adăugat Fromilid. 6 alerte noi.” / „Am salvat. 7 alerte noi” numără și alertele `minor` și `food`, pe care familia nu le vede | app | `AppStore.addMed`, `SettingsView` | Q3F4 |
+| Q3-28 | minor | Concentrația „9999 mg” se salvează fără avertizare (= QA-09 pe server) | app | `ConfirmSheet` | Q3F5 |
+| Q3-29…41 | polish | chevroane duble în detaliul medicamentului; „AM LUAT” cu majuscule; titlul foii de partajare diferit la Ana / Maria; titlul „Medicam…” strivit; analogia explicată de două ori; eticheta „k” (= QA-04); status suprapus și segment tăiat la confirmare; texte suprapuse în tranziția „Am luat”; ordinea dozelor la 07:30 față de fixture; graful gol = un cerc uriaș (= QA-13 pe web); comutarea rolului fără „Gata”; „Arată medicului” cu lista goală; „Anulează” la ștergere de 34 pt | app | vezi raportul | Q3F1 (AM LUAT), Q3F5 (restul) |
+| A-3 | minor | Erorile de validare FastAPI au `detail` listă / obiect, nu `string` ca `Error` din openapi; aplicația afișează mesajul generic | ambele | `api/main.py` (handler `RequestValidationError`) | Q3F3 |
+| A-5 | minor | Posologie necitită la scanare („1-0-1-1-1”, „9999-0-0”, „abc”) → 0-0-0-0 fără avertizare | ambele | `extract/posology.py` | Q3F2 |
+| A-6 | minor | `/what-if {query}` alege alt produs decât check-in-ul („algocalmin” → fiola 1 g/2 ml, cu majuscule) | ambele | `api/main.py` `what_if` | Q3F2 |
+| A-7 | minor | Aceeași întrebare X1 de două ori → două evenimente identice în Noutăți | ambele | `voice/can_i_take.py` / `create_checkin` | Q3F2 |
+| A-4, A-8 | – | doză 9999 / nume de 600 de caractere acceptate | ambele | = QA-09, QA-11 | QA1 |
+| Q3-I1…I5 | infra | `TOUR` în `run.sh` (gata); `tapFakeUsePage()` (gata); varianta Dark intermitentă (13 capturi din 7 fluxuri sunt Light); skill-ul lipsă (readus în #33) | – | `tools/review/`, `PolyGraphUITests/` | Q3F6 |
+
+#### Consistența între aplicație și web (completare la tabelul QA)
+
+Aceeași regulă ca la QA: **un lucru pe care îl văd și familia, și medicul are o singură sursă**. Rândurile de mai jos se adaugă la tabelul QA și se verifică la Q3F1–Q3F5 și la QA2–QA4.
+
+| Element | Aplicația (azi) | Web (azi) | Regula comună |
+|---|---|---|---|
+| Data și ora evenimentelor | Noutăți: doar ora („14:00”); detaliul check-in-ului: „sâmbătă, 14 noiembrie, ora 13:25” | `ro_datetime`: „14.11.2026, 13:25”; check-in-uri: „14.11, 13:25” | **„Azi, 14:00” / „Ieri, 20:00” / „joi, 12 nov., 14:00”** pe ecran, în ambele (`PgFormat.relativeDay` și `share/view.py`, aceleași perechi de test într-un fixture comun, ca la posologie); data completă „14.11.2026, 13:25” rămâne doar pe tipărire |
+| Numele codului pentru medic | Ana: butonul și foaia „Arată medicului”; Maria: „Cod pentru medicul de familie” și foaia „Codul pentru medic” | portalul îi spune medicului „Rugați familia să deschidă «Arată medicului»” | **„Arată medicului”** peste tot: butonul la Ana și la Maria, titlul foii, textele din portal și de pe pagina de prezentare |
+| Stările de eroare | aparținător: mesaj + „Încearcă din nou”; senior: „Trageți ecranul în jos” (Q3-05); graful fără buton (Q3-14) | decizia: mesaj inline (QA-16) | **orice eroare are mesajul în română și „Încearcă din nou”**, inclusiv în modul senior (buton de 72 pt) și în graf; mesajele de rețea / server separate, cu textele din QA-16 în ambele |
+| Datele vechi după o reîmprospătare eșuată | nimic (Q3-15) | pagina se reîncarcă întreagă | bandă discretă „Nu am putut actualiza. Încearcă din nou” în aplicație; pe web, dacă QA5.1 (actualizare automată) intră, același text |
+| Numărul de alerte noi | „6 alerte noi” (toate, inclusiv `minor`) | cifrele din rezumat numără gravele | **numărul spune doar ce se vede**: „2 alerte grave noi”, iar moderatele „și 2 de discutat”; aceeași funcție de numărare pe server și în aplicație (`critical` + `major`, fără `food`) |
+| Ordinea și culoarea alertelor | ACB primul, roșu (Q3-17) | gravele sus, ACB în rezumat | ordinea din 5.3 pe ambele: grave → moderate grupate → Mâncare și băutură → ACB; culoarea după `severity` (ACB `moderate` = portocaliu) |
+| Graful: ce e grav se vede primul | muchiile moderate la fel de groase ca gravele | la fel (+ QA-01) | în `graph-core.js` comun (QA2): moderate subțiri și transparente, grave groase, zoom inițial pe perechea cea mai gravă |
+| Accentul la contrast mare | teal `#0E6B68` / `#5CC2BC`, fără variantă „High Contrast” | aceleași culori, fără `prefers-contrast` | o variantă de contrast mare în Asset Catalog și `@media (prefers-contrast: more)` în `share.css`, cu aceleași valori |
+| Textele de check-in (răspunsul și ce vede medicul) | citite cu voce și afișate | fișa le arată la check-in-uri | se repară doar în backend (Q3F2): gramatica, genul neutru, fără „Mulțumesc.” la întrebări; ambele platforme se schimbă odată |
+| Stările goale | senior: „Ați terminat pastilele de azi” fals (Q3-04); graful gol = un nod uriaș | QA-13: lipsesc | aceleași texte în aplicație (aparținător și senior) și pe web: „Familia n-a adăugat încă medicamente.” (aparținător, portal), „Nu aveți pastile în program.” (pacient) |
+| Țintele de atingere | senior 72 pt (în afară de înapoi, Q3-25); aparținător 50 pt (în afară de „Anulează” 34 pt) | QA4: 44 px pe `pointer: coarse` | senior ≥ 72 pt, aparținător ≥ 44 pt (HIG), web tactil ≥ 44 px |
+| Suprafețele | senior: bara translucidă (Q3-26) | opace | modul senior și portalul: opace; materialele translucide doar în chrome-ul aparținătorului |
+
+#### Pașii
+
+Ordinea ține cont de S4 (D 09:30): Q3F0 acum; Q3F1–Q3F4 înainte de S4, în paralel cu QA1–QA4 (Q3F1 și Q3F4 sunt ale lui Dev A, Q3F2 și Q3F3 ale lui Dev B); Q3F5 doar cât rămâne timp; Q3F6 înainte de Q4. Fiecare etapă e un PR mic, cu testele ei; `make check`, `make demo-check` și, pentru cele cu app, `make check-ios` verzi la final. Prompturile detaliate, pe constatare, sunt în `docs/reviews/Q3.md`; mai jos e ce intră în fiecare PR.
+
+| Etapa | Ce rezolvă | Cine | Durată | Branch |
+|---|---|---|---|---|
+| Q3F0 | Q3-01 | Dev B | 15 min | `fix/q3f0-kb-freshness` |
+| Q3F1 | Q3-02…07, 25, 26, 30: modul senior | Dev A | 2,5 h | `fix/q3f1-senior` |
+| Q3F2 | Q3-08, 09, 18, 19, 21, A-5…7: vocea și scanarea pe backend | Dev B | 1,5 h | `fix/q3f2-voice-scan` |
+| Q3F3 | Q3-10, 11, 20 (backend), A-3: robustețea API | Dev B | 45 min | în `fix/qa1-backend-robustness`, dacă QA1 nu e închis; altfel `fix/q3f3-api` |
+| Q3F4 | Q3-13…17, 20 (app), 23, 24, 27: aparținătorul și consistența cu web-ul | Dev A (+ Dev B pentru datele din portal) | 2 h | `fix/q3f4-caregiver-consistency` |
+| Q3F5 | Q3-22, 28, polish-ul rămas | Dev A | 1 h | `chore/q3f5-polish` |
+| Q3F6 | regresia: `EdgeCaseTour` în Q4, Dark stabil, testul de ștergere reluat | Dev A (agent) | 30 min | `test/q3f6-review-tour` |
+
+Q3-12 (graful) nu are etapă proprie: intră în QA2, ca punctul 7 al promptului, pentru că `graph-core.js` e comun.
+
+##### Q3F0 · `kb.sqlite` la zi pe Mac-ul de demo
+
+**Responsabil:** Dev B · **Depinde de:** — · **Durată:** 15 min · **Branch:** `fix/q3f0-kb-freshness`
+
+`make kb` pe Mac-ul de demo (acum, înainte de orice repetiție). Apoi, în `backend/polygraph/demo/serve.py`, la verificările de pornire: `kb_meta.built_at` comparat cu mtime-ul maxim al `kb/ro_products_extra.csv`, `kb/curated_ddi.csv`, `kb/curated_dfi.csv`, `kb/overrides.csv` și `kb/rules/*.yaml`; dacă unul e mai nou, `✗ kb.sqlite e mai vechi decât <fișier>: rulați make kb`.
+
+**Teste**
+- [ ] T-Q3F0-01 Un CSV atins după build → `make demo` afișează ✗; după `make kb`, ✓.
+- [ ] T-Q3F0-02 `make demo-check` verde pe Mac-ul de demo, inclusiv pasul X1 (aspirina în Noutăți).
+
+##### Q3F1 · Modul senior: ce vede Maria e adevărat și se poate repara cu un buton
+
+**Responsabil:** Dev A · **Depinde de:** — · **Durată:** 2,5 h · **Branch:** `fix/q3f1-senior`
+
+~~~text
+[WORKFLOW] Branch: fix/q3f1-senior. Citește .claude/skills/apple-design/SKILL.md și docs/DESIGN.md (2.4.2). Nu edita project.pbxproj; fără dependențe externe; xcodebuild build după fiecare modificare.
+
+Obiectiv: pe „Acum” se vede mereu ce pastilă se ia, nicio atingere dublă nu anulează ce a făcut prima, nimic nu spune „ați terminat” când nu e adevărat, iar orice eroare se repară cu un buton mare.
+
+1. Q3-02: în NowView, `notices` după cardurile de doză (sau PatientNoticeCard compact: un rând + buton secundar). Când dynamicTypeSize.isAccessibilitySize, bara fixă de jos ține doar „Am luat”; „Mai târziu” și „Am sărit” intră în ScrollView, după carduri.
+2. Q3-03: „Anulează” din UndoBanner ignoră atingerile în primele 800 ms după apariție (sau un GuardedAction comun pentru toată bara de jos).
+3. Q3-04: `dayDone` doar dacă toate momentele zilei sunt luate sau sărite; altfel „Pentru azi nu mai e nimic de luat acum.” + „Mâine, primele sunt la ora 07:00.” (fără îndemn la doza ratată, fără roșu); `schedule.moments.isEmpty` → „Nu aveți pastile în program.” în Acum și în Ziua de azi (`day.empty`); vocea spune același lucru.
+4. Q3-05: SeniorButton „Încearcă din nou” (`now.retryButton`, `day.retryButton`) sub eroare; textul fără „trageți”; în Ziua de azi, „Arată medicului” ascuns cât e eroare.
+5. Q3-06: în SeniorRoot, `.task(id: scenePhase)` → `refreshAll()` la `.active`, plus `.NSCalendarDayChanged` → `refreshAll()`; cu PG_NOW (FixedClock) nu se schimbă nimic.
+6. Q3-07: DoseLog persistă coada `unsent` în UserDefaults („pg.doseLog.unsent”) și o retrimite la `.active` și la 30 s cât nu e goală; sub cronologie, cât `lastError != nil`: „Confirmarea pleacă când revine internetul.” (calm, `now.pendingSync`).
+7. Q3-25, 26, 30: la finalul Zilei de azi, SeniorButton „Înapoi la Acum”; bara de navigare opacă în modul senior (`.toolbarBackground(PgColor.background, for: .navigationBar)` + visible); „Am luat” în loc de „AM LUAT”.
+8. Butonul de cod din Ziua de azi se numește „Arată medicului” (regula comună din tabelul de consistență).
+Actualizează identificatorii noi în docs/DESIGN.md („Convenții de implementare”).
+
+Criterii de acceptare: EdgeCaseTour.testRapidLaterAndSkipped, testClockEdges (lateNight), testDeleteUndoAndDeleteAll (emptyNow, emptyDay), testBackendDownSeniorScreens, testBackendDropsMidFlowSenior și testSeniorHugeTextDark arată comportamentul nou; make check-ios verde; încercat pe iPhone la textul maxim.
+~~~
+
+**Teste**
+- [ ] T-Q3F1-01 AX și XXXL, PG_NOW=…T07:05: ora și numele primei pastile vizibile fără scroll (`onScreen(now.dose.med_05)`).
+- [ ] T-Q3F1-02 3 atingeri pe „Am sărit” → momentul e „sărit”, `now.undoBanner` vizibil, un singur `POST /doses` cu `skipped`.
+- [ ] T-Q3F1-03 23:59 fără confirmări → textul neutru; listă goală → „Nu aveți pastile în program.” în Acum și Ziua de azi.
+- [ ] T-Q3F1-04 Backend oprit → `now.retryButton` și `day.retryButton` (≥ 72 pt) reîncarcă după ce backend-ul revine.
+- [ ] T-Q3F1-05 Unit test DoseLog: trimitere eșuată → DoseLog nou pe aceleași `UserDefaults` → retrimite aceeași doză.
+- [ ] T-Q3F1-06 Unit test AppStore: ceasul trece de miezul nopții → `schedule.date` nou.
+
+##### Q3F2 · Vocea și scanarea pe backend
+
+**Responsabil:** Dev B · **Depinde de:** — · **Durată:** 1,5 h · **Branch:** `fix/q3f2-voice-scan`
+
+~~~text
+[WORKFLOW] Branch: fix/q3f2-voice-scan. În acest task ai voie să schimbi contracts/symptoms.md (doar sinonime și textul sfatului), nimic altceva din contracts/.
+
+Obiectiv: ce spune Maria în cuvinte obișnuite e înțeles, rețetele scrise pe DCI sunt citite, iar răspunsurile sunt corecte gramatical; aplicația și fișa din portal se schimbă odată.
+
+1. Q3-08: în symptoms.md, la dizziness „amețeli; amețesc; am amețeală”, la nausea „greață; am greață; greţuri”; potrivire pe cuvinte întregi.
+2. Q3-19: sinonimele nu se potrivesc pe prefix („mâncare” nu e „mâncărime”); `phonetic` și pe forma articulată („sindromul” → Sintrom).
+3. Q3-18, Q3-21: `reply_text` folosește `dative(caregiver)` și în „spuneți-i …”; sfatul pentru black_stool fără gen („dacă vă simțiți fără putere”); la intent can_i_take, fără „Mulțumesc.” în față.
+4. Q3-09: un rând de rețetă fără brand potrivit → căutare pe DCI + concentrație, cu produsul oral cu o singură substanță (rank-ul din can_i_take.pick_product), `match.method = "exact_dci"`, `needs_review = true`; rândurile nepotrivite → avertizare cu textul rândului („Nu am găsit «Paracetamol 500 mg». Adăugați-l manual.”).
+5. A-5: posologia necitită → avertizare „Nu am înțeles posologia «…»”, câmpul rămâne gol (aplicația îl marchează deja „verificați”).
+6. A-6: `/what-if {query}` folosește `can_i_take.pick_product`, ca check-in-ul.
+7. A-7: aceeași întrebare X1 (același brand, aceeași zi, același răspuns) nu adaugă al doilea eveniment în Noutăți.
+
+Criterii de acceptare: fraza „Am amețeli, greață, mă dor mușchii și am vânătăi pe mâini și scaun negru.” → dizziness, nausea, muscle_pain, bruising, black_stool; rețeta [Aspirin 500 mg, Paracetamol 500 mg, Algocalmin 500 mg] → 3 candidați; fixture-ul Fromilid și checkin_demo.json neschimbate; make check și make demo-check verzi.
+~~~
+
+**Teste**
+- [ ] T-Q3F2-01 „Am amețeli.”, „Am greață.”, „Amețesc.” → simptomul corect; „…cu mâncare” → fără `rash`.
+- [ ] T-Q3F2-02 Rețeta cu 3 rânduri → 3 candidați; „Paracetamol 500 mg” singur → un candidat oral cu `needs_review`.
+- [ ] T-Q3F2-03 `reply_text` fără „spuneți-i Ana”, fără „slăbită”; la „Pot să iau…?” nu începe cu „Mulțumesc.”.
+- [ ] T-Q3F2-04 `/what-if {"query":"algocalmin"}` și check-in-ul „Pot să iau Algocalmin?” aleg același produs.
+- [ ] T-Q3F2-05 Aceeași întrebare de două ori → un singur eveniment în Noutăți.
+
+##### Q3F3 · Robustețea API (lângă QA1)
+
+**Responsabil:** Dev B · **Depinde de:** — (dacă QA1 e în lucru, în același PR) · **Durată:** 45 min · **Branch:** `fix/qa1-backend-robustness` sau `fix/q3f3-api`
+
+1. **Q3-10:** `feed()` filtrează cu `>=`; aplicația deduplică deja pe `id`. În `openapi.yaml`, `since` e descris ca inclusiv.
+2. **Q3-11:** `free_med_id` + inserarea într-o tranzacție (`BEGIN IMMEDIATE`) sau reîncercare la `IntegrityError`; împreună cu QA-10 (cererea identică reluată → 200).
+3. **Q3-20 (backend):** `/demo/missed-dose` nu adaugă al doilea eveniment pentru același moment.
+4. **A-3:** handler pentru `RequestValidationError` și pentru `invalid()` → `{"detail": "<mesaj în română>"}`, ca în `Error` din `openapi.yaml`; lista de erori rămâne în log.
+
+**Teste**
+- [ ] T-Q3F3-01 Două evenimente cu același `at`, `since = at` → ambele.
+- [ ] T-Q3F3-02 5 `POST /meds` în paralel cu Fromilid → zero 5xx, un singur medicament.
+- [ ] T-Q3F3-03 `/demo/missed-dose` × 3 → un singur eveniment.
+- [ ] T-Q3F3-04 JSON invalid, câmp lipsă, enum greșit → 422 cu `detail` string, valid după `Error`.
+
+##### Q3F4 · Aparținătorul și consistența cu web-ul
+
+**Responsabil:** Dev A (+ Dev B pentru formatul datelor în `share/view.py`) · **Depinde de:** QA3 pentru texte (stările goale), Q3F3 pentru numărare · **Durată:** 2 h · **Branch:** `fix/q3f4-caregiver-consistency`
+
+~~~text
+[WORKFLOW] Branch: fix/q3f4-caregiver-consistency. Citește .claude/skills/apple-design/SKILL.md, docs/DESIGN.md și tabelul „Consistența între aplicație și web” din docs/PLAN.md (QA și completarea Q3). Nu edita project.pbxproj.
+
+Obiectiv: aparținătorul vede date, numere, nume și culori identice cu cele din portal.
+
+1. Q3-13: PgFormat.relativeDay („Azi, 14:00” / „Ieri, 20:00” / „joi, 12 nov., 14:00”) în cardurile din Noutăți și în detaliul check-in-ului; aceeași funcție în share/view.py pentru fișă și listă (tipărirea păstrează „14.11.2026, 13:25”); perechile de test în contracts/fixtures/date_words.json, verificate de pytest și de XCTest (ca posology_words.json din QA3).
+2. Q3-14, Q3-15: GraphView cu eroare + „Încearcă din nou” (`graph.retryButton`) și când WebView-ul are deja un graf; în Medicamente și Noutăți, bandă discretă „Nu am putut actualiza. Încearcă din nou” când `lastError != nil` și lista nu e goală.
+3. Q3-16: varianta High Contrast a culorii accent în Asset Catalog; aceleași valori în share.css sub `@media (prefers-contrast: more)` (Dev B).
+4. Q3-17: în AlertSections, ordinea grave → moderate grupate → Mâncare și băutură → ACB; cifra și punctul ACB cu Severity.moderate.color.
+5. Q3-27: „Am salvat. 2 alerte grave noi” / „Am adăugat Fromilid. 2 alerte grave noi și 2 de discutat.”: numără doar critical + major (fără food) și moderate, ca rezumatul din portal.
+6. Q3-20 (app): butoanele demo se dezactivează sincron (demoAction setat înainte de Task); a doua apăsare nu suprascrie statusul de succes.
+7. Q3-23: la eroarea de scanare, statusul de sus dispare; butoanele erorii .borderedProminent.
+8. Q3-24: peste 3 evenimente noi într-un lot, o singură notificare („Maria: 5 noutăți, 2 grave”).
+9. „Arată medicului”: același titlu pentru foaia de partajare la Ana și la Maria (regula comună); textele din portal rămân.
+
+Criterii de acceptare: aceeași doză ratată arată „joi, 12 nov., 14:00” în aplicație și în portal; numărul de alerte noi din aplicație = cel din rezumatul portalului după Fromilid; ReviewTour (Dark, Contrast) fără „Contrast failed” pe butoanele accent; make check, make check-ios și make demo-check verzi.
+~~~
+
+**Teste**
+- [ ] T-Q3F4-01 `date_words.json` trece în pytest (`share/view.py`) și în XCTest (`PgFormat`).
+- [ ] T-Q3F4-02 Backend oprit → `graph.retryButton`; revenit → graful se încarcă fără repornire.
+- [ ] T-Q3F4-03 Auditul de contrast în Dark și Contrast fără erori pe `meds.shareButton`, `settings.doneButton`, `scan.closeButton`, `share.doneButton`.
+- [ ] T-Q3F4-04 Alerte: primul card e o alertă gravă; ACB portocaliu.
+- [ ] T-Q3F4-05 „Adaugă rețeta ORL” × 4 → statusul de succes rămâne; un singur Fromilid.
+- [ ] T-Q3F4-06 Manual: aceeași doză ratată și același check-in, unul lângă altul în aplicație și în portal (dată, ora, severitatea, cuvintele).
+
+##### Q3F5 · Polish (doar cât rămâne timp înainte de S4)
+
+**Responsabil:** Dev A · **Depinde de:** Q3F1, Q3F4 · **Durată:** 1 h · **Branch:** `chore/q3f5-polish`
+
+În ordinea vizibilității în demo: Q3-29 (chevroane duble), Q3-32 (titlul strivit: „Arată medicului” ca pictogramă `qrcode` cu etichetă VoiceOver), Q3-33 (analogia o singură dată, ca pe web: detaliul complet după „i”), Q3-35 (statusul și segmentul la confirmare), Q3-40 („Arată medicului” ascuns cu lista goală), Q3-41 („Anulează” de 50 pt), Q3-22 (onboarding în AX), Q3-28 (avertizare la concentrații neobișnuite), Q3-36 (tranziția „Am luat”), Q3-37 (ordinea dozelor), Q3-38 (graful gol: textul comun din QA3), Q3-39 (comutarea rolului la „Gata”). Ce nu intră trece la secțiunea 11.
+
+**Teste**
+- [ ] T-Q3F5-01 `make review Q=Q3f5 ONLY="testCaregiverMeds testScanBoxFake testGraph testOnboarding" CONFIGS="Light AX" NO_VIDEO=1`: capturile arată schimbările.
+
+##### Q3F6 · Regresia pentru Q4
+
+**Responsabil:** Dev A (agent) · **Depinde de:** Q3F1–Q3F4 · **Durată:** 30 min · **Branch:** `test/q3f6-review-tour`
+
+1. Varianta Dark stabilă: în `run.sh`, Dark rulează separat, după `xcrun simctl ui <udid> appearance dark` (ca la Contrast), nu doar cu `XCUIDevice.appearance` în `setUp`.
+2. `testDeleteUndoAndDeleteAll`: auditul după „Anulează”, nu înainte, ca fereastra de 5 s să nu expire.
+3. La Q4: turul de bază + `make review Q=Q4e TOUR=EdgeCaseTour CONFIGS="Light AX" NO_VIDEO=1`; fiecare constatare din Q3 primește starea închisă / deschisă / regresie în `docs/reviews/Q4.md`.
+
+**Teste**
+- [ ] T-Q3F6-01 `make review Q=dbg CONFIGS=Dark ONLY="testSeniorNowMorning testCaregiverAlertsAndDetail testGraph"`: toate capturile sunt dark.
+- [ ] T-Q3F6-02 `testDeleteUndoAndDeleteAll`: „Anulează” readuce Sintrom (`meds.row.med_01` după undo).
+
 ---
 
 ### D1 · Integrare, repetiții, video de rezervă (împreună)
@@ -1523,6 +1747,7 @@ Restul ideilor din raport (simptome legate de medicamente, programul de lipit pe
 
 - [ ] `make demo-check` verde pe `main`
 - [ ] Q4: raportul `docs/reviews/Q4.md` fără blocker deschis; regresia constatărilor din Q1–Q3 verde
+- [ ] Q4 rulează și `EdgeCaseTour` (Q3F6); `make demo-check` verde pe Mac-ul de demo cu `kb.sqlite` reconstruit (Q3F0)
 - [ ] Scenariul din secțiunea 7 rulat cronometrat de 3 ori, cu resetare între rulări; fiecare problemă → fix doar dacă e < 20 min, altfel se scoate din scenariu
 - [ ] Înregistrare ecran (ambele telefoane + portalul medicului) a unei rulări curate: **video de rezervă** dacă ceva pică pe scenă
 - [ ] Telefoanele: luminozitate maximă, Nu deranja (cu excepția notificărilor app-ului), baterie > 80%, aplicația instalată din Xcode în configurația Release
@@ -1649,6 +1874,7 @@ Logistică:
 - Neo4j pentru graful populațional (ce combinații produc cele mai multe alerte la pacienții cabinetelor partenere).
 - Push real (APNs), conturi și consimțământ GDPR complet, audit log; Android doar dacă pilotul o cere.
 - Dozele individualizate (INR pentru anticoagulante, funcția renală) doar prin medic, niciodată automat.
+- Din review-ul Q3 (aplicația, `docs/reviews/Q3.md`): avertizare „expiră curând” din DataMatrix (azi doar „expirat”); aderența săptămânală în portal („5 din 7 seri”, cu „neconfirmate”, nu „nelulate”); al doilea telefon al familiei legat de același pacient, fără reset; „Pot să iau…?” și pentru suplimente / plante (sunătoare, ginkgo), din surse verificate; QR spre fișă pe reconcilierea tipărită; graful what-if în portal pentru o întrebare gravă; istoricul pe zile în „Ziua de azi” (doar citire, butoane mari); exportul FHIR `MedicationStatement`; actualizarea cutiei existente la o scanare duplicat (expirare, lot), în loc de un al doilea medicament.
 
 ---
 
