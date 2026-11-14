@@ -22,7 +22,7 @@
         "strength_text": "4 mg",
         "form": "comprimate",
         "gtin": null,
-        "pack_size": 30,
+        "pack_size": 20,
         "expiry": null,
         "batch": null
       },
@@ -64,9 +64,9 @@
       "product": {
         "brand": "Nurofen",
         "strength_text": "400 mg",
-        "form": "comprimate filmate",
+        "form": "capsule moi",
         "gtin": null,
-        "pack_size": 24,
+        "pack_size": 20,
         "expiry": null,
         "batch": null
       },
@@ -106,11 +106,11 @@
       "id": "med_03",
       "source": "photo_box",
       "product": {
-        "brand": "Simvastatin Terapia",
+        "brand": "Simvastatin LPH",
         "strength_text": "40 mg",
         "form": "comprimate filmate",
         "gtin": null,
-        "pack_size": 28,
+        "pack_size": 30,
         "expiry": null,
         "batch": null
       },
@@ -150,11 +150,11 @@
       "id": "med_04",
       "source": "photo_box",
       "product": {
-        "brand": "Amlodipină",
+        "brand": "Amlodipină Actavis",
         "strength_text": "10 mg",
         "form": "comprimate",
         "gtin": null,
-        "pack_size": 30,
+        "pack_size": 20,
         "expiry": null,
         "batch": null
       },
@@ -238,7 +238,7 @@
       "id": "med_06",
       "source": "photo_box",
       "product": {
-        "brand": "Calciu + Vitamina D3",
+        "brand": "Calcium + Vitamin D",
         "strength_text": null,
         "form": "comprimate",
         "gtin": null,
@@ -288,7 +288,7 @@
       "id": "med_07",
       "source": "photo_box",
       "product": {
-        "brand": "Omeprazol",
+        "brand": "Omeprazol Zentiva",
         "strength_text": "20 mg",
         "form": "capsule gastrorezistente",
         "gtin": null,
@@ -332,11 +332,11 @@
       "id": "med_08",
       "source": "photo_box",
       "product": {
-        "brand": "Amitriptilina Arena",
+        "brand": "Amitriptilin",
         "strength_text": "25 mg",
         "form": "comprimate filmate",
         "gtin": null,
-        "pack_size": 20,
+        "pack_size": 50,
         "expiry": null,
         "batch": null
       },

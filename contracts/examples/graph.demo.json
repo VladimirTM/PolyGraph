@@ -57,7 +57,7 @@
       "data": {
         "id": "med_03",
         "type": "product",
-        "label": "Simvastatin Terapia 40 mg",
+        "label": "Simvastatin LPH 40 mg",
         "prescriber": "medicină de familie",
         "severity": "major"
       }
@@ -80,7 +80,7 @@
       "data": {
         "id": "med_04",
         "type": "product",
-        "label": "Amlodipină 10 mg",
+        "label": "Amlodipină Actavis 10 mg",
         "prescriber": "medicină de familie",
         "severity": "major"
       }
@@ -126,7 +126,7 @@
       "data": {
         "id": "med_06",
         "type": "product",
-        "label": "Calciu + Vitamina D3",
+        "label": "Calcium + Vitamin D",
         "prescriber": "medicină de familie",
         "severity": "moderate"
       }
@@ -163,7 +163,7 @@
       "data": {
         "id": "med_07",
         "type": "product",
-        "label": "Omeprazol 20 mg",
+        "label": "Omeprazol Zentiva 20 mg",
         "prescriber": "gastroenterologie",
         "severity": "moderate"
       }
@@ -186,7 +186,7 @@
       "data": {
         "id": "med_08",
         "type": "product",
-        "label": "Amitriptilina Arena 25 mg",
+        "label": "Amitriptilin 25 mg",
         "prescriber": "neurologie",
         "severity": "major"
       }
