@@ -1,12 +1,14 @@
 Sintrom
 Nurofen
-Simvastatin Terapia
-Amlodipină
+Simvastatin LPH
+Amlodipină Actavis
 Euthyrox
-Calciu + Vitamina D3
-Omeprazol
-Amitriptilina Arena
+Calcium + Vitamin D
+Omeprazol Zentiva
+Amitriptilin
 Fromilid
+Calciu + Vitamina D3
+Nurofen Express Forte
 Zolgensma
 Mounjaro
 Retacrit
@@ -30,7 +32,6 @@ Wegovy
 Bloonis
 Enap
 Namaxir
-Omeprazol Zentiva
 Oxacilina Atb
 Pradaxa
 Alprazolam Atb
@@ -297,4 +298,3 @@ Evertas
 Exforge Hct
 Femoston
 Fenobarbital Zentiva
-Filsuvez

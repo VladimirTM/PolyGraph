@@ -584,7 +584,7 @@ def demo_missed_dose() -> dict[str, Any]:
         pid,
         "dose_missed",
         f"{name} n-a confirmat dozele de la 13:00",
-        "Calciu + Vitamina D3, la prânz.",
+        "Calcium + Vitamin D, la prânz.",
         severity="info",
         med_ids=["med_06"],
     )

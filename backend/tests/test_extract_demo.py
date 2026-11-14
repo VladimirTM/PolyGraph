@@ -176,7 +176,8 @@ def test_strength_unit_aliases(client, unit):
 def test_generic_manufacturer(client, monkeypatch):
     monkeypatch.setattr(match, "extract_image", lambda *_: [match.RawExtraction("Actavis", "10 mg", dci_text="Amlodipină")])
     (candidate,) = post_scan(client, picture=b"fixture")["candidates"]
-    assert "amlodipin" in candidate["product"]["brand"].lower()
+    # producătorul citit e în catalog (Amlodipina Actavis 10 mg, din ro_products_extra.csv): rămâne ce s-a citit
+    assert candidate["product"]["brand"].lower() in ("actavis", "amlodipină", "amlodipina")
     assert candidate["substances"][0]["atc"] == "C08CA01"
     assert candidate["match"]["needs_review"]
 
