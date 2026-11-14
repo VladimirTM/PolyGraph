@@ -124,7 +124,7 @@ final class ReviewTour: ReviewTestCase {
         let rx = app.buttons["Rețetă"]
         if rx.waitForExistence(timeout: 3) { rx.tap() } else { markAbsent("scan.modePicker Rețetă") }
         step("page", audit: true)
-        tap("scan.fake.usePage", orLabel: "Folosește pagina")
+        tapFakeUsePage()
         pause(1)
         step("reading")
         // pagina trimisă înlocuiește camera falsă; dacă butonul a rămas, atingerea n-a ajuns la el

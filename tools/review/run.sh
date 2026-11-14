@@ -8,7 +8,8 @@
 # Variabile opționale:
 #   SIMS=3                                  câte simulatoare în paralel (1 = secvențial)
 #   CONFIGS="Light Dark AX Motion Contrast" doar câteva variante
-#   ONLY="testDay testFeed"                 doar câteva teste din ReviewTour
+#   ONLY="testDay testFeed"                 doar câteva teste din tur
+#   TOUR=ReviewTour                         clasa de teste (EdgeCaseTour = turul agresiv de la Q3)
 #   NO_VIDEO=1                              fără video și cadre pentru „Am luat” / microfon
 #   AUDIT=0                                 fără auditul de accesibilitate (doar la depanarea unui test)
 #   PORT=8000                               portul de la care se caută porturi libere
@@ -22,6 +23,8 @@ DERIVED="$ROOT/.review/DerivedData"
 PY=(python3 -I "$ROOT/tools/review/review.py")
 START=$(date +%s)
 N=${SIMS:-3}
+TOUR="${TOUR:-ReviewTour}"
+[[ -f "$ROOT/app/PolyGraphUITests/$TOUR.swift" ]] || { printf '✗ Nu există app/PolyGraphUITests/%s.swift\n' "$TOUR" >&2; exit 1; }
 read -r -a CONFIG_LIST <<<"${CONFIGS:-Light Dark AX Motion Contrast}"
 
 log() { printf '▸ %s\n' "$*"; }
@@ -112,12 +115,12 @@ done
 # testele, împărțite după durata măsurată (review.py split); simulatorul 1 face și filmarea
 SHARD_TESTS=()
 while IFS= read -r line; do SHARD_TESTS+=("$line"); done < <(
-    "${PY[@]}" split "$N" app/PolyGraphUITests/ReviewTour.swift ${ONLY:-})
+    "${PY[@]}" split "$N" "app/PolyGraphUITests/$TOUR.swift" ${ONLY:-})
 
 run_tests() {  # <shard> <eticheta> <teste> <configurații…>
     local i="$1" label="$2" tests="$3"; shift 3
     local args=() t c
-    for t in $tests; do args+=("-only-testing:PolyGraphUITests/ReviewTour/$t"); done
+    for t in $tests; do args+=("-only-testing:PolyGraphUITests/$TOUR/$t"); done
     for c in "$@"; do args+=("-only-test-configuration" "$c"); done
     xcodebuild test-without-building -xctestrun "$DERIVED/Build/Products/Review-$Q-$((i + 1)).xctestrun" \
         -destination "id=${UDIDS[$i]}" -resultBundlePath "$OUT/result-$label.xcresult" "${args[@]}" \
@@ -151,7 +154,8 @@ run_shard() {
         run_tests "$i" "$((i + 1))-contrast" "$tests" Contrast
         xcrun simctl ui "${UDIDS[$i]}" increase_contrast disabled
     fi
-    if [[ $i -eq 0 && -z "${NO_VIDEO:-}" ]] && command -v ffmpeg >/dev/null; then run_video "$i"; fi
+    # filmarea folosește testele din ReviewTour
+    if [[ $i -eq 0 && -z "${NO_VIDEO:-}" && "$TOUR" == ReviewTour ]] && command -v ffmpeg >/dev/null; then run_video "$i"; fi
 }
 
 # --- turul -------------------------------------------------------------------------------------------------
