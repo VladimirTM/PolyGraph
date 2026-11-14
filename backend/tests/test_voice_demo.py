@@ -179,7 +179,7 @@ def test_checkin_feed_and_graph(client):
     ok("feed_event", ev)
     assert ev["type"] == "checkin" and ev["checkin_id"] == ci["id"] and ev["severity"] == "major"
     assert "Sintrom + Nurofen" in ev["body"]
-    assert client.get(f"{P}/feed", params={"since": ev["at"]}, headers=H).json() == []
+    assert [e["id"] for e in client.get(f"{P}/feed", params={"since": ev["at"]}, headers=H).json()] == [ev["id"]]
     graph = client.get(f"{P}/analysis", headers=H).json()["graph"]
     nodes = {n["data"]["id"] for n in graph["nodes"]}
     assert {"y:bruising", "y:dizziness_orthostatic"} <= nodes

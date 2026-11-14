@@ -1,5 +1,5 @@
 """Persistența: SQLite `app.sqlite` (B2)."""
 
-from polygraph.store.db import Store
+from polygraph.store.db import MedIdTaken, Store
 
-__all__ = ["Store"]
+__all__ = ["MedIdTaken", "Store"]

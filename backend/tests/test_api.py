@@ -69,10 +69,11 @@ def test_add_med_09_then_delete(client):
     assert len(client.get(f"{P}/analysis", headers=H).json()["alerts"]) == 27
 
 
-def test_add_med_with_taken_id_gets_new_id(client):
+def test_add_med_with_taken_id_is_409(client):
+    # QA-10: fără redenumire tăcută; cererea identică reluată e în test_q3f3.py
     m = copy.deepcopy(MED_09) | {"id": "med_01"}
     r = client.post(f"{P}/meds", headers=H, json=m)
-    assert r.status_code == 201 and r.json()["id"] not in {f"med_0{i}" for i in range(1, 9)}
+    assert r.status_code == 409 and isinstance(r.json()["detail"], str)
 
 
 def test_add_invalid_med_is_422(client):

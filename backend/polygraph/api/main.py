@@ -26,6 +26,7 @@ from typing import Annotated, Any, Literal
 from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Request, Response, UploadFile
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
@@ -35,6 +36,7 @@ sys.path.insert(0, str(ROOT / "contracts"))
 
 import validate as contracts  # noqa: E402  (contracts/validate.py: schemele JSON)
 
+from polygraph.api.errors import request_message, schema_message  # noqa: E402
 from polygraph.api.media import get_photo, save_photo  # noqa: E402
 from polygraph.demo.seed import seed_history, simulate_missed_dose  # noqa: E402
 from polygraph.engine import analyze, new_alerts  # noqa: E402
@@ -46,7 +48,7 @@ from polygraph.kb import Kb, KbMissing, default_kb  # noqa: E402
 from polygraph.schedule import build_schedule  # noqa: E402
 from polygraph.share import STATIC_DIR, render  # noqa: E402
 from polygraph.share.view import page_context, patient_card, portal_summary, review_event  # noqa: E402
-from polygraph.store import Store  # noqa: E402
+from polygraph.store import MedIdTaken, Store  # noqa: E402
 from polygraph.voice import can_i_take  # noqa: E402
 from polygraph.voice.correlate import correlate, feed_event, reply_text  # noqa: E402
 from polygraph.voice.understand import understand  # noqa: E402
@@ -145,9 +147,10 @@ app.mount("/static/share", StaticFiles(directory=STATIC_DIR), name="share-static
 
 
 def invalid(schema: str, body: Any) -> None:
-    errors = contracts.schema_errors(schema, body)
+    errors = sorted(contracts.validator(schema).iter_errors(body), key=lambda e: list(e.absolute_path))
     if errors:
-        raise HTTPException(422, {"message": "Corpul nu respectă schema.", "errors": errors[:10]})
+        LOG.warning("422       %s: %s", schema, contracts.schema_errors(schema, body)[:10])
+        raise HTTPException(422, schema_message(errors))
 
 
 def auth(pid: str, token: str | None) -> dict[str, Any]:
@@ -259,11 +262,13 @@ def list_meds(pid: str, x_patient_token: str | None = Header(None)) -> list[dict
 
 
 @app.post("/v1/patients/{pid}/meds", status_code=201)
-def add_med(pid: str, body: dict[str, Any], x_patient_token: str | None = Header(None)) -> dict[str, Any]:
+def add_med(pid: str, body: dict[str, Any], response: Response, x_patient_token: str | None = Header(None)) -> dict[str, Any]:
     patient = auth(pid, x_patient_token)
     invalid("medication_item", body)
     med = copy.deepcopy(body)
-    med["id"] = store().free_med_id(pid, med.get("id"))
+    saved = store().get_med(pid, med["id"])
+    if saved is not None:
+        return replayed_med(saved, med, response)
     catalog_product = None
     if med["product"].get("gtin"):
         try:
@@ -274,9 +279,20 @@ def add_med(pid: str, body: dict[str, Any], x_patient_token: str | None = Header
         except KbMissing:
             pass
     before = alerts_or_none(pid, patient)
-    store().add_med(pid, med, catalog_product)
+    try:
+        store().add_med(pid, med, catalog_product)
+    except MedIdTaken as taken:  # Q3-11: o cerere identică a ajuns între timp (dublă apăsare, reîncercare)
+        return replayed_med(taken.saved, med, response)
     announce_new_alerts(pid, patient, before, med)
     return med
+
+
+def replayed_med(saved: dict[str, Any], med: dict[str, Any], response: Response) -> dict[str, Any]:
+    """QA-10: aceeași cerere reluată nu dublează medicamentul și nu repetă alertele din Noutăți."""
+    if saved != med:
+        raise HTTPException(409, "Există deja un medicament cu acest id.")
+    response.status_code = 200
+    return saved
 
 
 def alerts_or_none(pid: str, patient: dict[str, Any]) -> list[dict[str, Any]] | None:
@@ -522,7 +538,8 @@ def feed(pid: str, since: str | None = None, x_patient_token: str | None = Heade
             cut = _instant(since)
         except ValueError:
             raise HTTPException(422, "since nu e o dată ISO 8601.") from None
-        events = [e for e in events if _instant(e["at"]) > cut]
+        # inclusiv: `at` are rezoluție de o secundă, iar aplicația deduplică pe id (Q3-10)
+        events = [e for e in events if _instant(e["at"]) >= cut]
     return list(reversed(events))
 
 
@@ -780,6 +797,12 @@ def demo_missed_dose() -> dict[str, Any]:
 @app.exception_handler(HTTPException)
 async def http_error(_: Request, exc: HTTPException) -> JSONResponse:
     return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
+
+
+@app.exception_handler(RequestValidationError)
+async def request_invalid(request: Request, exc: RequestValidationError) -> JSONResponse:
+    LOG.warning("422       %s %s: %s", request.method, request.url.path, exc.errors()[:10])
+    return JSONResponse({"detail": request_message(exc.errors())}, status_code=422)
 
 
 @app.exception_handler(KbMissing)

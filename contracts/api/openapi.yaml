@@ -161,11 +161,21 @@ paths:
             schema: { $ref: "../schema/medication_item.schema.json" }
       responses:
         "201":
-          description: Medicamentul salvat (id-ul poate fi schimbat de server dacă exista deja)
+          description: Medicamentul salvat
+          content:
+            application/json:
+              schema: { $ref: "../schema/medication_item.schema.json" }
+        "200":
+          description: Cerere reluată (același id, corp identic cu medicamentul salvat); nu se adaugă nimic
           content:
             application/json:
               schema: { $ref: "../schema/medication_item.schema.json" }
         "401": { $ref: "#/components/responses/Unauthorized" }
+        "409":
+          description: Există deja un medicament cu acest id, cu alt conținut
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "422": { $ref: "#/components/responses/Invalid" }
 
   /v1/patients/{id}/meds/{mid}:
@@ -327,7 +337,7 @@ paths:
         - name: since
           in: query
           required: false
-          description: doar evenimentele strict după acest moment
+          description: evenimentele de la acest moment inclusiv (același `at` poate reveni; clientul deduplică pe `id`)
           schema: { type: string, format: date-time }
       responses:
         "200":
@@ -463,11 +473,11 @@ paths:
     post:
       tags: [demo]
       operationId: demoMissedDose
-      summary: Doar cu DEMO_MODE=1. Simulează o doză ratată (apare în feed).
+      summary: Doar cu DEMO_MODE=1. Simulează o doză ratată (apare în feed), o singură dată pe moment.
       security: []
       responses:
         "200":
-          description: Evenimentul creat
+          description: Evenimentul creat sau, la o apăsare repetată pentru același moment, cel existent
           content:
             application/json:
               schema: { $ref: "../schema/feed_event.schema.json" }
@@ -509,7 +519,7 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/Error" }
     Invalid:
-      description: Corpul nu respectă schema
+      description: Corpul sau parametrii nu respectă schema (mesajul spune primul câmp greșit)
       content:
         application/json:
-          schema: { type: object }
+          schema: { $ref: "#/components/schemas/Error" }
