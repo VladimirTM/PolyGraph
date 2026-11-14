@@ -9,6 +9,7 @@ Amitriptilin
 Fromilid
 Calciu + Vitamina D3
 Nurofen Express Forte
+Aspirin
 Zolgensma
 Mounjaro
 Retacrit
@@ -297,4 +298,3 @@ Esomeprazol Terapia
 Evertas
 Exforge Hct
 Femoston
-Fenobarbital Zentiva
