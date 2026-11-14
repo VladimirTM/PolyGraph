@@ -588,7 +588,8 @@ caption { text-align: left; color: var(--text-2); padding: 0.5rem 0 0.25rem; cap
 .avatar { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; font-weight: 700; font-size: 1.125rem; margin-bottom: 1rem; }
 .avatar-patient { background: color-mix(in srgb, var(--sev-moderate) 18%, transparent); color: var(--sev-text-moderate); }
 .avatar-family { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
-.avatar-doctor { background: color-mix(in srgb, var(--sev-info) 14%, transparent); color: var(--sev-info); font-size: 1rem; }
+.avatar-doctor { background: color-mix(in srgb, var(--sev-info) 14%, transparent); color: var(--sev-info); }
+.avatar-icon { width: 1.5rem; height: 1.5rem; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
 
 .steps { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; counter-reset: none; }
 .step { position: relative; }
