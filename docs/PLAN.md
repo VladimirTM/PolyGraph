@@ -565,15 +565,17 @@ Autentificare: un `patient_token` simplu în header (`X-Patient-Token`), creat l
 
 | id | Produs (cutie) | Substanță | Prescris de | Posologie |
 |---|---|---|---|---|
-| med_01 | Sintrom 4 mg | acenocumarol | cardiolog | ½ seara |
-| med_02 | Nurofen 400 mg (din `ro_products_extra.csv`, OTC) | ibuprofen | OTC (durere de genunchi) | 1-0-1 |
-| med_03 | Simvastatin 40 mg | simvastatină | medic de familie | 0-0-1 |
-| med_04 | Amlodipină 10 mg | amlodipină | medic de familie | 1-0-0 |
+| med_01 | Sintrom 4 mg, 20 comprimate | acenocumarol | cardiolog | ½ seara |
+| med_02 | Nurofen Express Forte 400 mg, capsule moi (din `ro_products_extra.csv`, OTC) | ibuprofen | OTC (durere de genunchi) | 1-0-1 |
+| med_03 | Simvastatin LPH 40 mg (din `ro_products_extra.csv`) | simvastatină | medic de familie | 0-0-1 |
+| med_04 | Amlodipină Actavis 10 mg (din `ro_products_extra.csv`) | amlodipină | medic de familie | 1-0-0 |
 | med_05 | Euthyrox 75 mcg | levotiroxină | endocrinolog | dimineața, pe stomacul gol |
-| med_06 | Calciu + D3 | carbonat de calciu + colecalciferol | medic de familie | 0-1-0 |
-| med_07 | Omeprazol 20 mg | omeprazol | gastroenterolog (de 2 ani) | 1-0-0 înainte de masă |
-| med_08 | Amitriptilină 25 mg | amitriptilină | neurolog | 0-0-1 |
+| med_06 | Calcium + Vitamin D, Dr.Max (supliment, din `ro_products_extra.csv`) | carbonat de calciu + colecalciferol | medic de familie | 0-1-0 |
+| med_07 | Omeprazol Zentiva 20 mg | omeprazol | gastroenterolog (de 2 ani) | 1-0-0 înainte de masă |
+| med_08 | Amitriptilin 25 mg (ambalaj din Republica Moldova, doar pentru poză; în România: Amitriptilina Arena) | amitriptilină | neurolog | 0-0-1 |
 | med_09 *(scenariul „medic nou”)* | Fromilid 500 mg (sau Klabax 500 mg; Klacid 500 mg există doar ca SR, o dată pe zi) | claritromicină | ORL, 7 zile | 1-0-1 |
+
+*(14.11.2026)* Numele comerciale urmează cutiile din fotografiile demo (`demo/photos/med_0N.jpg`). Substanțele, dozele și posologiile nu s-au schimbat, deci nici alertele (`expected_alerts.json`) și nici programul. Cutiile care lipsesc din catalogul public sunt în `kb/ro_products_extra.csv`, cu motivul scris.
 
 Alertele așteptate, **verificate pe fișierele DDInter descărcate** (12.11.2026; `kb/raw/ddinter/demo_pairs_report.csv`) și pe `kb/curated_ddi.csv` / `kb/curated_dfi.csv`. Lista exactă, cu `id` și `med_ids`, e în `contracts/fixtures/expected_alerts.json` (P0, 13.11.2026).
 
