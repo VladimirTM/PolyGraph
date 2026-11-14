@@ -26,7 +26,7 @@ from typing import Annotated, Any, Literal
 from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Request, Response, UploadFile
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
@@ -159,6 +159,17 @@ def auth(pid: str, token: str | None) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------- sistem
+
+
+@app.get("/", response_class=PlainTextResponse)
+def root(request: Request) -> str:
+    # QR-ul din `make demo` deschis cu camera telefonului ajunge aici: spunem unde se pune adresa, nu „Not Found”
+    base = str(request.base_url).rstrip("/")
+    return (
+        "PolyGraph: serverul funcționează.\n\n"
+        f"Puneți această adresă în aplicație, la Setări → adresa serverului:\n{base}\n\n"
+        f"Portalul medicului de familie: {base}/portal\n"
+    )
 
 
 @app.get("/health")

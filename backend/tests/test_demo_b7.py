@@ -189,3 +189,9 @@ def test_reset_removes_the_old_extra_patient(client):
     assert store.get_patient("pat_demo_ana") is None
     names = [store.get_patient(pid)["name"] for pid in store.doctor_patient_ids("doc_demo")]
     assert sorted(names) == ["Ioana", "Ion", "Maria"]
+
+
+def test_root_explains_where_the_address_goes(client):
+    r = client.get("/")
+    assert r.status_code == 200 and r.headers["content-type"].startswith("text/plain")
+    assert "Setări → adresa serverului" in r.text and "http://testserver" in r.text
