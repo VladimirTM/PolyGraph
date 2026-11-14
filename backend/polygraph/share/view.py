@@ -346,6 +346,54 @@ def patient_card(patient: Json, meds: list[Json], analysis: Json, checkins: list
     }
 
 
+WEEKDAYS = ("luni", "marți", "miercuri", "joi", "vineri", "sâmbătă", "duminică")
+MONTHS = (
+    "ianuarie", "februarie", "martie", "aprilie", "mai", "iunie",
+    "iulie", "august", "septembrie", "octombrie", "noiembrie", "decembrie",
+)  # fmt: skip
+
+
+def portal_summary(cards: list[Json], today: date) -> Json:
+    """Capul listei de pacienți: data, cele patru cifre și împărțirea în „de revizuit” / „fără nimic urgent”."""
+    pending = sum(c["open_grave"] for c in cards)
+    escalated = sum(c["escalated"] for c in cards)
+    reviewed = sum(c["grave"] - c["open_grave"] for c in cards)
+    attention = [c for c in cards if c["open_grave"] or c["escalated"]]
+    with_pending = sum(1 for c in cards if c["open_grave"])
+    patients_value, patients_label = _count(len(cards), "pacient", "pacienți")
+    pending_value, pending_label = _count(pending, "alertă gravă", "alerte grave")
+    escalated_value, escalated_label = _count(escalated, "simptom semnalat", "simptome semnalate")
+    reviewed_value, reviewed_label = _count(reviewed, "alertă revizuită", "alerte revizuite")
+    return {
+        "date": f"{WEEKDAYS[today.weekday()]}, {today.day} {MONTHS[today.month - 1]}",
+        "lead": (
+            f"{plural(pending, 'alertă gravă', 'alerte grave')} de revizuit la {plural(with_pending, 'pacient', 'pacienți')}."
+            if pending
+            else "Totul e revizuit. Nicio alertă gravă nu vă așteaptă."
+        ),
+        "stats": [
+            {"id": "patients", "value": patients_value, "label": patients_label, "note": "în listă"},
+            {
+                "id": "pending",
+                "value": pending_value,
+                "label": pending_label,
+                "note": "de revizuit",
+                "tone": "attention" if pending else None,
+            },
+            {
+                "id": "escalated",
+                "value": escalated_value,
+                "label": escalated_label,
+                "note": "de familie, 7 zile",
+                "tone": "attention" if escalated else None,
+            },
+            {"id": "reviewed", "value": reviewed_value, "label": reviewed_label, "note": "trimise familiei"},
+        ],
+        "attention": attention,
+        "others": [c for c in cards if c not in attention],
+    }
+
+
 def review_event(alert: Json, decision: str, note: str, at: str, suffix: str) -> Json:
     """Evenimentul din Noutăți (A5) pentru o alertă revizuită de medicul de familie."""
     label = DECISION_LABEL[decision]

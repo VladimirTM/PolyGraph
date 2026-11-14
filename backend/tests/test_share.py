@@ -106,6 +106,12 @@ def test_patient_list_puts_pending_alerts_first(doctor):
         assert name in html
     assert html.index("Maria, 78 de ani") < html.index("Ioana, 74 de ani")
     assert "5 de revizuit" in html
+    # cei cu alerte nerevizuite stau în „De revizuit”, ceilalți dedesubt; cifrele de sus adună toată lista
+    order = [html.index(s) for s in ('id="h-attention"', "Maria, 78 de ani", 'id="h-others"', "Ioana, 74 de ani")]
+    assert order == sorted(order)
+    assert "7 alerte grave de revizuit la 2 pacienți." in html
+    pending = html[html.index('id="stat-pending"') :]
+    assert '<p class="stat-value">7</p>' in pending[: pending.index("</li>")]
 
 
 def test_logout_ends_the_session(doctor):

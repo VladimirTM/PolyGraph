@@ -1,45 +1,89 @@
 {% extends "base.html" %}
 {% block title %}Pacienții mei · Portalul medicului de familie{% endblock %}
 {% block body_class %}portal{% endblock %}
+
+{% macro patient(c) %}
+<li>
+  <a class="patient-card{% if c.escalated %} is-escalated{% elif c.open_grave %} is-pending{% endif %}" href="/portal/patients/{{ c.patient.id }}">
+    <span class="patient-avatar" aria-hidden="true">{{ c.patient.name[:1] }}</span>
+    <div class="patient-main">
+      <p class="patient-name">{{ c.patient.name }}{% if c.age %}, {{ c.age }} de ani{% endif %}</p>
+      <p class="patient-meta">{{ c.meds }} medicamente · scor ACB {{ c.acb }}{% if c.last_checkin %} · ultimul check-in {{ c.last_checkin }}{% endif %}</p>
+      {% if c.open_titles %}
+      <ul class="patient-why">{% for t in c.open_titles %}<li>{{ t }}</li>{% endfor %}</ul>
+      {% endif %}
+    </div>
+    <div class="patient-badges">
+      {% if c.escalated %}<span class="badge sev-major">Semnalat de familie</span>{% endif %}
+      {% if c.open_grave %}<span class="badge sev-major">{{ c.open_grave }} de revizuit</span>
+      {% elif c.grave %}<span class="badge ok">Revizuit</span>
+      {% else %}<span class="badge">Fără alerte grave</span>{% endif %}
+    </div>
+    <span class="chevron" aria-hidden="true">›</span>
+  </a>
+</li>
+{% endmacro %}
+
 {% block body %}
 <div class="scroll-sentinel" aria-hidden="true"></div>
-<header class="topbar" data-topbar>
+<header class="topbar portal-bar" data-topbar>
   <div class="topbar-inner">
-    <div>
-      <h1 class="page-title">Pacienții mei</h1>
-      <p class="disclaimer">{{ doctor.name }} · Portalul medicului de familie</p>
+    <a class="wordmark" href="/portal"><img class="wordmark-logo" src="/static/share/logo.svg" alt="" width="32" height="32"><span>PolyGraph <span class="wordmark-sub">· Portalul medicului</span></span></a>
+    <div class="bar-actions">
+      <span class="doctor-name">{{ doctor.name }}</span>
+      <form method="post" action="/portal/logout"><button class="btn btn-secondary" type="submit">Ieșire</button></form>
     </div>
-    <form method="post" action="/portal/logout"><button class="btn btn-secondary" type="submit">Ieșire</button></form>
   </div>
 </header>
 
-<main class="content">
-  {% set pending = cards | sum(attribute="open_grave") %}
-  <p class="summary-line lead">{% if pending %}{{ pending }} {{ "alertă gravă" if pending == 1 else "alerte grave" }} de revizuit{% else %}Totul e revizuit.{% endif %}</p>
+<main class="content portal-content">
+  <section class="welcome" aria-labelledby="h-welcome">
+    <p class="eyebrow">{{ date | capitalize }}</p>
+    <h1 id="h-welcome" class="page-title welcome-title">Pacienții mei</h1>
+    <p class="welcome-lead">{{ lead }}</p>
+  </section>
 
-  <ul class="patients">
-    {% for c in cards %}
-    <li>
-      <a class="patient-card{% if c.escalated %} is-escalated{% endif %}" href="/portal/patients/{{ c.patient.id }}">
-        <div class="patient-main">
-          <p class="patient-name">{{ c.patient.name }}{% if c.age %}, {{ c.age }} de ani{% endif %}</p>
-          <p class="small muted">{{ c.meds }} medicamente · ACB {{ c.acb }}{% if c.last_checkin %} · ultimul check-in {{ c.last_checkin }}{% endif %}</p>
-          {% if c.open_titles %}<p class="patient-why">{{ c.open_titles | join(" · ") }}</p>{% endif %}
-        </div>
-        <div class="patient-badges">
-          {% if c.escalated %}<span class="badge sev-major">Semnalat de familie</span>{% endif %}
-          {% if c.open_grave %}<span class="badge sev-major">{{ c.open_grave }} de revizuit</span>
-          {% elif c.grave %}<span class="badge ok">Revizuit</span>
-          {% else %}<span class="badge">Fără alerte grave</span>{% endif %}
-        </div>
-      </a>
-    </li>
-    {% else %}
-    <li class="muted">Încă nu aveți pacienți în portal.</li>
-    {% endfor %}
-  </ul>
+  <section aria-label="Rezumat">
+    <ul class="stats">
+      {% for s in stats %}
+      <li class="stat{% if s.tone %} tone-{{ s.tone }}{% endif %}" id="stat-{{ s.id }}">
+        <p class="stat-value">{{ s.value }}</p>
+        <p class="stat-label">{{ s.label }}</p>
+        <p class="stat-note">{{ s.note }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
 
-  <p class="small muted hint">Un pacient nou intră în listă când scanați codul QR din aplicația familiei, cât timp sunteți autentificat aici.</p>
+  {% if not cards %}
+  <section class="empty">
+    <h2>Încă nu aveți pacienți în portal</h2>
+    <p class="muted">Pacienții apar aici după ce scanați codul QR din aplicația familiei.</p>
+  </section>
+  {% endif %}
+
+  {% if attention %}
+  <section aria-labelledby="h-attention">
+    <h2 id="h-attention">De revizuit <span class="count">{{ attention | length }}</span></h2>
+    <p class="section-lead">Alerte grave nerevizuite sau simptome semnalate de familie. Cele mai urgente sunt primele.</p>
+    <ul class="patients">{% for c in attention %}{{ patient(c) }}{% endfor %}</ul>
+  </section>
+  {% endif %}
+
+  {% if others %}
+  <section aria-labelledby="h-others">
+    <h2 id="h-others">Fără nimic urgent <span class="count">{{ others | length }}</span></h2>
+    <ul class="patients">{% for c in others %}{{ patient(c) }}{% endfor %}</ul>
+  </section>
+  {% endif %}
+
+  <section class="add-card" aria-labelledby="h-add">
+    <svg class="add-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3.5" y="3.5" width="6" height="6" rx="1.2"/><rect x="14.5" y="3.5" width="6" height="6" rx="1.2"/><rect x="3.5" y="14.5" width="6" height="6" rx="1.2"/><path d="M14.5 14.5h2.5v2.5M20.5 14.5v.01M17 20.5h3.5v-3"/></svg>
+    <div>
+      <h2 id="h-add">Adăugați un pacient</h2>
+      <p>Rugați familia să deschidă „Arată medicului” în aplicația PolyGraph și scanați codul QR cu telefonul, cât timp sunteți autentificat aici. Pacientul intră în listă și rămâne acolo; codul e valabil 72 de ore.</p>
+    </div>
+  </section>
 </main>
 <script src="/static/share/share.js" defer></script>
 {% endblock %}

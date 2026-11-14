@@ -45,7 +45,7 @@ from polygraph.extract.ocr_match import OcrLine  # noqa: E402
 from polygraph.kb import Kb, KbMissing, default_kb  # noqa: E402
 from polygraph.schedule import build_schedule  # noqa: E402
 from polygraph.share import STATIC_DIR, render  # noqa: E402
-from polygraph.share.view import page_context, patient_card, review_event  # noqa: E402
+from polygraph.share.view import page_context, patient_card, portal_summary, review_event  # noqa: E402
 from polygraph.store import Store  # noqa: E402
 from polygraph.voice import can_i_take  # noqa: E402
 from polygraph.voice.correlate import correlate, feed_event, reply_text  # noqa: E402
@@ -636,7 +636,7 @@ def portal(request: Request) -> HTMLResponse:
         checkins = s.list_checkins(pid)
         cards.append(patient_card(patient, meds, run_analysis(pid, patient, meds), checkins, today()))
     cards.sort(key=lambda c: c["sort"])
-    return page("portal.html", doctor=doctor, cards=cards)
+    return page("portal.html", doctor=doctor, cards=cards, **portal_summary(cards, today()))
 
 
 @app.post("/portal/login", response_class=HTMLResponse)
