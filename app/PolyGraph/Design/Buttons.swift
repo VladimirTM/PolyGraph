@@ -125,18 +125,12 @@ struct SeniorButton: View {
 /// `.borderedProminent` cu eticheta în `PgColor.onAccent`. Stilul de sistem scrie cu alb, iar pe teal-ul
 /// deschis din Dark (și pe ecranul de scanare, mereu întunecat) contrastul e ~2:1 (Q3-16, auditul pe
 /// `scan.retryButton`); `onAccent` are variantele lui pentru light / dark / contrast mare.
-struct PgProminentButtonStyle: PrimitiveButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        Button(role: configuration.role, action: configuration.trigger) {
-            configuration.label
-                .foregroundStyle(PgColor.onAccent)
-        }
-        .buttonStyle(.pgProminent)
+/// Modificator, nu `PrimitiveButtonStyle`: un `Button` construit în stil intră în recursivitate pe iOS 26.
+extension View {
+    func pgProminentButton() -> some View {
+        buttonStyle(.borderedProminent)
+            .foregroundStyle(PgColor.onAccent)
     }
-}
-
-extension PrimitiveButtonStyle where Self == PgProminentButtonStyle {
-    static var pgProminent: PgProminentButtonStyle { PgProminentButtonStyle() }
 }
 
 /// Eticheta lui „Gata” din bară (`.confirmationAction`). Pe iOS 26 sistemul îl desenează plin, în accent, cu

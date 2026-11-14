@@ -191,7 +191,7 @@ struct ScanView: View {
             Text("Puneți foaia pe o masă, cu lumină bună. Camera o decupează și o îndreaptă singură.")
         } actions: {
             Button("Deschide camera") { showsDocumentCamera = true }
-                .buttonStyle(.pgProminent)
+                .pgProminentButton()
                 .controlSize(.large)
                 .accessibilityIdentifier("scan.openDocumentCamera")
             Button("Completez manual") { model.startManualEntry() }
@@ -279,7 +279,7 @@ struct ScanView: View {
                 } label: {
                     Text("Încearcă din nou").frame(maxWidth: .infinity, minHeight: ControlHeight.caregiver - 16)
                 }
-                .buttonStyle(.pgProminent)
+                .pgProminentButton()
                 .accessibilityIdentifier("scan.retryButton")
 
                 Button {
@@ -287,7 +287,7 @@ struct ScanView: View {
                 } label: {
                     Text("Completez manual").frame(maxWidth: .infinity, minHeight: ControlHeight.caregiver - 16)
                 }
-                .buttonStyle(.pgProminent)
+                .pgProminentButton()
                 .accessibilityIdentifier("scan.manualButton")
             }
         }
@@ -306,7 +306,7 @@ struct ScanView: View {
                 Button("Deschide Setările") {
                     if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
                 }
-                .buttonStyle(.pgProminent)
+                .pgProminentButton()
             }
             Button("Completez manual") { model.startManualEntry() }
                 .buttonStyle(.bordered)

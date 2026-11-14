@@ -90,7 +90,7 @@ struct MedsListView: View {
                     Button("Încearcă din nou") {
                         Task { await store.refreshAll() }
                     }
-                    .buttonStyle(.pgProminent)
+                    .pgProminentButton()
                     .accessibilityIdentifier("meds.retryButton")
                 }
                 .accessibilityIdentifier("meds.error")
@@ -101,7 +101,7 @@ struct MedsListView: View {
                     Text("Scanați cutia sau rețeta, iar medicamentele apar aici.")
                 } actions: {
                     Button("Scanează un medicament") { isScanning = true }
-                        .buttonStyle(.pgProminent)
+                        .pgProminentButton()
                         .accessibilityIdentifier("meds.emptyScanButton")
                 }
                 .accessibilityIdentifier("meds.empty")
@@ -150,7 +150,7 @@ struct MedsListView: View {
             Button("Anulează") {
                 store.deletions.undo()
             }
-            .buttonStyle(.pgProminent)
+            .pgProminentButton()
             .accessibilityIdentifier("meds.undoButton")
         }
         .padding(.horizontal, Spacing.m)
@@ -176,7 +176,7 @@ struct MedsListView: View {
                     withPgAnimation(.pgStandard) { completion = nil }
                     showAlerts()
                 }
-                .buttonStyle(.pgProminent)
+                .pgProminentButton()
                 .accessibilityIdentifier("meds.savedBanner.showAlerts")
             }
         }

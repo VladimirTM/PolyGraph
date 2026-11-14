@@ -122,7 +122,7 @@ struct ShareSheet: View {
         } actions: {
             if audience == .caregiver {
                 Button("Încearcă din nou") { Task { await load() } }
-                    .buttonStyle(.pgProminent)
+                    .pgProminentButton()
                     .accessibilityIdentifier("share.retryButton")
             }
         }

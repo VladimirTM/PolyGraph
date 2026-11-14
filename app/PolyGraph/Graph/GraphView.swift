@@ -65,7 +65,7 @@ struct GraphView: View {
                     Button("Încearcă din nou") {
                         Task { await store.refreshAll() }
                     }
-                    .buttonStyle(.pgProminent)
+                    .pgProminentButton()
                     .accessibilityIdentifier("graph.retryButton")
                 }
             }

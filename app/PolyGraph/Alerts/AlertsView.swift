@@ -82,7 +82,7 @@ struct AlertsView: View {
                 Button("Încearcă din nou") {
                     Task { await store.refreshAll() }
                 }
-                .buttonStyle(.pgProminent)
+                .pgProminentButton()
                 .accessibilityIdentifier("alerts.retryButton")
             }
             .accessibilityIdentifier("alerts.error")

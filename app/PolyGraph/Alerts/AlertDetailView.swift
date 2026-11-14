@@ -119,7 +119,7 @@ struct AlertDetailView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity, minHeight: ControlHeight.caregiver)
                 }
-                .buttonStyle(.pgProminent)
+                .pgProminentButton()
                 .listRowInsets(EdgeInsets())
                 .listRowBackground(Color.clear)
                 .accessibilityIdentifier("alertDetail.understoodButton")

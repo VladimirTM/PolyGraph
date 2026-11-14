@@ -155,7 +155,7 @@ struct ConfirmSheet: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity, minHeight: ControlHeight.caregiver)
             }
-            .buttonStyle(.pgProminent)
+            .pgProminentButton()
             .disabled(isSaving || current.map { !$0.canSave || done.contains($0.id) } ?? true)
             .accessibilityIdentifier("confirm.saveButton")
 
