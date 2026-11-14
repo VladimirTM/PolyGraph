@@ -387,7 +387,12 @@ def portal_summary(cards: list[Json], today: date) -> Json:
                 "note": "de familie, 7 zile",
                 "tone": "attention" if escalated else None,
             },
-            {"id": "reviewed", "value": reviewed_value, "label": reviewed_label, "note": "trimise familiei"},
+            {
+                "id": "reviewed",
+                "value": reviewed_value,
+                "label": reviewed_label,
+                "note": "trimisă familiei" if reviewed == 1 else "trimise familiei",
+            },
         ],
         "attention": attention,
         "others": [c for c in cards if c not in attention],

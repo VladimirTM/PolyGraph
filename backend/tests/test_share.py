@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 from markupsafe import escape
 
 from polygraph.api import main
-from polygraph.share.view import adherence, plain_posology, plural
+from polygraph.share.view import adherence, plain_posology, plural, portal_summary
 from polygraph.store import Store
 
 H = {"X-Patient-Token": "demo-token"}
@@ -334,3 +334,17 @@ def test_adherence_counts_only_past_doses():
     doses = [{"med_id": "m1", "scheduled_at": f"2026-11-{d:02d}T08:00:00+02:00", "status": "taken"} for d in range(8, 15)]
     # 7 zile × dimineața; seara niciodată; azi seara e încă în viitor
     assert adherence([], doses, schedule, day, now) == round(100 * 7 / 13)
+
+
+@pytest.mark.parametrize(
+    ("reviewed", "label", "note"),
+    [
+        (0, "alerte revizuite", "trimise familiei"),
+        (1, "alertă revizuită", "trimisă familiei"),
+        (2, "alerte revizuite", "trimise familiei"),
+    ],
+)
+def test_reviewed_stat_agrees_with_its_count(reviewed, label, note):
+    cards = [{"open_grave": 0, "escalated": 0, "grave": reviewed}]
+    stat = next(s for s in portal_summary(cards, date(2026, 11, 14))["stats"] if s["id"] == "reviewed")
+    assert (stat["value"], stat["label"], stat["note"]) == (str(reviewed), label, note)
