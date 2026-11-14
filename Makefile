@@ -66,6 +66,6 @@ demo-warm: ## cache-ul Gemini pentru fotografiile și transcrierile demo (cu int
 demo-check: ## R4: scenariul demo prin API (B7); cu URL=http://127.0.0.1:8000 pe serverul din make demo
 	cd backend && uv run python -W ignore::DeprecationWarning -m polygraph.demo.check $(if $(URL),--url $(URL))
 
-review: ## R5: turul de review pe simulator, make review Q=Q1 (Q0)
+review: ## R5: turul de review pe simulator, make review Q=Q1 [SHARDS=… ONLY=… NO_VIDEO=1] (tools/review/README.md)
 	@test -x tools/review/run.sh || { echo "tools/review/run.sh vine la Q0"; exit 1; }
-	tools/review/run.sh $(Q)
+	tools/review/run.sh $(or $(Q),Q0)
