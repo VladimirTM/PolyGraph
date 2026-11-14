@@ -38,6 +38,7 @@ class ReviewTestCase: XCTestCase {
         super.setUp()
         continueAfterFailure = true
         XCUIDevice.shared.orientation = .portrait
+        // run.sh pune aspectul pe simulator înaintea rulării Dark (Q3-I4); asta doar îl confirmă
         XCUIDevice.shared.appearance = Self.variant == "Dark" ? .dark : .light
         // permisiunile de sistem (notificări, cameră) apar peste aplicație în momente greu de prevăzut
         addUIInterruptionMonitor(withDescription: "permisiuni") { alert in

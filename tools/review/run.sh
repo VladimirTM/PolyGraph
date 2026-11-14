@@ -59,6 +59,7 @@ cleanup() {
     for port in "${PORTS[@]}"; do lsof -t -nP -iTCP:"$port" -sTCP:LISTEN 2>/dev/null | xargs kill 2>/dev/null; done
     for i in "${!UDIDS[@]}"; do
         xcrun simctl ui "${UDIDS[$i]}" increase_contrast disabled 2>/dev/null
+        xcrun simctl ui "${UDIDS[$i]}" appearance light 2>/dev/null
         xcrun simctl status_bar "${UDIDS[$i]}" clear 2>/dev/null
         # clonele se opresc (memorie); simulatorul principal rămâne pornit
         [[ $i -gt 0 ]] && xcrun simctl shutdown "${UDIDS[$i]}" 2>/dev/null
@@ -146,8 +147,14 @@ run_video() {  # <shard>: „Am luat” și inelul microfonului, filmate în Lig
 run_shard() {
     local i="$1" tests="${SHARD_TESTS[$1]}" plain=() c
     [[ -n "$tests" ]] || return
-    for c in "${CONFIG_LIST[@]}"; do [[ "$c" != Contrast ]] && plain+=("$c"); done
+    for c in "${CONFIG_LIST[@]}"; do [[ "$c" != Contrast && "$c" != Dark ]] && plain+=("$c"); done
     [[ ${#plain[@]} -gt 0 ]] && run_tests "$i" "$((i + 1))-main" "$tests" "${plain[@]}"
+    # Dark tot ca setare a simulatorului: `XCUIDevice.appearance` din setUp singur lăsa capturi Light (Q3-I4)
+    if [[ " ${CONFIG_LIST[*]} " == *" Dark "* ]]; then
+        xcrun simctl ui "${UDIDS[$i]}" appearance dark
+        run_tests "$i" "$((i + 1))-dark" "$tests" Dark
+        xcrun simctl ui "${UDIDS[$i]}" appearance light
+    fi
     # Increase Contrast e o setare a simulatorului, deci Contrast rulează separat, după ce o pornim
     if [[ " ${CONFIG_LIST[*]} " == *" Contrast "* ]]; then
         xcrun simctl ui "${UDIDS[$i]}" increase_contrast enabled
