@@ -45,6 +45,7 @@ struct ContractsCodingTests {
         case "expected_schedule.json": try roundTrip(Schedule.self, data)
         case "checkin_demo.json": try roundTrip(CheckIn.self, data)
         case "gs1_cases.json": try roundTrip(GS1CasesFixture.self, data)
+        case "date_words.json": try roundTrip(DateWordsFixture.self, data)
         default:
             Issue.record("Fixture fără model în test: \(name). Adaugă-l în switch.")
         }
@@ -142,6 +143,18 @@ private struct GS1CasesFixture: Codable {
     }
 
     let description: String
+    let cases: [Case]
+}
+
+@MainActor
+private struct DateWordsFixture: Codable {
+    struct Case: Codable {
+        let at: String
+        let text: String
+    }
+
+    let now: String
+    let timezone: String
     let cases: [Case]
 }
 

@@ -121,3 +121,39 @@ struct SeniorButton: View {
         .accessibilityIdentifier(identifier)
     }
 }
+
+/// `.borderedProminent` cu eticheta în `PgColor.onAccent`. Stilul de sistem scrie cu alb, iar pe teal-ul
+/// deschis din Dark (și pe ecranul de scanare, mereu întunecat) contrastul e ~2:1 (Q3-16, auditul pe
+/// `scan.retryButton`); `onAccent` are variantele lui pentru light / dark / contrast mare.
+struct PgProminentButtonStyle: PrimitiveButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Button(role: configuration.role, action: configuration.trigger) {
+            configuration.label
+                .foregroundStyle(PgColor.onAccent)
+        }
+        .buttonStyle(.pgProminent)
+    }
+}
+
+extension PrimitiveButtonStyle where Self == PgProminentButtonStyle {
+    static var pgProminent: PgProminentButtonStyle { PgProminentButtonStyle() }
+}
+
+/// Eticheta lui „Gata” din bară (`.confirmationAction`). Pe iOS 26 sistemul îl desenează plin, în accent, cu
+/// text alb (același contrast slab ca mai sus, în Dark), deci eticheta ia `onAccent`; pe iOS 18 e text
+/// în accent pe bară și rămâne așa.
+struct BarConfirmLabel: View {
+    let title: String
+
+    init(_ title: String) {
+        self.title = title
+    }
+
+    var body: some View {
+        if #available(iOS 26, *) {
+            Text(title).foregroundStyle(PgColor.onAccent)
+        } else {
+            Text(title)
+        }
+    }
+}
