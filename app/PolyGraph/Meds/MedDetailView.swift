@@ -101,7 +101,7 @@ struct MedDetailView: View {
                 } else {
                     ForEach(alerts) { alert in
                         NavigationLink(value: CaregiverRoute.alert(id: alert.id, zoom: false)) {
-                            CompactAlertRow(alert: alert)
+                            CompactAlertRow(alert: alert, showsChevron: false)
                         }
                         .accessibilityIdentifier("medDetail.alert.\(alert.id)")
                     }

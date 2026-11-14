@@ -218,14 +218,15 @@ struct ScanView: View {
                 if model.isWorking, !isRecognized {
                     ProgressView()
                 }
+                // o singură pastilă care își schimbă textul, nu două suprapuse în trecere (Q3-35)
                 Text(text)
                     .font(.headline)
                     .multilineTextAlignment(.center)
+                    .contentTransition(.opacity)
             }
             .padding(.horizontal, Spacing.m)
             .padding(.vertical, Spacing.s)
             .background(.regularMaterial, in: Capsule())
-            .id(text)
             .transition(.opacity)
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("scan.guidance")

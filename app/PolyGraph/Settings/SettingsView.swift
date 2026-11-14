@@ -10,6 +10,8 @@ struct SettingsView: View {
     @State private var isChecking = false
     @State private var isResettingDemo = false
     @State private var confirmSignOut = false
+    /// rolul ales în foaie; se aplică abia la „Gata”, ca stiva deschisă să nu dispară sub deget (Q3-39)
+    @State private var pendingRole: AppRole = .senior
     @State private var demoAction: DemoAction?
     @State private var demoStatus: String?
     /// mesajul de succes al rețetei ORL rămâne pe ecran și dacă butonul e apăsat din nou (Q3-20)
@@ -57,7 +59,7 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    Picker("Cine folosește telefonul", selection: $settings.role) {
+                    Picker("Cine folosește telefonul", selection: $pendingRole) {
                         ForEach(AppRole.allCases) { role in
                             Text(role.title).tag(role)
                         }
@@ -67,10 +69,12 @@ struct SettingsView: View {
                 } header: {
                     Text("Cine folosește telefonul")
                 } footer: {
-                    Text("Pacient: un singur ecran, cu butoane mari. Aparținător: lista, alertele, graful și noutățile.")
+                    Text(pendingRole == settings.role
+                        ? "Pacient: un singur ecran, cu butoane mari. Aparținător: lista, alertele, graful și noutățile."
+                        : "Modul se schimbă când apăsați „Gata”.")
                 }
 
-                if settings.role == .senior {
+                if pendingRole == .senior {
                     Section {
                         Toggle("Citește cu voce tare la deschidere", isOn: $settings.speakOnOpen)
                             .accessibilityIdentifier("settings.speakOnOpenToggle")
@@ -129,6 +133,7 @@ struct SettingsView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button {
                         saveBaseURL()
+                        if store.settings.role != pendingRole { store.settings.role = pendingRole }
                         dismiss()
                     } label: {
                         BarConfirmLabel("Gata")
@@ -150,7 +155,10 @@ struct SettingsView: View {
                 Text("Datele rămân pe server. Telefonul va porni din nou de la început.")
             }
         }
-        .onAppear { baseURL = store.settings.baseURLString }
+        .onAppear {
+            baseURL = store.settings.baseURLString
+            pendingRole = store.settings.role
+        }
     }
 
     private func saveBaseURL() {

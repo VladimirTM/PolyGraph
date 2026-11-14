@@ -1731,6 +1731,8 @@ Criterii de acceptare: aceeași doză ratată arată „joi, 12 nov., 14:00” �
 **Teste**
 - [ ] T-Q3F5-01 `make review Q=Q3f5 ONLY="testCaregiverMeds testScanBoxFake testGraph testOnboarding" CONFIGS="Light AX" NO_VIDEO=1`: capturile arată schimbările.
 
+> Implementat pe 14.11.2026 (`chore/q3f5-polish`, pornit din `fix/q3f4-caregiver-consistency`): Q3-29 (fără chevronul propriu în listă), Q3-32 („Arată medicului” ca `qrcode` cu etichetă VoiceOver), Q3-40 (ascuns cu lista goală), Q3-41 („Anulează” la înălțimea aparținătorului), Q3-33 (analogia doar în `detail`, fără cardul dublu), Q3-35 (o singură pastilă de status, „Stomac gol” în segment, cu eticheta VoiceOver întreagă), Q3-22 (butoanele onboarding-ului în scroll la AX, textul pe mai multe rânduri), Q3-28 (`confirm.unusualStrengthWarning` peste 10× catalogul sau peste 2 g, cu test unitar), Q3-38 (`graph.empty`, „Graful apare după primul medicament”), Q3-39 (rolul se schimbă la „Gata”). Amânate: Q3-36 (tranziția „Am luat”, de lucrat pe simulator cu capturile de cadre) și Q3-37 (fixture-ul are `med_07, med_04`, solverul sortează după id; schimbarea fixture-ului atinge testele senior). Turul T-Q3F5-01 rămâne pentru testarea de la final.
+
 ##### Q3F6 · Regresia pentru Q4
 
 **Responsabil:** Dev A (agent) · **Depinde de:** Q3F1–Q3F4 · **Durată:** 30 min · **Branch:** `test/q3f6-review-tour`

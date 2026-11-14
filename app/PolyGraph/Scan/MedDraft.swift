@@ -156,6 +156,16 @@ final class MedDraft: Identifiable {
         return substances.count > 1 || Self.milligrams(in: strengthText) == nil
     }
 
+    /// Concentrația scrisă de mână e de peste 10 ori mai mare sau mai mică decât cea din catalog (sau, fără
+    /// catalog, peste 2 g): „9999 mg” nu se salvează în tăcere (Q3-28). Doar avertizare, salvarea rămâne posibilă.
+    var strengthLooksUnusual: Bool {
+        guard strengthEdited, let mg = Self.milligrams(in: strengthText), mg > 0 else { return false }
+        guard substances.count == 1, let usual = original.substances.first?.strengthMg, usual > 0 else {
+            return mg > 2000
+        }
+        return mg / usual > 10 || usual / mg > 10
+    }
+
     /// „4 mg” → 4, „75 mcg” → 0,075, „2,5 mg” → 2,5, „1 g” → 1000; altceva → nil.
     nonisolated static func milligrams(in text: String) -> Double? {
         let pattern = "(\\d+(?:[.,]\\d+)?)\\s*(mg|mcg|µg|μg|g)(?![a-z])"
@@ -256,7 +266,8 @@ extension WithFood {
     /// Etichetele scurte din controlul segmentat.
     var shortLabel: String {
         switch self {
-        case .emptyStomach: "Pe stomacul gol"
+        // scurt, ca să încapă în segment (Q3-35); VoiceOver citește `instruction`
+        case .emptyStomach: "Stomac gol"
         case .beforeMeal: "Înainte"
         case .withMeal: "La masă"
         case .afterMeal: "După"

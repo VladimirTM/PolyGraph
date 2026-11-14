@@ -28,10 +28,15 @@ struct MedsListView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Arată medicului") { isSharing = true }
+                // pictogramă, ca titlul să nu fie strivit (Q3-32); ascuns cât lista e goală (Q3-40)
+                if !store.visibleMeds.isEmpty {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button { isSharing = true } label: {
+                            Label("Arată medicului", systemImage: "qrcode")
+                        }
                         .accessibilityHint("Deschide codul QR pentru medicul de familie")
                         .accessibilityIdentifier("meds.shareButton")
+                    }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -147,8 +152,10 @@ struct MedsListView: View {
             Text("Am șters \(pending.name).")
                 .font(.subheadline.weight(.semibold))
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Button("Anulează") {
+            Button {
                 store.deletions.undo()
+            } label: {
+                Text("Anulează").frame(minHeight: ControlHeight.caregiver - 16)
             }
             .pgProminentButton()
             .accessibilityIdentifier("meds.undoButton")
