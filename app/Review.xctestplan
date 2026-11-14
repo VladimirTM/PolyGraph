@@ -1,0 +1,94 @@
+{
+  "configurations": [
+    {
+      "id": "30353145-983F-4D09-9C63-E33FB33F2119",
+      "name": "Light",
+      "options": {
+        "environmentVariableEntries": [
+          {
+            "key": "PG_REVIEW_VARIANT",
+            "value": "Light"
+          }
+        ]
+      }
+    },
+    {
+      "id": "F4A27EAA-33ED-48F3-9465-B96D655FF22F",
+      "name": "Dark",
+      "options": {
+        "environmentVariableEntries": [
+          {
+            "key": "PG_REVIEW_VARIANT",
+            "value": "Dark"
+          }
+        ]
+      }
+    },
+    {
+      "id": "000CB456-5771-4CA1-9CCB-D5956B1DEF11",
+      "name": "AX",
+      "options": {
+        "commandLineArgumentEntries": [
+          {
+            "argument": "-UIPreferredContentSizeCategoryName UICTContentSizeCategoryAccessibilityXL"
+          }
+        ],
+        "environmentVariableEntries": [
+          {
+            "key": "PG_REVIEW_VARIANT",
+            "value": "AX"
+          }
+        ]
+      }
+    },
+    {
+      "id": "64871191-D753-4DBC-9843-A70007C547E3",
+      "name": "Motion",
+      "options": {
+        "environmentVariableEntries": [
+          {
+            "key": "PG_REVIEW_VARIANT",
+            "value": "Motion"
+          },
+          {
+            "key": "PG_REDUCE_MOTION",
+            "value": "1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "3F90FCF3-164C-4DBA-9C4F-B1823367FBA1",
+      "name": "Contrast",
+      "options": {
+        "environmentVariableEntries": [
+          {
+            "key": "PG_REVIEW_VARIANT",
+            "value": "Contrast"
+          }
+        ]
+      }
+    }
+  ],
+  "defaultOptions": {
+    "defaultTestExecutionTimeAllowance": 180,
+    "systemAttachmentLifetime": "deleteOnSuccess",
+    "targetForVariableExpansion": {
+      "containerPath": "container:PolyGraph.xcodeproj",
+      "identifier": "D2AD676A30A735BF005E13ED",
+      "name": "PolyGraph"
+    },
+    "testTimeoutsEnabled": true,
+    "userAttachmentLifetime": "keepAlways"
+  },
+  "testTargets": [
+    {
+      "target": {
+        "containerPath": "container:PolyGraph.xcodeproj",
+        "identifier": "D2AD678130A735C1005E13ED",
+        "name": "PolyGraphUITests"
+      }
+    }
+  ],
+  "version": 1
+}
