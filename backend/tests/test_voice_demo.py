@@ -107,6 +107,7 @@ TRANSCRIPTS = sorted((ROOT / "demo" / "transcripts").glob("*.txt"))
 # Ce trebuie să iasă din fiecare transcriere reală (demo/transcripts/README.md spune ce s-a rostit).
 TRANSCRIPT_EXPECTED = {
     "dictare_01_pot_sa_iau.txt": {"intent": "can_i_take", "symptoms": [], "drug": "Algocalmin"},
+    "dictare_02_ma_simt_bine.txt": {"intent": "other", "symptoms": [], "drug": None},
 }
 
 
