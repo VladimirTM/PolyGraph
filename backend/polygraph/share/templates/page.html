@@ -2,6 +2,14 @@
 {% block title %}{{ patient.name }} · Portalul medicului de familie{% endblock %}
 {% block body_class %}page{% endblock %}
 
+{# butonul „i”: detaliile tehnice stau un nivel mai jos, sub elementul pe care îl explică #}
+{% macro info(label) %}
+<details class="info">
+  <summary class="info-btn" aria-label="{{ label }}" title="Mai multe informații"><span aria-hidden="true">i</span></summary>
+  <div class="info-panel">{{ caller() }}</div>
+</details>
+{% endmacro %}
+
 {% macro alert_card(a) %}
 <article class="alert sev-{{ a.severity }}{% if a.reviewed %} is-reviewed{% endif %}" id="alert-{{ a.id }}" data-alert-id="{{ a.id }}">
   <header class="alert-head">
@@ -11,23 +19,26 @@
   <h3 class="alert-title">{{ a.title }}</h3>
   <p class="alert-meds">{{ a.meds | join(" · ") }}</p>
   <p class="alert-rec">{{ a.recommendation }}</p>
-  <p class="alert-source">
-    Sursa: {% if a.source.url %}<a href="{{ a.source.url }}" rel="noopener noreferrer" target="_blank">{{ a.source_label }}</a>{% else %}{{ a.source_label }}{% endif %}
-    {% if a.basis == "class_analogy" %}<span class="tag">prin analogie de clasă{% if a.analogy %} ({{ a.analogy.via }}, {{ a.analogy.atc4 }}){% endif %}: de confirmat</span>{% endif %}
-  </p>
-  <details class="alert-details">
-    <summary>Mecanism și referință</summary>
-    <p>{{ a.detail }}</p>
-    {% if a.source.ref %}<p class="small">{{ a.source.ref }}</p>{% endif %}
-    <p class="small">Cod alertă: {{ a.id }}</p>
-  </details>
+  {% call info("Mai multe despre: " ~ a.title) %}
+    <dl class="facts">
+      <dt>De ce</dt><dd>{{ a.detail }}</dd>
+      <dt>Sursa</dt>
+      <dd>{% if a.source.url %}<a href="{{ a.source.url }}" rel="noopener noreferrer" target="_blank">{{ a.source_label }}</a>{% else %}{{ a.source_label }}{% endif %}{% if a.source.ref %}<br><span class="small muted">{{ a.source.ref }}</span>{% endif %}</dd>
+      {% if a.basis == "class_analogy" %}<dt>De confirmat</dt><dd>Dedusă prin analogie de clasă{% if a.analogy %} ({{ a.analogy.via }}, {{ a.analogy.atc4 }}){% endif %}, nu dintr-o sursă despre exact aceste medicamente.</dd>{% endif %}
+      <dt>Cod alertă</dt><dd class="mono">{{ a.id }}</dd>
+    </dl>
+  {% endcall %}
+  <p class="alert-source">Sursa: {{ a.source_label }}{% if a.basis == "class_analogy" %} · <span class="tag">de confirmat</span>{% endif %}</p>
   <div class="review">
     {% if a.reviewed %}
     <p class="reviewed-state" role="status">{{ a.decision_label or "Revizuit" }} · {{ a.resolution_at }}{% if a.resolution.note %}<br><span class="note">„{{ a.resolution.note }}”</span>{% endif %}</p>
     {% else %}
     <form class="review-form" method="post" action="{{ base }}/alerts/{{ a.id }}/review" novalidate>
-      <label class="visually-hidden" for="note-{{ a.id }}">Notă pentru familie (opțional)</label>
-      <input class="note-input" id="note-{{ a.id }}" name="note" type="text" maxlength="1000" autocomplete="off" placeholder="Notă pentru familie (opțional)">
+      <details class="note-toggle">
+        <summary>Adaugă o notă pentru familie</summary>
+        <label class="visually-hidden" for="note-{{ a.id }}">Notă pentru familie (opțional)</label>
+        <input class="note-input" id="note-{{ a.id }}" name="note" type="text" maxlength="1000" autocomplete="off" placeholder="Notă pentru familie (opțional)">
+      </details>
       <div class="decisions" role="group" aria-label="Decizia dumneavoastră">
         <button class="btn" type="submit" name="decision" value="keep">Menține</button>
         <button class="btn btn-secondary" type="submit" name="decision" value="change_at_visit">Modific la consultație</button>
@@ -55,58 +66,46 @@
 
 <main class="content">
   <section class="summary" aria-labelledby="h-summary">
-    <h2 id="h-summary" class="visually-hidden">Rezumat</h2>
-    <p class="summary-line">{% for s in summary %}<span>{{ s }}</span>{% if not loop.last %}<span class="dot" aria-hidden="true"> · </span>{% endif %}{% endfor %}</p>
-    <p class="small muted">Actualizată la {{ generated }}. Medicamentele sunt introduse de familie din cutii și rețete; verificați-le cu pacientul la consultație.</p>
+    <h2 id="h-summary" class="visually-hidden">Rezumat: {{ summary | join(" · ") }}</h2>
+    <ul class="stats">
+      {% for s in stats %}
+      <li class="stat{% if s.tone %} tone-{{ s.tone }}{% endif %}" id="stat-{{ s.id }}">
+        <p class="stat-value">{{ s.value }}</p>
+        <p class="stat-label">{{ s.label }}</p>
+        <p class="stat-note">{{ s.note }}</p>
+        {% if s.info %}{% call info("Ce înseamnă " ~ s.label ~ "?") %}<p>{{ s.info }}</p>{% endcall %}{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="small muted summary-foot">Actualizată la {{ generated }}. Medicamentele sunt introduse de familie din cutii și rețete; verificați-le cu pacientul la consultație.</p>
   </section>
 
   <section aria-labelledby="h-grave">
     <h2 id="h-grave">Alerte grave</h2>
+    <p class="section-lead">De discutat cu prioritate. Alegeți o decizie pe fiecare; familia o vede în aplicație.</p>
     {% for a in grave %}{{ alert_card(a) }}{% else %}<p class="muted">Nicio alertă gravă.</p>{% endfor %}
   </section>
 
   <section aria-labelledby="h-meds">
     <h2 id="h-meds">Medicamente</h2>
-    <div class="table-wrap">
-      <table class="meds">
-        <thead><tr><th scope="col">Medicament</th><th scope="col">DCI</th><th scope="col">ATC</th><th scope="col">Posologie</th><th scope="col">Prescriptor</th><th scope="col">De când</th></tr></thead>
-        <tbody>
-        {% for m in meds %}
-          <tr><th scope="row">{{ m.name }}</th><td>{{ m.dci }}</td><td class="mono">{{ m.atc }}</td><td>{{ m.posology }}</td><td>{{ m.prescriber }}</td><td class="nowrap">{{ m.since }}</td></tr>
-        {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  {% if other %}
-  <section aria-labelledby="h-other">
-    <h2 id="h-other">Celelalte alerte <span class="count">{{ other | length }}</span></h2>
-    {% for a in other %}{{ alert_card(a) }}{% endfor %}
-  </section>
-  {% endif %}
-
-  <section aria-labelledby="h-graph" class="no-print">
-    <h2 id="h-graph">Graful terapeutic</h2>
-    <p class="small muted">Medicamentele și interacțiunile dintre ele; muchiile colorate sunt alerte. Atingeți o muchie ca să ajungeți la alertă.</p>
-    <div class="graph-frame">
-      <div id="graph" class="graph" role="img" aria-label="Graful terapeutic: {{ meds | length }} medicamente și interacțiunile dintre ele; lista alertelor de mai sus conține aceleași informații."></div>
-    </div>
-    <p><a href="{{ base }}/graph">Deschideți graful pe tot ecranul</a></p>
-  </section>
-
-  <section aria-labelledby="h-checkins">
-    <h2 id="h-checkins">Cum s-a simțit în ultimele 7 zile</h2>
-    {% for ci in checkins %}
-    <div class="checkin{% if ci.grave %} is-escalated{% endif %}">
-      <p class="checkin-when">{{ ci.when }}{% if ci.to_family %} · <strong>semnalat familiei</strong>{% endif %}</p>
-      <p class="checkin-text">„{{ ci.transcript }}”</p>
-      {% if ci.answer %}<p class="small">Răspuns: {{ ci.answer }}</p>{% endif %}
-      {% if ci.symptoms %}<p class="small">Simptome: {% for s in ci.symptoms %}{{ s.label }}{% if not loop.last %}, {% endif %}{% endfor %}</p>{% endif %}
-    </div>
-    {% else %}
-    <p class="muted">Niciun check-in în ultimele 7 zile.</p>
-    {% endfor %}
+    <p class="section-lead">Ce ia acum și cum. Substanța activă și codul ATC sunt la „i”.</p>
+    <ul class="med-list">
+      {% for m in meds %}
+      <li class="med" id="med-{{ m.id }}">
+        <p class="med-name">{{ m.name }}</p>
+        <p class="med-how">{{ m.how }}</p>
+        <p class="med-who">{{ m.who }}</p>
+        {% call info("Mai multe despre " ~ m.name) %}
+          <dl class="facts">
+            <dt>Substanța activă (DCI)</dt><dd>{{ m.dci }}</dd>
+            <dt>Cod ATC</dt><dd class="mono">{{ m.atc }}</dd>
+            <dt>Pe rețetă</dt><dd>{{ m.posology }}</dd>
+            <dt>Din</dt><dd>{{ m.since }}</dd>
+          </dl>
+        {% endcall %}
+      </li>
+      {% endfor %}
+    </ul>
   </section>
 
   <section aria-labelledby="h-schedule">
@@ -120,6 +119,42 @@
       {% endfor %}
     </ol>
     {% for u in schedule.unsatisfied %}<p class="small">Nu s-a putut respecta: {{ u.meds | join(" + ") }}: {{ u.reason }}</p>{% endfor %}
+  </section>
+
+  <section aria-labelledby="h-checkins">
+    <h2 id="h-checkins">Cum s-a simțit în ultimele 7 zile</h2>
+    <div class="card-list">
+    {% for ci in checkins %}
+    <div class="checkin{% if ci.grave %} is-escalated{% endif %}">
+      <p class="checkin-when">{{ ci.when }}{% if ci.to_family %} · <strong>semnalat familiei</strong>{% endif %}</p>
+      <p class="checkin-text">„{{ ci.transcript }}”</p>
+      {% if ci.answer %}<p class="small">Răspuns: {{ ci.answer }}</p>{% endif %}
+      {% if ci.symptoms %}<p class="small">Simptome: {% for s in ci.symptoms %}{{ s.label }}{% if not loop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+    </div>
+    {% else %}
+    <p class="muted">Niciun check-in în ultimele 7 zile.</p>
+    {% endfor %}
+    </div>
+  </section>
+
+  {% if other %}
+  <section aria-labelledby="h-other">
+    <h2 id="h-other">Celelalte alerte <span class="count">{{ other | length }}</span></h2>
+    <p class="section-lead">Interacțiuni moderate și lucruri bune de știut. Nu sunt urgente.</p>
+    <details class="more">
+      <summary class="btn btn-secondary"><span class="when-closed">Arată {{ "alerta" if other | length == 1 else "cele " ~ other_label }}</span><span class="when-open">Ascunde</span></summary>
+      <div class="more-body">{% for a in other %}{{ alert_card(a) }}{% endfor %}</div>
+    </details>
+  </section>
+  {% endif %}
+
+  <section aria-labelledby="h-graph" class="no-print">
+    <h2 id="h-graph">Graful terapeutic</h2>
+    <p class="section-lead">Medicamentele și legăturile dintre ele; liniile colorate sunt alerte. Atingeți o linie ca să ajungeți la alertă.</p>
+    <div class="graph-frame">
+      <div id="graph" class="graph" role="img" aria-label="Graful terapeutic: {{ meds | length }} medicamente și interacțiunile dintre ele; lista alertelor de mai sus conține aceleași informații."></div>
+    </div>
+    <p class="graph-link"><a href="{{ base }}/graph">Deschideți graful pe tot ecranul</a></p>
   </section>
 </main>
 

@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 from markupsafe import escape
 
 from polygraph.api import main
-from polygraph.share.view import adherence, plural
+from polygraph.share.view import adherence, plain_posology, plural, portal_summary
 from polygraph.store import Store
 
 H = {"X-Patient-Token": "demo-token"}
@@ -106,6 +106,12 @@ def test_patient_list_puts_pending_alerts_first(doctor):
         assert name in html
     assert html.index("Maria, 78 de ani") < html.index("Ioana, 74 de ani")
     assert "5 de revizuit" in html
+    # cei cu alerte nerevizuite stau în „De revizuit”, ceilalți dedesubt; cifrele de sus adună toată lista
+    order = [html.index(s) for s in ('id="h-attention"', "Maria, 78 de ani", 'id="h-others"', "Ioana, 74 de ani")]
+    assert order == sorted(order)
+    assert "7 alerte grave de revizuit la 2 pacienți." in html
+    pending = html[html.index('id="stat-pending"') :]
+    assert '<p class="stat-value">7</p>' in pending[: pending.index("</li>")]
 
 
 def test_logout_ends_the_session(doctor):
@@ -172,6 +178,33 @@ def test_patient_page_has_summary_alerts_and_sections(doctor):
         assert section in html
     assert "Sintrom 4 mg" in html and "acenocumarol" in html and "B01AA07" in html
     assert "Menține" in html and "Modific la consultație" in html and "Trimit la specialist" in html
+
+
+def test_patient_page_is_plain_with_details_behind_info(doctor):
+    # calea comună prima: cifre mari cu o frază simplă; DCI, ATC, mecanismul și sursa completă stau în „i”
+    html = doctor.get(PORTAL).text
+    stats = html[html.index('class="stats"') : html.index("</ul>", html.index('class="stats"'))]
+    for sid, value, label in (("meds", "8", "medicamente"), ("grave", "5", "alerte grave"), ("acb", "3", "scor ACB")):
+        tile = stats[stats.index(f'id="stat-{sid}"') :]
+        assert f'<p class="stat-value">{value}</p>' in tile and f'<p class="stat-label">{label}</p>' in tile
+    assert "5 de revizuit" in stats and "efect anticolinergic semnificativ" in stats
+    sintrom = html[html.index('id="med-med_01"') : html.index("</li>", html.index('id="med-med_01"'))]
+    assert "½ comprimat seara" in sintrom and "Prescris de: cardiologie" in sintrom
+    info = sintrom[sintrom.index('class="info"') :]
+    assert "acenocumarol" in info and "B01AA07" in info and "1/2 cp seara" in info
+    cards = html.count('<article class="alert')
+    assert html.count('class="info-btn"') == cards + 8 + 2  # fiecare alertă, fiecare medicament, ACB și aderența
+    more = html[html.index('<details class="more">') :]
+    assert "Arată cele 22 de alerte" in more and more.count('<article class="alert') == 22
+
+
+def test_plain_posology():
+    assert plain_posology("1-0-1, după masă") == "1 dimineața, 1 seara · după masă"
+    assert plain_posology("0-1-0") == "1 la prânz"
+    assert plain_posology("1/2-0-1/2") == "½ dimineața, ½ seara"
+    assert plain_posology("0-0-0-1") == "1 la culcare"
+    assert plain_posology("1/2 cp seara") == "½ comprimat seara"
+    assert plain_posology("la nevoie, max 3/zi") == "la nevoie, max 3/zi"
 
 
 def test_pages_keep_medical_data_private(doctor):
@@ -301,3 +334,17 @@ def test_adherence_counts_only_past_doses():
     doses = [{"med_id": "m1", "scheduled_at": f"2026-11-{d:02d}T08:00:00+02:00", "status": "taken"} for d in range(8, 15)]
     # 7 zile × dimineața; seara niciodată; azi seara e încă în viitor
     assert adherence([], doses, schedule, day, now) == round(100 * 7 / 13)
+
+
+@pytest.mark.parametrize(
+    ("reviewed", "label", "note"),
+    [
+        (0, "alerte revizuite", "trimise familiei"),
+        (1, "alertă revizuită", "trimisă familiei"),
+        (2, "alerte revizuite", "trimise familiei"),
+    ],
+)
+def test_reviewed_stat_agrees_with_its_count(reviewed, label, note):
+    cards = [{"open_grave": 0, "escalated": 0, "grave": reviewed}]
+    stat = next(s for s in portal_summary(cards, date(2026, 11, 14))["stats"] if s["id"] == "reviewed")
+    assert (stat["value"], stat["label"], stat["note"]) == (str(reviewed), label, note)
