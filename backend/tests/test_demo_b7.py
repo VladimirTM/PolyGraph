@@ -192,6 +192,9 @@ def test_reset_removes_the_old_extra_patient(client):
 
 
 def test_root_explains_where_the_address_goes(client):
+    # pagina de prezentare păstrează adresa serverului pentru aplicație (ținta QR-ului din `make demo`)
     r = client.get("/")
-    assert r.status_code == 200 and r.headers["content-type"].startswith("text/plain")
+    assert r.status_code == 200 and r.headers["content-type"].startswith("text/html")
     assert "Setări → adresa serverului" in r.text and "http://testserver" in r.text
+    assert 'href="/portal"' in r.text and 'id="conectare"' in r.text
+    assert "Nu pune diagnostice" in r.text and "<script>" not in r.text
