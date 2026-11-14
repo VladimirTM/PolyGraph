@@ -3,6 +3,7 @@ Funcții pure; rutele sunt în polygraph/api/main.py."""
 
 from __future__ import annotations
 
+import re
 from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -52,6 +53,19 @@ QUESTION = {
 }
 MAX_QUESTIONS = 7
 
+# explicațiile din butonul „i” al rezumatului; fișa arată doar cifra și o frază simplă
+ACB_INFO = (
+    "Scala ACB adună efectul anticolinergic al fiecărui medicament (0–3 puncte pe medicament). "
+    "Un total de 3 sau mai mult e considerat relevant la vârstnici: risc mai mare de confuzie, constipație și căderi."
+)
+ADHERENCE_INFO = (
+    "Aderența: dozele confirmate cu „Am luat” în aplicație, din cele programate în ultimele 7 zile (azi, doar până acum). "
+    "O doză neconfirmată poate fi luată, dar neînregistrată."
+)
+SLOTS = ("dimineața", "la prânz", "seara", "la culcare")
+_QTY = r"(?:\d+(?:[.,/]\d+)?|½)"
+_SCHEME = re.compile(rf"^\s*({_QTY}(?:\s*-\s*{_QTY}){{2,3}})\s*(.*)$")
+
 
 def plural(n: int, one: str, many: str) -> str:
     """„1 medicament”, „9 medicamente”, „20 de medicamente”."""
@@ -93,11 +107,28 @@ def prescriber(med: Json) -> str | None:
     return p.get("name") or p.get("specialty")
 
 
+def plain_posology(raw: str) -> str:
+    """Posologia în cuvinte: „1-0-1, după masă” → „1 dimineața, 1 seara · după masă”; „cp” scris întreg.
+    Ce nu e în schema dimineață-prânz-seară rămâne cum l-a scris medicul."""
+    text = raw
+    m = _SCHEME.match(raw)
+    if m:
+        qty = [q.strip() for q in m.group(1).split("-")]
+        parts = [f"{q} {SLOTS[i]}" for i, q in enumerate(qty) if q.strip("0.,") != ""]
+        if parts:
+            rest = m.group(2).lstrip(",; ").strip()
+            text = ", ".join(parts) + (f" · {rest}" if rest else "")
+    text = re.sub(r"\bcp\b", "comprimat", text)
+    return re.sub(r"(?<![\d/])1/2(?![\d/])", "½", text)
+
+
 def med_row(med: Json) -> Json:
     dosage = med.get("dosage") or {}
     posology = dosage.get("raw") or ""
+    how = plain_posology(posology)
     if dosage.get("as_needed"):
         posology = f"{posology} (la nevoie)" if posology else "la nevoie"
+        how = f"{how} (la nevoie)" if how else "la nevoie"
     subs = med.get("substances") or []
     return {
         "id": med["id"],
@@ -105,7 +136,9 @@ def med_row(med: Json) -> Json:
         "dci": ", ".join(ro_name(s.get("inn"), s.get("dci")) for s in subs) or "–",
         "atc": ", ".join(s.get("atc") or "–" for s in subs) or "–",
         "posology": posology or "–",
+        "how": how or "–",
         "prescriber": prescriber(med) or "fără rețetă / nespecificat",
+        "who": f"Prescris de: {prescriber(med)}" if prescriber(med) else "Fără rețetă (sau prescriptor nespecificat)",
         "since": ro_date(med.get("start_date")),
     }
 
@@ -212,6 +245,35 @@ def questions(alerts: list[Json], age: int | None, acb: int) -> list[str]:
     return out[:MAX_QUESTIONS]
 
 
+def _count(n: int, one: str, many: str) -> tuple[str, str]:
+    value, _, label = plural(n, one, many).partition(" ")
+    return value, label
+
+
+def summary_stats(meds: int, doctors: int, grave: list[Json], acb: int, adh: int | None) -> list[Json]:
+    """Cele patru cifre din capul fișei, fiecare cu o frază pe înțelesul oricui; termenii tehnici stau în „i”."""
+    open_grave = sum(1 for a in grave if not a["reviewed"])
+    meds_value, meds_label = _count(meds, "medicament", "medicamente")
+    grave_value, grave_label = _count(len(grave), "alertă gravă", "alerte grave")
+    if open_grave:
+        grave_note, grave_tone = f"{open_grave} de revizuit", "attention"
+    else:
+        grave_note, grave_tone = ("toate revizuite" if grave else "nimic urgent"), None
+    acb_note = "efect anticolinergic " + ("absent" if acb == 0 else "mic" if acb < 3 else "semnificativ")
+    return [
+        {"id": "meds", "value": meds_value, "label": meds_label, "note": f"de la {plural(doctors, 'medic', 'medici')}"},
+        {"id": "grave", "value": grave_value, "label": grave_label, "note": grave_note, "tone": grave_tone},
+        {"id": "acb", "value": str(acb), "label": "scor ACB", "note": acb_note, "info": ACB_INFO},
+        {
+            "id": "adherence",
+            "value": f"{adh}%" if adh is not None else "–",
+            "label": "doze luate",
+            "note": "în ultimele 7 zile" if adh is not None else "încă nicio doză înregistrată",
+            "info": ADHERENCE_INFO,
+        },
+    ]
+
+
 def page_context(
     patient: Json,
     meds: list[Json],
@@ -239,6 +301,7 @@ def page_context(
         f"ACB {analysis['acb_total']}",
         f"aderență {adh}% în ultimele 7 zile" if adh is not None else "aderență: încă nicio doză înregistrată",
     ]
+    stats = summary_stats(len(active), len(doctors), grave, analysis["acb_total"], adh)
     by_prescriber: dict[str, list[Json]] = {}
     for m in active:
         by_prescriber.setdefault(prescriber(m) or "Fără rețetă / nespecificat", []).append(med_row(m))
@@ -246,10 +309,12 @@ def page_context(
         "patient": patient,
         "age": age,
         "summary": summary,
+        "stats": stats,
         "meds": [med_row(m) for m in active],
         "by_prescriber": sorted(by_prescriber.items(), key=lambda kv: kv[0].startswith("Fără")),
         "grave": grave,
         "other": [a for a in alerts if not a["grave"]],
+        "other_label": plural(sum(1 for a in alerts if not a["grave"]), "alertă", "alerte"),
         "alerts": alerts,
         "acb": analysis["acb_total"],
         "graph": analysis["graph"],
