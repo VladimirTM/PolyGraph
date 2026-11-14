@@ -198,3 +198,6 @@ def test_root_explains_where_the_address_goes(client):
     assert "Setări → adresa serverului" in r.text and "http://testserver" in r.text
     assert 'href="/portal"' in r.text and 'id="conectare"' in r.text
     assert "Nu pune diagnostice" in r.text and "<script>" not in r.text
+    assert 'src="/static/share/logo.svg"' in r.text and 'rel="icon"' in r.text
+    logo = client.get("/static/share/logo.svg")
+    assert logo.status_code == 200 and logo.headers["content-type"].startswith("image/svg+xml")

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- iconița aplicației (app/PolyGraph/Assets.xcassets/AppIcon), redesenată vectorial pentru web -->
+  <style>
+    .bg { fill: #0e6b68; } .node { fill: #ffffff; } .edge { stroke: #ffffff; } .hub { fill: #f2d6a2; } .alert { stroke: #f2d6a2; }
+    @media (prefers-color-scheme: dark) { .bg { fill: #0c201f; } .node { fill: #5cc2bc; } .edge { stroke: #5cc2bc; } }
+  </style>
+  <rect class="bg" width="1024" height="1024" rx="228"/>
+  <g class="edge" stroke-width="22" stroke-linecap="round">
+    <line x1="512" y1="511" x2="512" y2="212"/><line x1="512" y1="511" x2="226" y2="418"/>
+    <line x1="512" y1="511" x2="798" y2="418"/><line x1="512" y1="511" x2="336" y2="754"/>
+    <line x1="512" y1="511" x2="688" y2="754"/>
+  </g>
+  <line class="alert" x1="798" y1="418" x2="688" y2="754" stroke-width="28" stroke-linecap="round"/>
+  <g class="node">
+    <circle cx="512" cy="212" r="62"/><circle cx="226" cy="418" r="62"/><circle cx="798" cy="418" r="62"/>
+    <circle cx="336" cy="754" r="62"/><circle cx="688" cy="754" r="62"/>
+  </g>
+  <circle class="hub" cx="512" cy="511" r="94"/>
+</svg>
