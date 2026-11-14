@@ -22,6 +22,11 @@ struct MedsListView: View {
             .navigationTitle("Medicamente")
             .navigationBarTitleDisplayMode(.large)
             .refreshable { await store.refreshAll() }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if store.lastError != nil && !store.visibleMeds.isEmpty && !store.isLoading {
+                    StaleBanner(identifier: "meds") { await store.refreshAll() }
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Arată medicului") { isSharing = true }
@@ -85,7 +90,7 @@ struct MedsListView: View {
                     Button("Încearcă din nou") {
                         Task { await store.refreshAll() }
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.pgProminent)
                     .accessibilityIdentifier("meds.retryButton")
                 }
                 .accessibilityIdentifier("meds.error")
@@ -96,7 +101,7 @@ struct MedsListView: View {
                     Text("Scanați cutia sau rețeta, iar medicamentele apar aici.")
                 } actions: {
                     Button("Scanează un medicament") { isScanning = true }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.pgProminent)
                         .accessibilityIdentifier("meds.emptyScanButton")
                 }
                 .accessibilityIdentifier("meds.empty")
@@ -145,7 +150,7 @@ struct MedsListView: View {
             Button("Anulează") {
                 store.deletions.undo()
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.pgProminent)
             .accessibilityIdentifier("meds.undoButton")
         }
         .padding(.horizontal, Spacing.m)
@@ -166,12 +171,12 @@ struct MedsListView: View {
             Text(Self.completionText(outcome))
                 .font(.subheadline.weight(.semibold))
                 .frame(maxWidth: .infinity, alignment: .leading)
-            if outcome.newAlerts > 0 {
+            if !outcome.newAlerts.isEmpty {
                 Button("Vezi") {
                     withPgAnimation(.pgStandard) { completion = nil }
                     showAlerts()
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.pgProminent)
                 .accessibilityIdentifier("meds.savedBanner.showAlerts")
             }
         }
@@ -184,17 +189,11 @@ struct MedsListView: View {
         .accessibilityIdentifier("meds.savedBanner")
     }
 
-    /// „Am salvat. 2 alerte noi”, „Am salvat 3 medicamente. O alertă nouă”
+    /// „Am salvat. 2 alerte grave noi”, „Am salvat 3 medicamente. O alertă gravă nouă și 2 de discutat”
+    /// (se numără doar ce vede aparținătorul, ca în portal: Q3-27)
     static func completionText(_ outcome: ScanOutcome) -> String {
         let saved = outcome.savedCount > 1 ? "Am salvat \(PgFormat.medicationCount(outcome.savedCount))." : "Am salvat."
-        let alerts =
-            switch outcome.newAlerts {
-            case 0: "Nicio alertă nouă"
-            case 1: "O alertă nouă"
-            case 2...19: "\(outcome.newAlerts) alerte noi"
-            default: "\(outcome.newAlerts) de alerte noi"
-            }
-        return "\(saved) \(alerts)"
+        return "\(saved) \(outcome.newAlerts.sentence)"
     }
 }
 

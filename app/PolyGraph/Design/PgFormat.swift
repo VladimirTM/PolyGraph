@@ -21,6 +21,31 @@ enum PgFormat {
         date.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(romanian))
     }
 
+    /// „Azi, 14:00” / „Ieri, 20:00” / „joi, 12 nov., 14:00” (anul doar când nu e cel curent), ca în portal
+    /// (`share/view.py` `relative_day`); perechile comune sunt în contracts/fixtures/date_words.json (Q3-13).
+    /// Numele zilelor și lunilor sunt scrise aici, nu luate din `Locale`, ca să iasă identic cu portalul.
+    static func relativeDay(_ date: Date, now: Date, calendar: Calendar = .current) -> String {
+        let parts = calendar.dateComponents([.year, .month, .day, .weekday, .hour, .minute], from: date)
+        let clock = String(format: "%02ld:%02ld", parts.hour ?? 0, parts.minute ?? 0)
+        let days = calendar.dateComponents(
+            [.day], from: calendar.startOfDay(for: date), to: calendar.startOfDay(for: now)
+        ).day ?? 0
+        switch days {
+        case 0: return "Azi, \(clock)"
+        case 1: return "Ieri, \(clock)"
+        default:
+            // `weekday` din Calendar: 1 = duminică
+            let weekday = weekdays[((parts.weekday ?? 1) + 5) % 7]
+            let month = shortMonths[max(0, min(11, (parts.month ?? 1) - 1))]
+            let year = parts.year != calendar.component(.year, from: now) ? " \(parts.year ?? 0)" : ""
+            return "\(weekday), \(parts.day ?? 0) \(month)\(year), \(clock)"
+        }
+    }
+
+    /// luni = 0, ca `date.weekday()` din Python
+    static let weekdays = ["luni", "marți", "miercuri", "joi", "vineri", "sâmbătă", "duminică"]
+    static let shortMonths = ["ian.", "feb.", "mar.", "apr.", "mai", "iun.", "iul.", "aug.", "sept.", "oct.", "nov.", "dec."]
+
     /// „HH:MM” → data de azi la ora aceea (pentru DatePicker)
     static func date(fromClock text: String, on day: Date = Date()) -> Date? {
         let parts = text.split(separator: ":").compactMap { Int($0) }

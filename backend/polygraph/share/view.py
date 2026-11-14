@@ -89,10 +89,36 @@ def _instant(raw: str) -> datetime:
 
 
 def ro_moment(raw: str) -> str:
+    """„14.11.2026, 13:25”: doar pe tipărire, unde foaia rămâne și după ziua de azi."""
     try:
         return _instant(raw).astimezone(TZ).strftime("%d.%m.%Y, %H:%M")
     except ValueError:
         return raw
+
+
+WEEKDAYS = ("luni", "marți", "miercuri", "joi", "vineri", "sâmbătă", "duminică")
+MONTHS = (
+    "ianuarie", "februarie", "martie", "aprilie", "mai", "iunie",
+    "iulie", "august", "septembrie", "octombrie", "noiembrie", "decembrie",
+)  # fmt: skip
+MONTHS_SHORT = ("ian.", "feb.", "mar.", "apr.", "mai", "iun.", "iul.", "aug.", "sept.", "oct.", "nov.", "dec.")
+
+
+def relative_day(raw: str, today: date) -> str:
+    """„Azi, 14:00” / „Ieri, 20:00” / „joi, 12 nov., 14:00” (anul doar când nu e cel curent). Aceeași regulă ca
+    `PgFormat.relativeDay` din aplicație; perechile comune sunt în contracts/fixtures/date_words.json (Q3-13)."""
+    try:
+        at = _instant(raw).astimezone(TZ)
+    except ValueError:
+        return raw
+    clock = at.strftime("%H:%M")
+    days = (today - at.date()).days
+    if days == 0:
+        return f"Azi, {clock}"
+    if days == 1:
+        return f"Ieri, {clock}"
+    year = f" {at.year}" if at.year != today.year else ""
+    return f"{WEEKDAYS[at.weekday()]}, {at.day} {MONTHS_SHORT[at.month - 1]}{year}, {clock}"
 
 
 def med_name(med: Json) -> str:
@@ -143,7 +169,7 @@ def med_row(med: Json) -> Json:
     }
 
 
-def alert_view(alert: Json, names: dict[str, str]) -> Json:
+def alert_view(alert: Json, names: dict[str, str], today: date) -> Json:
     source = alert["source"]
     res = alert.get("resolution")
     return {
@@ -155,7 +181,7 @@ def alert_view(alert: Json, names: dict[str, str]) -> Json:
         "grave": alert["severity"] in GRAVE,
         "reviewed": alert["status"] == "reviewed_by_doctor",
         "decision_label": DECISION_LABEL.get((res or {}).get("decision") or "", None),
-        "resolution_at": ro_moment(res["at"]) if res else None,
+        "resolution_at": relative_day(res["at"], today) if res else None,
     }
 
 
@@ -201,7 +227,7 @@ def recent_checkins(checkins: list[Json], today: date, events: list[Json] | None
             out.append(
                 {
                     **ci,
-                    "when": when.strftime("%d.%m, %H:%M"),
+                    "when": relative_day(ci["at"], today),
                     "answer": answer or None,
                     "to_family": ci.get("escalate") or event is not None,
                     "grave": ci.get("escalate") or (event is not None and event["severity"] in ("critical", "major")),
@@ -288,7 +314,7 @@ def page_context(
     active = [m for m in meds if is_active(m, today)]
     names = {m["id"]: med_name(m) for m in meds}
     alerts = sorted(
-        (alert_view(a, names) for a in analysis["alerts"]),
+        (alert_view(a, names, today) for a in analysis["alerts"]),
         key=lambda a: (SEV_RANK[a["severity"]], a["status"] == "reviewed_by_doctor"),
     )
     grave = [a for a in alerts if a["grave"]]
@@ -321,7 +347,9 @@ def page_context(
         "checkins": recent_checkins(checkins, today, events),
         "schedule": schedule_view(schedule_for(today), names),
         "questions": questions(alerts, age, analysis["acb_total"]),
+        # tipărirea păstrează data completă; pe ecran, ca în aplicație
         "generated": now.astimezone(TZ).strftime("%d.%m.%Y, %H:%M"),
+        "updated": relative_day(now.isoformat(), today),
     }
 
 
@@ -344,13 +372,6 @@ def patient_card(patient: Json, meds: list[Json], analysis: Json, checkins: list
         "last_checkin": recent[0]["when"] if recent else None,
         "sort": (-len(escalated), -len(open_grave), patient.get("name") or ""),
     }
-
-
-WEEKDAYS = ("luni", "marți", "miercuri", "joi", "vineri", "sâmbătă", "duminică")
-MONTHS = (
-    "ianuarie", "februarie", "martie", "aprilie", "mai", "iunie",
-    "iulie", "august", "septembrie", "octombrie", "noiembrie", "decembrie",
-)  # fmt: skip
 
 
 def portal_summary(cards: list[Json], today: date) -> Json:

@@ -12,6 +12,8 @@ struct SettingsView: View {
     @State private var confirmSignOut = false
     @State private var demoAction: DemoAction?
     @State private var demoStatus: String?
+    /// mesajul de succes al rețetei ORL rămâne pe ecran și dacă butonul e apăsat din nou (Q3-20)
+    @State private var prescriptionStatus: String?
 
     private enum DemoAction {
         case prescription
@@ -125,9 +127,11 @@ struct SettingsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Gata") {
+                    Button {
                         saveBaseURL()
                         dismiss()
+                    } label: {
+                        BarConfirmLabel("Gata")
                     }
                     .accessibilityIdentifier("settings.doneButton")
                 }
@@ -172,6 +176,9 @@ struct SettingsView: View {
 
     private func demoButton(_ title: String, action: DemoAction) -> some View {
         Button {
+            // dezactivat sincron, înainte de Task: a doua atingere rapidă nu mai pornește nimic (Q3-20)
+            guard demoAction == nil else { return }
+            demoAction = action
             Task { await run(action) }
         } label: {
             HStack {
@@ -190,14 +197,12 @@ struct SettingsView: View {
         do {
             switch action {
             case .prescription:
-                let newAlerts = try await store.addDemoPrescription()
-                demoStatus =
-                    switch newAlerts {
-                    case nil: "Fromilid e deja în listă."
-                    case 0?: "Am adăugat Fromilid. Nicio alertă nouă."
-                    case 1?: "Am adăugat Fromilid. O alertă nouă."
-                    case let count?: "Am adăugat Fromilid. \(count) alerte noi."
-                    }
+                if let newAlerts = try await store.addDemoPrescription() {
+                    prescriptionStatus = Self.prescriptionText(newAlerts)
+                    demoStatus = prescriptionStatus
+                } else {
+                    demoStatus = prescriptionStatus ?? "Fromilid e deja în listă."
+                }
             case .missedDose:
                 try await store.simulateMissedDose()
                 demoStatus = "Am trimis o doză ratată. Apare în Noutăți în câteva secunde."
@@ -207,7 +212,13 @@ struct SettingsView: View {
         }
     }
 
+    /// „Am adăugat Fromilid. 2 alerte grave noi și 2 de discutat.” (numărate ca în portal, Q3-27)
+    static func prescriptionText(_ newAlerts: NewAlerts) -> String {
+        "Am adăugat Fromilid. \(newAlerts.sentence)."
+    }
+
     private func useDemoPatient() async {
+        prescriptionStatus = nil
         saveBaseURL()
         isResettingDemo = true
         defer { isResettingDemo = false }

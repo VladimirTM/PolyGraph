@@ -28,7 +28,7 @@ enum ScanMode: String, CaseIterable, Identifiable {
 /// Ce s-a salvat după scanare; lista îl transformă în mesajul de finalizare.
 struct ScanOutcome: Equatable {
     let savedCount: Int
-    let newAlerts: Int
+    let newAlerts: NewAlerts
 }
 
 /// Răspunsul de la /scan plus ce s-a trimis (poza pentru sheet, OCR-ul pentru exportul din Debug).

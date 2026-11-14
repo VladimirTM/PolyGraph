@@ -54,7 +54,10 @@ final class AppStore {
                 guard let self else { return [] }
                 return try await self.fetchFeed(since: since)
             },
-            notify: { FeedAlerts.notify($0) })
+            notify: { FeedAlerts.notify($0) },
+            notifyBatch: { [weak self] total, serious in
+                FeedAlerts.notifyBatch(patient: self?.patient?.name, total: total, serious: serious)
+            })
     }
 
     var api: APIClient {
@@ -180,18 +183,17 @@ final class AppStore {
 
     // MARK: - Medicamente
 
-    /// Întoarce câte alerte noi a adus medicamentul (pentru „Am salvat. 2 alerte noi”).
+    /// Întoarce alertele noi aduse de medicament, numărate ca în portal (pentru „Am salvat. 2 alerte grave noi”).
     @discardableResult
-    func addMed(_ med: MedicationItem) async throws -> Int {
+    func addMed(_ med: MedicationItem) async throws -> NewAlerts {
         let id = try requirePatientID()
-        let before = Set(analysis?.alerts.map(\.id) ?? [])
+        let before = analysis?.alerts ?? []
         let saved = try await api.addMed(patientID: id, med)
         withPgAnimation(.pgStandard) {
             meds.append(saved)
         }
         await reloadAnalysis()
-        let after = Set(analysis?.alerts.map(\.id) ?? [])
-        return after.subtracting(before).count
+        return NewAlerts(before: before, after: analysis?.alerts ?? [])
     }
 
     func updateMed(id medID: String, _ changes: MedicationUpdate) async throws {
@@ -288,13 +290,13 @@ final class AppStore {
 
     // MARK: - Modul demo
 
-    /// „Adaugă rețeta ORL”: Fromilid din scenariul „medic nou”. Întoarce câte alerte noi a adus,
+    /// „Adaugă rețeta ORL”: Fromilid din scenariul „medic nou”. Întoarce alertele noi aduse,
     /// sau `nil` dacă e deja în listă (a doua apăsare nu-l dublează).
-    func addDemoPrescription() async throws -> Int? {
+    func addDemoPrescription() async throws -> NewAlerts? {
         let med = try DemoData.prescription()
         if meds.contains(where: { $0.product.brand == med.product.brand }) { return nil }
         let newAlerts = try await addMed(med)
-        Log.demo.info("rețeta ORL adăugată, \(newAlerts) alerte noi")
+        Log.demo.info("rețeta ORL adăugată: \(newAlerts.grave) grave, \(newAlerts.discuss) de discutat")
         return newAlerts
     }
 

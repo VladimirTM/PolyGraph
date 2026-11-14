@@ -102,3 +102,59 @@ extension DoctorDecision {
         }
     }
 }
+
+/// Alertele noi aduse de un medicament, numărate doar din ce vede aparținătorul, ca rezumatul din portal
+/// (Q3-27): grave = cardurile de sus din Alerte (critical + major, fără mâncare); „de discutat” = cele
+/// `moderate` fără mâncare. Alertele minore și cele de mâncare nu intră în număr.
+struct NewAlerts: Equatable {
+    var grave = 0
+    var discuss = 0
+
+    init(grave: Int = 0, discuss: Int = 0) {
+        self.grave = grave
+        self.discuss = discuss
+    }
+
+    init(before: [Alert], after: [Alert]) {
+        let old = Set(before.map(\.id))
+        let sections = AlertSections(after.filter { !old.contains($0.id) })
+        grave = sections.serious.count
+        discuss = sections.moderate.filter { $0.severity == .moderate }.count
+    }
+
+    var isEmpty: Bool { grave == 0 && discuss == 0 }
+
+    static func + (lhs: NewAlerts, rhs: NewAlerts) -> NewAlerts {
+        NewAlerts(grave: lhs.grave + rhs.grave, discuss: lhs.discuss + rhs.discuss)
+    }
+
+    static func += (lhs: inout NewAlerts, rhs: NewAlerts) {
+        lhs = lhs + rhs
+    }
+
+    /// „2 alerte grave noi și 2 de discutat”, „o alertă gravă nouă”, „3 alerte noi de discutat”,
+    /// „nicio alertă gravă nouă” (cu literă mică; `sentence` o face mare la început de propoziție)
+    var text: String {
+        let discussText = discuss == 1 ? "una" : Self.number(discuss)
+        switch (grave, discuss) {
+        case (0, 0): return "nicio alertă gravă nouă"
+        case (0, 1): return "o alertă nouă de discutat"
+        case (0, _): return "\(Self.number(discuss)) alerte noi de discutat"
+        case (_, 0): return Self.graveText(grave)
+        default: return "\(Self.graveText(grave)) și \(discussText) de discutat"
+        }
+    }
+
+    var sentence: String {
+        text.prefix(1).uppercased() + text.dropFirst()
+    }
+
+    private static func graveText(_ count: Int) -> String {
+        count == 1 ? "o alertă gravă nouă" : "\(number(count)) alerte grave noi"
+    }
+
+    /// „3”, „20 de” (aceeași regulă ca `plural` din share/view.py)
+    private static func number(_ count: Int) -> String {
+        count == 0 || (1...19).contains(count % 100) ? "\(count)" : "\(count) de"
+    }
+}

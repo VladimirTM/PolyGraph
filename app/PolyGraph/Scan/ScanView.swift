@@ -191,7 +191,7 @@ struct ScanView: View {
             Text("Puneți foaia pe o masă, cu lumină bună. Camera o decupează și o îndreaptă singură.")
         } actions: {
             Button("Deschide camera") { showsDocumentCamera = true }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.pgProminent)
                 .controlSize(.large)
                 .accessibilityIdentifier("scan.openDocumentCamera")
             Button("Completez manual") { model.startManualEntry() }
@@ -212,7 +212,8 @@ struct ScanView: View {
 
     @ViewBuilder
     private var guidancePill: some View {
-        if showsOverlays, let text = model.guidance {
+        // la eroare, statusul de sus dispare: cardul de jos spune ce s-a întâmplat (Q3-23)
+        if showsOverlays, model.errorMessage == nil, let text = model.guidance {
             HStack(spacing: Spacing.xs) {
                 if model.isWorking, !isRecognized {
                     ProgressView()
@@ -278,7 +279,7 @@ struct ScanView: View {
                 } label: {
                     Text("Încearcă din nou").frame(maxWidth: .infinity, minHeight: ControlHeight.caregiver - 16)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.pgProminent)
                 .accessibilityIdentifier("scan.retryButton")
 
                 Button {
@@ -286,7 +287,7 @@ struct ScanView: View {
                 } label: {
                     Text("Completez manual").frame(maxWidth: .infinity, minHeight: ControlHeight.caregiver - 16)
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.pgProminent)
                 .accessibilityIdentifier("scan.manualButton")
             }
         }
@@ -305,7 +306,7 @@ struct ScanView: View {
                 Button("Deschide Setările") {
                     if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.pgProminent)
             }
             Button("Completez manual") { model.startManualEntry() }
                 .buttonStyle(.bordered)

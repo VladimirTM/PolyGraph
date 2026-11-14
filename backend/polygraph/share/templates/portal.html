@@ -8,7 +8,7 @@
     <span class="patient-avatar" aria-hidden="true">{{ c.patient.name[:1] }}</span>
     <div class="patient-main">
       <p class="patient-name">{{ c.patient.name }}{% if c.age %}, {{ c.age }} de ani{% endif %}</p>
-      <p class="patient-meta">{{ c.meds }} medicamente · scor ACB {{ c.acb }}{% if c.last_checkin %} · ultimul check-in {{ c.last_checkin }}{% endif %}</p>
+      <p class="patient-meta">{{ c.meds }} medicamente · scor ACB {{ c.acb }}{% if c.last_checkin %} · ultimul check-in {{ c.last_checkin | lower }}{% endif %}</p>
       {% if c.open_titles %}
       <ul class="patient-why">{% for t in c.open_titles %}<li>{{ t }}</li>{% endfor %}</ul>
       {% endif %}

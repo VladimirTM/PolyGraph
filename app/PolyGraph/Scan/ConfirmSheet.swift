@@ -16,7 +16,7 @@ struct ConfirmSheet: View {
     @State private var page = 0
     @State private var done: Set<String> = []
     @State private var savedCount = 0
-    @State private var newAlerts = 0
+    @State private var newAlerts = NewAlerts()
     @State private var isSaving = false
     @State private var saveError: String?
     @State private var errorCount = 0
@@ -155,7 +155,7 @@ struct ConfirmSheet: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity, minHeight: ControlHeight.caregiver)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.pgProminent)
             .disabled(isSaving || current.map { !$0.canSave || done.contains($0.id) } ?? true)
             .accessibilityIdentifier("confirm.saveButton")
 
