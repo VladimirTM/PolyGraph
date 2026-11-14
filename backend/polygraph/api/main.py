@@ -396,10 +396,11 @@ def what_if(pid: str, body: dict[str, Any], x_patient_token: str | None = Header
         if matched["id"] in taken:
             matched["id"] = "med_whatif"
     else:
-        hits = kb().search(body["query"], limit=1)
-        if not hits:
+        # A-6: același produs ca la „Pot să iau…?” din check-in (oral, o singură substanță), nu primul din căutare
+        hit = can_i_take.pick_product(kb(), body["query"])
+        if hit is None:
             return {"matched": None, "new_alerts": []}
-        matched = med_from_kb(hits[0], "med_whatif")
+        matched = med_from_kb(hit, "med_whatif")
     before = run_analysis(pid, patient, meds)["alerts"]
     after = run_analysis(pid, patient, [*meds, matched])["alerts"]
     return {"matched": matched, "new_alerts": new_alerts(before, after)}
@@ -477,14 +478,16 @@ async def create_checkin(pid: str, request: Request, x_patient_token: str | None
     store().add_checkin(pid, checkin)
     if x1:
         # o întrebare nu e un simptom: escalate rămâne false, dar grav și „fără date” ajung în Noutăți
-        if x1.to_feed:
-            store().add_event(pid, can_i_take.feed_event(patient, checkin, x1))
+        event = can_i_take.feed_event(patient, checkin, x1) if x1.to_feed else None
+        sent = event is not None and not _asked_today(pid, event)
+        if sent:
+            store().add_event(pid, event)
         LOG.info(
             "POT SĂ IAU %-11s → %-10s severitate %-8s · %s",
             x1.brand,
             x1.case,
             x1.severity or "–",
-            "trimis în Noutăți" if x1.to_feed else "fără Noutăți",
+            "trimis în Noutăți" if sent else "deja în Noutăți azi" if x1.to_feed else "fără Noutăți",
         )
     labels = ", ".join(s.label for s in u.symptoms) or "fără simptome"
     via = "gemini" if u.used_llm else "sinonime"
@@ -496,6 +499,18 @@ async def create_checkin(pid: str, request: Request, x_patient_token: str | None
     else:
         LOG.info("CHECK-IN  %s (%s), fără escaladare", labels, via)
     return checkin
+
+
+def _asked_today(pid: str, event: dict[str, Any]) -> bool:
+    """A-7: aceeași întrebare X1 (același titlu, deci același brand, și același răspuns) în aceeași zi e deja în Noutăți."""
+    day = _instant(event["at"]).astimezone(TZ).date()
+    return any(
+        e["type"] == "checkin"
+        and e["title"] == event["title"]
+        and e["body"] == event["body"]
+        and _instant(e["at"]).astimezone(TZ).date() == day
+        for e in store().list_events(pid)
+    )
 
 
 @app.get("/v1/patients/{pid}/feed")

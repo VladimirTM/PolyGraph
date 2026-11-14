@@ -34,14 +34,16 @@ def scan(kb: Kb, store: Store, kind: str, lines: list[OcrLine], image: bytes, mi
 
     cached_id = store.cached_gtin(code["gtin"], kb.version) if code else None
     cached = catalog(kb)[0].get(cached_id) if cached_id is not None else None
+    unread: list[str] = []  # rândurile de rețetă care n-au putut fi potrivite, numite în avertizare
     if cached:
-        matches, missing, route = [Match(cached, RawExtraction(), "gtin_cache", 1.0)], False, "gtin_cache"
+        matches, route = [Match(cached, RawExtraction(), "gtin_cache", 1.0)], "gtin_cache"
     elif kind == "prescription":
-        matches, missing = prescription_matches(kb, lines)
+        matches, unread = prescription_matches(kb, lines)
         route = "ocr_match"
     else:
         match = box_match(kb, lines)
-        matches, missing, route = [match] if match else [], False, "ocr_match"
+        matches, route = [match] if match else [], "ocr_match"
+    missing = bool(unread)
 
     if image and (missing or not matches or any(m.confidence < 0.85 for m in matches)):
         vision = []
@@ -60,13 +62,20 @@ def scan(kb: Kb, store: Store, kind: str, lines: list[OcrLine], image: bytes, mi
         ):
             matches, route = vision[:1] if kind == "box" else vision, "gemini"
             missing = len(vision) != len(raw_rows)
+            unread = []
 
     candidates = [candidate(kb, m, kind, code, route, lines) for m in matches]
     if not candidates:
         warnings.append(MANUAL if kind == "box" else "Nu am putut citi rețeta, completați manual.")
         route = "gtin_miss" if kind == "box" and code and not image and not lines else "manual"
+    elif unread:
+        warnings += [f"Nu am găsit «{text}». Adăugați-l manual." for text in unread]
     elif missing:
         warnings.append("Unele medicamente de pe rețetă trebuie completate manual.")
+    for m, c in zip(matches, candidates, strict=True):
+        dosage = c["dosage"]
+        if m.raw.posology_text and not dosage["as_needed"] and not any(dosage["pattern"].values()):
+            warnings.append(f"Nu am înțeles posologia «{m.raw.posology_text.strip()}» la {c['product']['brand']}.")
     if kind == "box" and any(m["match"]["needs_review"] for m in candidates):
         warnings.append(PHOTO)
     names = ", ".join(f"{c['product']['brand']} {c['product']['strength_text'] or ''}".strip() for c in candidates)

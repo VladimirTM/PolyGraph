@@ -13,6 +13,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from polygraph.store import Store
+from polygraph.voice.correlate import unwell_hint
 
 Json = dict[str, Any]
 TZ = ZoneInfo("Europe/Bucharest")
@@ -92,7 +93,7 @@ def seed_history(
                 store.add_event(pid, missed_event(patient, meds, moment, day, skipped, f"{day:%m%d}_{moment['time'][:2]}"))
 
     when = datetime.combine(today - timedelta(days=OLD_CHECKIN["days_ago"]), time.fromisoformat(OLD_CHECKIN["time"]), TZ)
-    caregiver = patient.get("caregiver_name") or "cuiva apropiat"
+    caregiver = patient.get("caregiver_name")
     store.add_checkin(
         pid,
         {
@@ -103,7 +104,7 @@ def seed_history(
             "symptoms": [],
             "correlations": [],
             "escalate": False,
-            "reply_text": f"Mulțumesc. Dacă nu vă simțiți bine, spuneți-i {caregiver} sau medicului.",
+            "reply_text": f"Mulțumesc. {unwell_hint(caregiver)}",
         },
     )
 

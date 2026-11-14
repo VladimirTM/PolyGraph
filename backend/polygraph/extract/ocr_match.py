@@ -18,6 +18,9 @@ RX_PREFIX = re.compile(r"^\s*(?:rp\s*[./:]+\s*)?(?:\d+[.)]\s*)?", re.I)
 RX_END = re.compile(r"^(?:data prescrierii|semnatura|parafa|document fictiv)\b")
 DOSAGE = re.compile(r"\b(?:d s|dimineata|seara|la pranz|la culcare|pe zi|ori pe zi|la nevoie|mese|masa|nemancate)\b")
 FORM = re.compile(r"\b(comprimate(?: filmate)?|capsule|picaturi|sirop|solutie|crema|gel|pulbere)\b")
+# formele luate pe gură înaintea gelurilor și a fiolelor: „un Ketonal” e de obicei o capsulă, nu crema
+ORAL = ("compr", "caps", "draj", "pulb", "sol. orala", "sirop", "plic")
+DCI_CONFIDENCE = 0.8  # sub 0,85: candidatul pe DCI e mereu „verificați”
 SPECIALTY = re.compile(
     r"\b(cardiologie|medicina de familie|medicina interna|geriatrie|neurologie|psihiatrie|"
     r"endocrinologie|diabetologie|dermatologie|pneumologie|gastroenterologie|orl|otorinolaringologie)\b"
@@ -201,11 +204,42 @@ def box_match(kb: Kb, lines: list[OcrLine], raw: RawExtraction | None = None) ->
     return Match(product, raw, method, confidence)
 
 
-def prescription_matches(kb: Kb, lines: list[OcrLine]) -> tuple[list[Match], bool]:
+def dci_match(kb: Kb, lines: list[OcrLine]) -> Match | None:
+    """Q3-09: un rând de rețetă scris pe DCI („Paracetamol 500 mg”) fără produs potrivit în catalog. Substanțele vin
+    din produsul cu o singură substanță, luat pe gură, cu aceeași concentrație dacă există (ca can_i_take.pick_product);
+    numele și concentrația rămân cele de pe rețetă, iar candidatul e mereu de verificat."""
+    if not lines:
+        return None
+    _, _, dcis, _ = catalog(kb)
+    first = lines[0].text
+    keys = aliases_in(first, dcis)
+    if not keys:
+        return None
+    observed = strengths(first)
+    single = [p for p in {p for key in keys for p in dcis[key]} if len(kb.scan_substances(p.id)) == 1]
+    if not single:
+        return None
+
+    def rank(product: Product) -> tuple:
+        oral = any(k in (product.form or "").lower() for k in ORAL)
+        return (strengths(product.strength) != observed, not oral, product.id)
+
+    reference = min(single, key=rank)
+    key = max(sorted(keys), key=len)
+    strength_text = STRENGTH.search(first)[0] if observed else None
+    form = FORM.search(norm("\n".join(line.text for line in lines)))
+    raw = RawExtraction(strength_text=strength_text, form=form[1] if form else None, dci_text=key)
+    label = " ".join(word.capitalize() for word in key.split())
+    product = replace(reference, brand=label, key=key, strength=strength_text, form=raw.form)
+    return Match(product, raw, "exact_dci", DCI_CONFIDENCE)
+
+
+def prescription_matches(kb: Kb, lines: list[OcrLine]) -> tuple[list[Match], list[str]]:
+    """→ (potrivirile, textul rândurilor de medicament care n-au putut fi potrivite)."""
     _, brands, dcis, _ = catalog(kb)
     starts = []
     end = len(lines)
-    missing = False
+    missing: list[str] = []
     for i, line in enumerate(lines):
         if starts and RX_END.search(norm(line.text)):
             end = i
@@ -217,7 +251,7 @@ def prescription_matches(kb: Kb, lines: list[OcrLine]) -> tuple[list[Match], boo
             starts.append(i)
 
     if not starts:
-        return [], False
+        return [], []
     header = "\n".join(line.text for line in lines[: starts[0]])
     doctor = re.search(r"(?im)^\s*(?:dr\.?|medic(?: prescriptor)?\s*:)\s+([^\n]+)", header)
     specialty = SPECIALTY.search(norm(header))
@@ -232,9 +266,9 @@ def prescription_matches(kb: Kb, lines: list[OcrLine]) -> tuple[list[Match], boo
                 posology.append(line.text)
             else:
                 evidence.append(line)
-        match = box_match(kb, evidence)
+        match = box_match(kb, evidence) or dci_match(kb, evidence)
         if not match:
-            missing = True
+            missing.append(first.text.strip())
             continue
         raw = replace(
             match.raw,
