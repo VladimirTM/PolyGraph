@@ -26,7 +26,7 @@ from typing import Annotated, Any, Literal
 from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Request, Response, UploadFile
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
@@ -45,7 +45,7 @@ from polygraph.extract.ocr_match import OcrLine  # noqa: E402
 from polygraph.kb import Kb, KbMissing, default_kb  # noqa: E402
 from polygraph.schedule import build_schedule  # noqa: E402
 from polygraph.share import STATIC_DIR, render  # noqa: E402
-from polygraph.share.view import page_context, patient_card, review_event  # noqa: E402
+from polygraph.share.view import page_context, patient_card, portal_summary, review_event  # noqa: E402
 from polygraph.store import Store  # noqa: E402
 from polygraph.voice import can_i_take  # noqa: E402
 from polygraph.voice.correlate import correlate, feed_event, reply_text  # noqa: E402
@@ -162,15 +162,11 @@ def auth(pid: str, token: str | None) -> dict[str, Any]:
 # ---------------------------------------------------------------- sistem
 
 
-@app.get("/", response_class=PlainTextResponse)
-def root(request: Request) -> str:
-    # QR-ul din `make demo` deschis cu camera telefonului ajunge aici: spunem unde se pune adresa, nu „Not Found”
-    base = str(request.base_url).rstrip("/")
-    return (
-        "PolyGraph: serverul funcționează.\n\n"
-        f"Puneți această adresă în aplicație, la Setări → adresa serverului:\n{base}\n\n"
-        f"Portalul medicului de familie: {base}/portal\n"
-    )
+@app.get("/", response_class=HTMLResponse)
+def root(request: Request) -> HTMLResponse:
+    # pagina de prezentare; QR-ul din `make demo` deschis cu camera telefonului ajunge tot aici,
+    # deci adresa de pus în aplicație rămâne pe pagină (secțiunea „Conectați aplicația”)
+    return page("home.html", base=str(request.base_url).rstrip("/"))
 
 
 @app.get("/health")
@@ -640,7 +636,7 @@ def portal(request: Request) -> HTMLResponse:
         checkins = s.list_checkins(pid)
         cards.append(patient_card(patient, meds, run_analysis(pid, patient, meds), checkins, today()))
     cards.sort(key=lambda c: c["sort"])
-    return page("portal.html", doctor=doctor, cards=cards)
+    return page("portal.html", doctor=doctor, cards=cards, **portal_summary(cards, today()))
 
 
 @app.post("/portal/login", response_class=HTMLResponse)

@@ -69,12 +69,28 @@
       });
   });
 
+  // explicațiile din rezumat sunt popover-e: se închid la o atingere în afara lor sau cu Escape
+  function closeStats(except) {
+    document.querySelectorAll(".stat details.info[open]").forEach(function (d) {
+      if (d !== except) d.open = false;
+    });
+  }
+  document.addEventListener("click", function (event) {
+    closeStats(event.target.closest(".stat details.info"));
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") closeStats(null);
+  });
+
   // tap pe o muchie din graf → alerta corespunzătoare (graph.js trimite evenimentul)
   document.addEventListener("pg:alert", function (event) {
     var card = document.getElementById("alert-" + event.detail);
     if (!card) return;
-    var details = card.querySelector("details");
-    if (details) details.open = true;
+    // alertele moderate stau strânse sub „Arată…”; deschidem lista și detaliile alertei
+    var more = card.closest("details.more");
+    if (more) more.open = true;
+    var info = card.querySelector("details.info");
+    if (info) info.open = true;
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     card.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
     document.querySelectorAll(".alert.is-highlighted").forEach(function (el) { el.classList.remove("is-highlighted"); });

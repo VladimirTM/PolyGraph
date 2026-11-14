@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}PolyGraph · toate medicamentele, într-un singur loc{% endblock %}
+{% block body_class %}home{% endblock %}
+
+{% macro info(label) %}
+<details class="info">
+  <summary class="info-btn" aria-label="{{ label }}" title="Mai multe informații"><span aria-hidden="true">i</span></summary>
+  <div class="info-panel">{{ caller() }}</div>
+</details>
+{% endmacro %}
+
+{% block body %}
+<div class="scroll-sentinel" aria-hidden="true"></div>
+<header class="topbar home-bar" data-topbar>
+  <div class="topbar-inner home-inner">
+    <a class="wordmark" href="/"><img class="wordmark-logo" src="/static/share/logo.svg" alt="" width="32" height="32">PolyGraph</a>
+    <a class="btn btn-secondary" href="/portal">Portalul medicului</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="h-hero">
+    <div class="home-inner hero-grid">
+      <div class="hero-copy">
+        <p class="status-pill" role="status"><span class="status-dot" aria-hidden="true"></span>Serverul funcționează</p>
+        <h1 id="h-hero" class="hero-title">Toate medicamentele, într&#8209;un singur loc.</h1>
+        <p class="hero-lead">Pozați cutiile și rețetele. PolyGraph găsește interacțiunile și medicamentele nepotrivite vârstei, face un program simplu pe zi și ține familia și medicul de familie în aceeași buclă.</p>
+        <div class="hero-actions">
+          <a class="btn btn-large" href="/portal">Intrați în portalul medicului</a>
+          <a class="btn btn-secondary btn-large" href="#conectare">Conectați aplicația</a>
+        </div>
+      </div>
+
+      <figure class="hero-visual" aria-label="Exemplu: graful terapeutic al unui pacient, cu o alertă gravă între Sintrom și Nurofen și decizia medicului de familie.">
+        <svg class="hero-graph" viewBox="0 0 440 360" role="img" aria-hidden="true" focusable="false">
+          <g class="g-spokes">
+            <line x1="220" y1="180" x2="220" y2="60"/><line x1="220" y1="180" x2="312" y2="95"/>
+            <line x1="220" y1="180" x2="350" y2="180"/><line x1="220" y1="180" x2="312" y2="265"/>
+            <line x1="220" y1="180" x2="220" y2="300"/><line x1="220" y1="180" x2="128" y2="265"/>
+            <line x1="220" y1="180" x2="90" y2="180"/><line x1="220" y1="180" x2="128" y2="95"/>
+          </g>
+          <g class="g-moderate">
+            <line x1="220" y1="300" x2="128" y2="265"/><line x1="220" y1="300" x2="90" y2="180"/>
+            <line x1="220" y1="60" x2="90" y2="180"/><line x1="312" y1="95" x2="312" y2="265"/>
+            <line x1="220" y1="60" x2="220" y2="300"/>
+          </g>
+          <g class="g-food"><line x1="350" y1="180" x2="410" y2="236"/><circle cx="410" cy="236" r="5"/><text x="410" y="256">grepfrut</text></g>
+          <g class="g-major">
+            <line x1="220" y1="60" x2="312" y2="95"/><line x1="350" y1="180" x2="312" y2="265"/>
+          </g>
+          <g class="g-center"><circle cx="220" cy="180" r="30"/><text x="220" y="184">Pacient</text></g>
+          <g class="g-nodes">
+            <g class="is-alert"><rect x="178" y="47" width="84" height="26" rx="8"/><text x="220" y="64">Sintrom</text></g>
+            <g class="is-alert"><rect x="270" y="82" width="84" height="26" rx="8"/><text x="312" y="99">Nurofen</text></g>
+            <g class="is-alert"><rect x="304" y="167" width="92" height="26" rx="8"/><text x="350" y="184">Simvastatin</text></g>
+            <g class="is-alert"><rect x="266" y="252" width="92" height="26" rx="8"/><text x="312" y="269">Amlodipină</text></g>
+            <g><rect x="178" y="287" width="84" height="26" rx="8"/><text x="220" y="304">Euthyrox</text></g>
+            <g><rect x="86" y="252" width="84" height="26" rx="8"/><text x="128" y="269">Calciu</text></g>
+            <g><rect x="44" y="167" width="92" height="26" rx="8"/><text x="90" y="184">Omeprazol</text></g>
+            <g><rect x="80" y="82" width="96" height="26" rx="8"/><text x="128" y="99">Amitriptilin</text></g>
+          </g>
+        </svg>
+        <div class="float-card float-alert" aria-hidden="true">
+          <span class="badge sev-major">Gravă</span>
+          <p class="float-title">Sintrom și Nurofen</p>
+          <p class="float-text">Discutați cu medicul cardiolog înainte de următoarea doză de Nurofen.</p>
+        </div>
+        <div class="float-card float-decision" aria-hidden="true">
+          <p class="float-who">Medicul de familie</p>
+          <p class="float-title"><span class="check" aria-hidden="true">✓</span> Modific la consultație</p>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="h-people">
+    <div class="home-inner">
+      <p class="eyebrow">Pentru cine</p>
+      <h2 id="h-people" class="band-title">Pacienți, familii și medici, în aceeași buclă</h2>
+      <p class="band-lead">PolyGraph e construit pe roluri, nu pe persoane: oricâți pacienți, fiecare cu familia lui, iar fiecare medic de familie își vede toți pacienții într-un singur portal.</p>
+      <ul class="people">
+        <li class="person">
+          <span class="avatar avatar-patient"><svg class="avatar-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5"/></svg></span>
+          <h3>Pacienții</h3>
+          <p class="person-role">vârstnici cu mai multe tratamente</p>
+          <p>Văd doar ce au de luat acum, cu poza cutiei și un buton mare „Am luat”. Pot spune cu voce cum se simt sau pot întreba dacă au voie să ia un medicament nou.</p>
+        </li>
+        <li class="person">
+          <span class="avatar avatar-family"><svg class="avatar-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8.5" r="3"/><circle cx="16.5" cy="9.5" r="2.5"/><path d="M3.5 20c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5"/><path d="M15 14.6c3 .1 5.5 2 5.5 5.4"/></svg></span>
+          <h3>Familiile</h3>
+          <p class="person-role">aproape sau de la distanță</p>
+          <p>Scanează cutiile și rețetele, văd lista, alertele și graful, și sunt anunțate când ceva grav are nevoie de atenție.</p>
+        </li>
+        <li class="person">
+          <span class="avatar avatar-doctor"><svg class="avatar-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9.5 4h5v5.5H20v5h-5.5V20h-5v-5.5H4v-5h5.5z"/></svg></span>
+          <h3>Medicii de familie</h3>
+          <p class="person-role">la cabinet</p>
+          <p>Adaugă pacienți în portal printr&#8209;un cod QR, decid pe fiecare alertă și lasă o notă pentru familie. Tipăresc reconcilierea medicației pentru consultație.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band band-alt" aria-labelledby="h-how">
+    <div class="home-inner">
+      <p class="eyebrow">Cum funcționează</p>
+      <h2 id="h-how" class="band-title">De la cutie la decizia medicului</h2>
+      <ol class="steps">
+        <li class="step"><span class="step-num" aria-hidden="true">1</span><h3>Pozați cutia sau rețeta</h3><p>Telefonul citește textul și codul de pe cutie, inclusiv data expirării. Confirmați înainte de salvare.</p></li>
+        <li class="step"><span class="step-num" aria-hidden="true">2</span><h3>Găsim problemele</h3><p>Interacțiuni, dubluri și medicamente nepotrivite vârstei, fiecare cu sursa ei.</p></li>
+        <li class="step"><span class="step-num" aria-hidden="true">3</span><h3>Un program simplu pe zi</h3><p>Cât mai puține momente, cu fiecare pastilă la ora potrivită: pe stomacul gol, la masă sau seara.</p></li>
+        <li class="step"><span class="step-num" aria-hidden="true">4</span><h3>Medicul de familie decide</h3><p>Alertele grave ajung la el și la familie. Decizia lui apare în aplicație.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="h-checks">
+    <div class="home-inner">
+      <p class="eyebrow">Ce verificăm</p>
+      <h2 id="h-checks" class="band-title">Fiecare alertă are o sursă</h2>
+      <ul class="checks">
+        <li class="check-card"><h3>Interacțiuni între medicamente</h3><p>Cu severitatea lor, de la „de știut” la „critică”.</p>
+          {% call info("Ce sursă folosim pentru interacțiuni?") %}<p>DDInter 2.0, o bază de date publică de interacțiuni, plus o listă verificată manual pentru medicamentele din demo.</p>{% endcall %}</li>
+        <li class="check-card"><h3>Medicamente cu alimente</h3><p>De exemplu simvastatina cu grepfrutul.</p></li>
+        <li class="check-card"><h3>Dubluri terapeutice</h3><p>Aceeași substanță sub două nume comerciale, de la medici diferiți.</p></li>
+        <li class="check-card"><h3>Nepotrivite la vârstnici</h3><p>Medicamente de evitat sau de folosit cu grijă după 65 de ani.</p>
+          {% call info("Ce criterii folosim pentru vârstnici?") %}<p>Un subset din criteriile AGS Beers 2023 și STOPP/START v3, folosite de medici pentru a evalua tratamentele vârstnicilor.</p>{% endcall %}</li>
+        <li class="check-card"><h3>Efectul anticolinergic</h3><p>Suma efectelor care pot aduce confuzie și căderi.</p>
+          {% call info("Ce este scorul ACB?") %}<p>Scala ACB dă fiecărui medicament 0–3 puncte. Un total de 3 sau mai mult e considerat relevant la vârstnici.</p>{% endcall %}</li>
+        <li class="check-card"><h3>Cutii expirate</h3><p>Din codul de pe cutie, înainte să fie salvată.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band band-dark" aria-labelledby="h-llm">
+    <div class="home-inner principle">
+      <div>
+        <p class="eyebrow">Principiul nostru</p>
+        <h2 id="h-llm" class="band-title">Inteligența artificială doar la margini</h2>
+      </div>
+      <div class="principle-text">
+        <p>Interacțiunile, severitatea și programul zilei le decide un motor determinist, pe date și reguli verificate. Același tratament dă mereu același răspuns.</p>
+        <p>Un model de limbaj intervine doar ca rezervă, când textul de pe o cutie nu poate fi citit, și rezultatul lui trebuie să se regăsească în nomenclator.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="conectare" aria-labelledby="h-connect">
+    <div class="home-inner connect">
+      <div>
+        <p class="eyebrow">Conectați aplicația</p>
+        <h2 id="h-connect" class="band-title">Adresa acestui server</h2>
+        <p>Puneți-o în aplicația PolyGraph, la Setări → adresa serverului. Telefonul trebuie să fie în aceeași rețea Wi-Fi.</p>
+      </div>
+      <div class="address-card">
+        <div class="address-row">
+          <p class="address-label">Aplicația</p>
+          <p class="address">{{ base }}</p>
+        </div>
+        <div class="address-row">
+          <p class="address-label">Portalul medicului de familie</p>
+          <p class="address"><a href="/portal">{{ base }}/portal</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="home-footer">
+  <div class="home-inner">
+    <p><strong>PolyGraph</strong> · UniHack 2026, Medical Renaissance</p>
+    <p class="muted">Prototip de hackathon. Nu pune diagnostice, nu schimbă și nu oprește medicamente, nu recomandă doze. Nu înlocuiește medicul de familie.</p>
+  </div>
+</footer>
+<script src="/static/share/share.js" defer></script>
+{% endblock %}
