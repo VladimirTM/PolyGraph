@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}PolyGraph · medicamentele bunicii, într-un singur loc{% endblock %}
+{% block title %}PolyGraph · toate medicamentele, într-un singur loc{% endblock %}
 {% block body_class %}home{% endblock %}
 
 {% macro info(label) %}
@@ -23,7 +23,7 @@
     <div class="home-inner hero-grid">
       <div class="hero-copy">
         <p class="status-pill" role="status"><span class="status-dot" aria-hidden="true"></span>Serverul funcționează</p>
-        <h1 id="h-hero" class="hero-title">Toate medicamentele bunicii, într&#8209;un singur loc.</h1>
+        <h1 id="h-hero" class="hero-title">Toate medicamentele, într&#8209;un singur loc.</h1>
         <p class="hero-lead">Pozați cutiile și rețetele. PolyGraph găsește interacțiunile și medicamentele nepotrivite vârstei, face un program simplu pe zi și ține familia și medicul de familie în aceeași buclă.</p>
         <div class="hero-actions">
           <a class="btn btn-large" href="/portal">Intrați în portalul medicului</a>
@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <figure class="hero-visual" aria-label="Exemplu: graful terapeutic al Mariei, cu o alertă gravă între Sintrom și Nurofen și decizia medicului de familie.">
+      <figure class="hero-visual" aria-label="Exemplu: graful terapeutic al unui pacient, cu o alertă gravă între Sintrom și Nurofen și decizia medicului de familie.">
         <svg class="hero-graph" viewBox="0 0 440 360" role="img" aria-hidden="true" focusable="false">
           <g class="g-spokes">
             <line x1="220" y1="180" x2="220" y2="60"/><line x1="220" y1="180" x2="312" y2="95"/>
@@ -48,7 +48,7 @@
           <g class="g-major">
             <line x1="220" y1="60" x2="312" y2="95"/><line x1="350" y1="180" x2="312" y2="265"/>
           </g>
-          <g class="g-center"><circle cx="220" cy="180" r="30"/><text x="220" y="184">Maria</text></g>
+          <g class="g-center"><circle cx="220" cy="180" r="30"/><text x="220" y="184">Pacient</text></g>
           <g class="g-nodes">
             <g class="is-alert"><rect x="178" y="47" width="84" height="26" rx="8"/><text x="220" y="64">Sintrom</text></g>
             <g class="is-alert"><rect x="270" y="82" width="84" height="26" rx="8"/><text x="312" y="99">Nurofen</text></g>
