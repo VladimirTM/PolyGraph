@@ -19,7 +19,8 @@ Durata măsurată la Q0 (Mac cu 10 nuclee și 16 GB, 3 simulatoare iPhone 18 Pro
 |---|---|
 | `SIMS=3` | câte simulatoare în paralel (3 e maximul rezonabil pe un Mac cu 16 GB; 5 au dus load-ul la 350); `SIMS=1` = secvențial |
 | `CONFIGS="Light Dark AX Motion Contrast"` | doar câteva variante (de ex. `CONFIGS=Light` pentru o verificare rapidă) |
-| `ONLY="testDay testFeed"` | doar câteva teste din `ReviewTour` (de ex. fluxurile atinse de fix-uri, la Q2) |
+| `ONLY="testDay testFeed"` | doar câteva teste din tur (de ex. fluxurile atinse de fix-uri, la Q2) |
+| `TOUR=EdgeCaseTour` | altă clasă de teste din `app/PolyGraphUITests/` (implicit `ReviewTour`); filmarea rulează doar cu `ReviewTour`. Turul agresiv de la Q3: `make review Q=Q3e TOUR=EdgeCaseTour CONFIGS="Light AX" NO_VIDEO=1` |
 | `NO_VIDEO=1` | fără video și cadre |
 | `AUDIT=0` | fără `performAccessibilityAudit` (~2 s pe fiecare element nerezolvat); doar la depanare, nu la un review |
 | `PORT=8000` | portul de la care se caută porturi libere |

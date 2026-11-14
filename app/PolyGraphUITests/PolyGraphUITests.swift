@@ -179,6 +179,18 @@ class ReviewTestCase: XCTestCase {
         return true
     }
 
+    /// „Folosește pagina” din camera falsă: identificatorul containerului (`scan.fakeCamera`) îl acoperă pe al
+    /// butonului, iar frame-ul raportat e tot ecranul, deci `tap()` ar atinge mijlocul pozei. Butonul stă jos,
+    /// centrat (FakeCameraView), așa că îl atingem acolo.
+    @discardableResult
+    func tapFakeUsePage() -> Bool {
+        if tap("scan.fake.usePage", timeout: 2) { return true }
+        let button = app.buttons["Folosește pagina"]
+        guard button.waitForExistence(timeout: 2) else { return false }
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.9)).tap()
+        return true
+    }
+
     func onScreen(_ target: XCUIElement) -> Bool {
         let frame = target.frame
         return !frame.isEmpty && app.frame.contains(CGPoint(x: frame.midX, y: frame.midY))
