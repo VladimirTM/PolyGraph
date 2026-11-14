@@ -242,12 +242,14 @@ def _patient_match(tok: str, meds: list[Json]) -> tuple[int, Json] | None:
 def _catalog_match(tok: str, kb: Kb) -> Json | None:
     if tok in COMMON_WORDS or tok in _symptom_words():
         return None
-    for hit in kb.search(tok, limit=5):
-        names = {norm(hit["brand"]).split()[0]} | {
-            norm(x).split()[0] for sub in hit["substances"] for x in (sub["inn"], sub["dci"]) if norm(x)
-        }
-        if tok in names:
-            return {"text": tok, "source": "catalog", "brand": tok.capitalize(), "med_id": None}
+    # „o aspirină” → „aspirina”: articolul românesc se lipește de numele comercial („Aspirin”)
+    for word in dict.fromkeys([tok, tok[:-1] if tok.endswith("a") and len(tok) > 5 else tok]):
+        for hit in kb.search(word, limit=5):
+            names = {norm(hit["brand"]).split()[0]} | {
+                norm(x).split()[0] for sub in hit["substances"] for x in (sub["inn"], sub["dci"]) if norm(x)
+            }
+            if word in names:
+                return {"text": word, "source": "catalog", "brand": word.capitalize(), "med_id": None}
     return None
 
 

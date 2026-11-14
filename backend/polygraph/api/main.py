@@ -47,6 +47,7 @@ from polygraph.schedule import build_schedule  # noqa: E402
 from polygraph.share import STATIC_DIR, render  # noqa: E402
 from polygraph.share.view import page_context, patient_card, review_event  # noqa: E402
 from polygraph.store import Store  # noqa: E402
+from polygraph.voice import can_i_take  # noqa: E402
 from polygraph.voice.correlate import correlate, feed_event, reply_text  # noqa: E402
 from polygraph.voice.understand import understand  # noqa: E402
 
@@ -457,6 +458,14 @@ async def create_checkin(pid: str, request: Request, x_patient_token: str | None
     u = understand(text, meds, kb())
     alerts = run_analysis(pid, patient, meds)["alerts"]
     correlations, escalate = correlate(make_ctx(patient, meds, today(), kb()), alerts, u.symptoms)
+    can_take = None
+    if u.intent == "can_i_take" and u.drug_query and u.drug_query["source"] == "catalog":
+        x1 = can_i_take.answer(
+            u.drug_query, meds, kb(), lambda regimen: run_analysis(pid, patient, regimen)["alerts"], today().isoformat()
+        )
+        if x1:
+            can_take = x1.text
+            LOG.info("POT SĂ IAU %s → %s %s", x1.brand, x1.case, ", ".join(x1.alert_ids) or "")
     checkin = {
         "id": f"ci_{secrets.token_hex(4)}",
         "at": datetime.now(TZ).replace(microsecond=0).isoformat(),
@@ -465,7 +474,7 @@ async def create_checkin(pid: str, request: Request, x_patient_token: str | None
         "symptoms": [{"code": s.code, "label": s.label, "severity": s.severity} for s in u.symptoms],
         "correlations": correlations,
         "escalate": escalate,
-        "reply_text": reply_text(u, correlations, escalate, patient.get("caregiver_name")),
+        "reply_text": reply_text(u, correlations, escalate, patient.get("caregiver_name"), can_take),
     }
     store().add_checkin(pid, checkin)
     labels = ", ".join(s.label for s in u.symptoms) or "fără simptome"
