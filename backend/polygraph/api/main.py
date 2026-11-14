@@ -458,14 +458,16 @@ async def create_checkin(pid: str, request: Request, x_patient_token: str | None
     u = understand(text, meds, kb())
     alerts = run_analysis(pid, patient, meds)["alerts"]
     correlations, escalate = correlate(make_ctx(patient, meds, today(), kb()), alerts, u.symptoms)
-    can_take = None
+    x1 = None
     if u.intent == "can_i_take" and u.drug_query and u.drug_query["source"] == "catalog":
         x1 = can_i_take.answer(
-            u.drug_query, meds, kb(), lambda regimen: run_analysis(pid, patient, regimen)["alerts"], today().isoformat()
+            u.drug_query,
+            meds,
+            kb(),
+            lambda regimen: run_analysis(pid, patient, regimen)["alerts"],
+            today().isoformat(),
+            patient.get("caregiver_name"),
         )
-        if x1:
-            can_take = x1.text
-            LOG.info("POT SĂ IAU %s → %s %s", x1.brand, x1.case, ", ".join(x1.alert_ids) or "")
     checkin = {
         "id": f"ci_{secrets.token_hex(4)}",
         "at": datetime.now(TZ).replace(microsecond=0).isoformat(),
@@ -474,9 +476,20 @@ async def create_checkin(pid: str, request: Request, x_patient_token: str | None
         "symptoms": [{"code": s.code, "label": s.label, "severity": s.severity} for s in u.symptoms],
         "correlations": correlations,
         "escalate": escalate,
-        "reply_text": reply_text(u, correlations, escalate, patient.get("caregiver_name"), can_take),
+        "reply_text": reply_text(u, correlations, escalate, patient.get("caregiver_name"), x1.text if x1 else None),
     }
     store().add_checkin(pid, checkin)
+    if x1:
+        # o întrebare nu e un simptom: escalate rămâne false, dar grav și „fără date” ajung în Noutăți
+        if x1.to_feed:
+            store().add_event(pid, can_i_take.feed_event(patient, checkin, x1))
+        LOG.info(
+            "POT SĂ IAU %-11s → %-10s severitate %-8s · %s",
+            x1.brand,
+            x1.case,
+            x1.severity or "–",
+            "trimis în Noutăți" if x1.to_feed else "fără Noutăți",
+        )
     labels = ", ".join(s.label for s in u.symptoms) or "fără simptome"
     via = "gemini" if u.used_llm else "sinonime"
     if escalate:

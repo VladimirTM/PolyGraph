@@ -1,5 +1,7 @@
-"""X1, „Pot să iau…?”: what-if pe regimul pacientului, cu răspunsul prudent decis pe 14.11.2026 (docs/PLAN.md, 1.3).
-Niciun răspuns nu spune „puteți lua”. Testele cu kb-ul real se sar dacă kb/kb.sqlite nu e construit (CI)."""
+"""X1, „Pot să iau…?”: what-if pe regimul pacientului, cu răspunsul pe severități decis pe 14.11.2026 (docs/PLAN.md,
+1.3). Grav și „fără date” ajung în Noutăți; moderat și „nimic găsit” rămân doar în răspuns și în check-in.
+Niciun răspuns nu spune „puteți lua” și nu trimite la farmacist. Testele cu kb-ul real se sar dacă kb/kb.sqlite nu e
+construit (CI)."""
 
 from __future__ import annotations
 
@@ -11,6 +13,7 @@ from engine_helpers import FIX, real_kb
 from fastapi.testclient import TestClient
 
 from polygraph.api import main
+from polygraph.engine.texts_ro import FORBIDDEN
 from polygraph.store import Store
 from polygraph.voice import can_i_take
 from polygraph.voice import understand as U
@@ -18,7 +21,7 @@ from polygraph.voice import understand as U
 H = {"X-Patient-Token": "demo-token"}
 P = "/v1/patients/pat_demo"
 MEDS = json.loads((FIX / "demo_patient.json").read_text(encoding="utf-8"))["meds"]
-PERMISSIVE = ("puteți lua", "puteti lua", "e sigur", "nu e nicio problemă")
+PERMISSIVE = ("puteți lua", "puteti lua", "e sigur", "nu e nicio problemă", "farmacist", "opriți", "nu mai luați")
 
 
 @pytest.fixture
@@ -35,47 +38,73 @@ def client(monkeypatch):
 
 
 def ask(client, text):
+    """→ (reply_text, evenimentul din Noutăți pentru check-in sau None)."""
     r = client.post(f"{P}/checkins", json={"text": text}, headers=H)
     assert r.status_code == 201, r.text
     ci = r.json()
     assert not contracts.schema_errors("checkin", ci)
     assert ci["intent"] == "can_i_take" and ci["escalate"] is False
-    assert not any(p in ci["reply_text"].lower() for p in PERMISSIVE), ci["reply_text"]
-    return ci["reply_text"]
+    reply = ci["reply_text"]
+    assert not any(p in reply.lower() for p in PERMISSIVE), reply
+    assert not FORBIDDEN.search(reply), reply
+    feed = client.get(f"{P}/feed", headers=H).json()
+    event = next((e for e in feed if e["checkin_id"] == ci["id"]), None)
+    if event:
+        assert not contracts.schema_errors("feed_event", event), event
+        assert event["type"] == "checkin" and ": " not in event["title"]
+        assert not any(p in event["body"].lower() for p in PERMISSIVE), event["body"]
+    return reply, event
 
 
-def test_aspirin_with_sintrom_asks_the_doctor(client):  # exemplul de la pitch
-    reply = ask(client, "Pot să iau o aspirină?")
-    assert "Înainte să luați Aspirin, întrebați medicul de familie." in reply
-    assert "Sintrom și Aspirin" in reply
+def test_aspirin_with_sintrom_is_serious_and_reaches_the_feed(client):  # exemplul de la pitch
+    reply, event = ask(client, "Pot să iau o aspirină?")
+    assert "Aspirin și Sintrom împreună cresc riscul de sângerare." in reply
+    assert "Nu luați Aspirin până nu vă răspunde medicul de familie." in reply
+    assert "I-am trimis întrebarea lui și Anei." in reply
+    assert event is not None
+    assert event["title"] == "Maria a întrebat dacă poate lua Aspirin"
+    assert event["severity"] == "major" and event["med_ids"] == ["med_01"]
+    assert "Sintrom și Aspirin" in event["body"] and "Sursa: DDInter" in event["body"]
 
 
-def test_same_class_as_a_current_drug(client):
-    reply = ask(client, "Pot să iau un Ketonal?")
-    assert "întrebați medicul de familie" in reply and "aceeași clasă" in reply
+def test_paracetamol_is_moderate_and_stays_out_of_the_feed(client):
+    reply, event = ask(client, "Pot să iau un paracetamol?")
+    assert "are o interacțiune moderată cu Sintrom." in reply
+    assert "Am notat întrebarea; Ana și medicul de familie o văd în fișa dumneavoastră." in reply
+    assert event is None
 
 
-def test_no_interaction_data_is_said_plainly(client):  # metamizolul nu e în DDInter
-    reply = ask(client, "Pot să iau un Algocalmin dacă am deja Sintrom?")
-    assert "Nu am date despre Algocalmin" in reply
+def test_ketonal_names_the_anticoagulant(client):
+    reply, event = ask(client, "Pot să iau un Ketonal?")
+    assert "Sintrom împreună cresc riscul de sângerare" in reply and "până nu vă răspunde medicul" in reply
+    assert event is not None and event["severity"] == "major"
+
+
+def test_no_interaction_data_reaches_the_feed(client):  # metamizolul nu e în DDInter
+    reply, event = ask(client, "Pot să iau un Algocalmin dacă am deja Sintrom?")
+    assert "Nu am date despre Algocalmin. I-am trimis întrebarea medicului de familie." in reply
+    assert event is not None and event["severity"] is None and event["med_ids"] == []
+    assert event["title"] == "Maria a întrebat dacă poate lua Algocalmin"
 
 
 def test_drug_already_on_the_list_keeps_its_answer(client):
-    reply = ask(client, "Pot să iau Nurofen?")
+    reply, event = ask(client, "Pot să iau Nurofen?")
     assert "Nurofen e pe lista dumneavoastră" in reply
+    assert event is None
 
 
 def test_unknown_drug_falls_back_to_the_doctor(client):
-    reply = ask(client, "Pot să iau un Zezouxan?")
+    reply, event = ask(client, "Pot să iau un Zezouxan?")
     assert "întrebați medicul de familie" in reply
+    assert event is None
 
 
-def test_nothing_found_still_sends_to_the_pharmacist():
+def test_nothing_found_says_so_without_the_feed():
     kb = real_kb()
     dq = {"text": "aspirin", "source": "catalog", "brand": "Aspirin", "med_id": None}
-    a = can_i_take.answer(dq, MEDS, kb, lambda _regimen: [], "2026-11-14")
-    assert a.case == "none_found"
-    assert "Nu am găsit o interacțiune cunoscută" in a.text and "întrebați farmacistul" in a.text
+    a = can_i_take.answer(dq, MEDS, kb, lambda _regimen: [], "2026-11-14", "Ana")
+    assert a.case == "none_found" and not a.to_feed
+    assert a.text == "Nu am găsit o interacțiune cunoscută cu medicamentele dumneavoastră."
 
 
 def test_oral_single_product_is_preferred():

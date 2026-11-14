@@ -181,10 +181,15 @@ class Scenario:
 
     def can_i_take(self) -> str:
         ci = valid("checkin", self.post(f"{P}/checkins", 201, headers=H, json={"text": "Pot să iau o aspirină?"}).json())
+        reply = ci["reply_text"]
         need(ci["intent"] == "can_i_take", f"intent: {ci['intent']}")
-        need("întrebați medicul de familie" in ci["reply_text"] and "Sintrom" in ci["reply_text"], ci["reply_text"])
-        need("puteți lua" not in ci["reply_text"].lower(), "răspunsul nu are voie să spună „puteți lua”")
-        return "aspirină → „întrebați medicul de familie” (Sintrom), fără „puteți lua”"
+        need(ci["escalate"] is False, "o întrebare nu e un simptom: escalate rămâne false")
+        need("Sintrom împreună cresc riscul de sângerare" in reply and "până nu vă răspunde medicul" in reply, reply)
+        need(not any(w in reply.lower() for w in ("puteți lua", "farmacist")), f"răspuns nepermis: {reply}")
+        event = next((e for e in self.feed() if e["checkin_id"] == ci["id"]), None)
+        need(event and event["severity"] == "major" and "Aspirin" in event["title"], f"Noutățile pentru Ana: {event}")
+        valid("feed_event", event)
+        return "aspirină → grav (Sintrom, sângerare), „nu o luați până răspunde medicul”; apare în Noutăți"
 
     def new_doctor(self) -> str:
         fromilid = self.scan("fromilid_prescription")["candidates"]
