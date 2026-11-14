@@ -29,6 +29,7 @@ struct OnboardingView: View {
     @FocusState private var nameFocused: Bool
 
     @ScaledMetric(relativeTo: .title2) private var fieldSize: CGFloat = 22
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         NavigationStack {
@@ -36,15 +37,21 @@ struct OnboardingView: View {
                 if step != .welcome {
                     progressHeader
                 }
+                // la mărimile de accesibilitate butoanele intră în scroll, după întrebare: fixate jos, o acopereau (Q3-22)
                 ScrollView {
                     stepContent
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(Spacing.m)
                         .id(step)
                         .transition(stepTransition)
+                    if dynamicTypeSize.isAccessibilitySize {
+                        bottomBar
+                    }
                 }
                 .scrollDismissesKeyboard(.interactively)
-                bottomBar
+                if !dynamicTypeSize.isAccessibilitySize {
+                    bottomBar
+                }
             }
             .background(PgColor.background)
             .toolbar {

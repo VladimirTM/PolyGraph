@@ -97,8 +97,10 @@ struct SeniorButton: View {
                     Image(systemName: systemImage)
                         .accessibilityHidden(true)
                 }
+                // pe mai multe rânduri la textul mare, nu „Pentru cinev…” (Q3-22)
                 Text(title)
                     .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .font(.system(size: fontSize, weight: .semibold))
             .foregroundStyle(prominence == .primary ? PgColor.onAccent : PgColor.accent)

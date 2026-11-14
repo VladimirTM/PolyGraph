@@ -101,6 +101,16 @@ struct ConfirmDraftTests {
         #expect(draft.canSave)
     }
 
+    // Q3-28: „9999 mg” la Sintrom 4 mg primește avertizarea; „2 mg” nu
+    @Test func unusualStrengthIsFlagged() throws {
+        let draft = MedDraft(try sintrom())
+        #expect(!draft.strengthLooksUnusual)
+        draft.strengthText = "9999 mg"
+        #expect(draft.strengthLooksUnusual)
+        draft.strengthText = "2 mg"
+        #expect(!draft.strengthLooksUnusual)
+    }
+
     @Test func expiryComparesByDay() throws {
         let draft = MedDraft(try sintrom())
         draft.expiry = MedDraft.date(fromISODay: "2024-01-31")

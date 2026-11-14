@@ -210,8 +210,10 @@ private struct AlertGroupCard: View {
 }
 
 /// Un rând dintr-un card restrâns: punct + severitate, titlul, medicamentele.
+/// În `List` (detaliul medicamentului) sistemul pune deja chevronul, deci `showsChevron: false` (Q3-29).
 struct CompactAlertRow: View {
     let alert: Alert
+    var showsChevron = true
 
     @Environment(AppStore.self) private var store
 
@@ -229,10 +231,12 @@ struct CompactAlertRow: View {
                     .multilineTextAlignment(.leading)
             }
             Spacer(minLength: 0)
-            Image(systemName: "chevron.right")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.tertiary)
-                .accessibilityHidden(true)
+            if showsChevron {
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
         }
         .padding(.vertical, Spacing.xs)
         .contentShape(Rectangle())

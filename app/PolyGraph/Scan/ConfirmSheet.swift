@@ -308,6 +308,13 @@ private struct DraftForm: View {
                     .font(.subheadline)
                     .foregroundStyle(.orange)
                     .accessibilityIdentifier("confirm.strengthWarning")
+            } else if draft.strengthLooksUnusual {
+                Label(
+                    "Concentrația pare neobișnuită pentru acest medicament. Verificați ce scrie pe cutie.",
+                    systemImage: "exclamationmark.triangle.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(.orange)
+                    .accessibilityIdentifier("confirm.unusualStrengthWarning")
             }
 
             if draft.substances.isEmpty {
@@ -354,7 +361,9 @@ private struct DraftForm: View {
                 .accessibilityIdentifier("confirm.asNeededToggle")
             Picker("Masa", selection: $draft.withFood) {
                 ForEach(draft.foodChoices, id: \.self) { choice in
-                    Text(choice.shortLabel).tag(choice)
+                    Text(choice.shortLabel)
+                        .accessibilityLabel(choice.instruction ?? "Oricând")
+                        .tag(choice)
                 }
             }
             .pickerStyle(.segmented)

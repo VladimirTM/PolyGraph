@@ -58,13 +58,8 @@ struct AlertDetailView: View {
                     .accessibilityIdentifier("alertDetail.recommendation")
             }
 
-            if let analogy = alert.analogy {
-                Section {
-                    Text("Pentru perechea aceasta nu există date directe. Am evaluat-o prin analogie cu \(analogy.via), din aceeași clasă (ATC \(analogy.atc4)). De confirmat de medicul de familie.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-            }
+            // analogia de clasă e spusă o singură dată, la sfârșitul lui `detail` (vine așa de la server);
+            // antetul are deja „· prin analogie” (Q3-33)
 
             let meds = alert.medids.compactMap { store.med(id: $0) }
             if !meds.isEmpty {

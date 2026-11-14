@@ -28,7 +28,15 @@ struct GraphView: View {
 
     @ViewBuilder
     private var content: some View {
-        if let graph = store.analysis?.graph {
+        if store.analysis != nil && store.visibleMeds.isEmpty {
+            // fără medicamente graful ar fi doar nodul pacientului, un cerc uriaș (Q3-38)
+            ContentUnavailableView {
+                Label("Graful apare după primul medicament", systemImage: "point.3.connected.trianglepath.dotted")
+            } description: {
+                Text("Adăugați medicamentele din tab-ul Medicamente; legăturile dintre ele apar aici.")
+            }
+            .accessibilityIdentifier("graph.empty")
+        } else if let graph = store.analysis?.graph {
             GraphWebView(
                 source: source(graph), resetCount: resetCount, animateReset: !reduceMotion, onMessage: handle
             )
