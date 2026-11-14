@@ -26,7 +26,7 @@ from typing import Annotated, Any, Literal
 from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, Query, Request, Response, UploadFile
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
@@ -102,8 +102,10 @@ DEMO_EXTRA = (
         {"id": "pat_demo_ion", "name": "Ion", "birth_year": 1944, "caregiver_name": "Mihai"},
         ("med_03", "med_04", "med_05", "med_07"),
     ),
-    ({"id": "pat_demo_ana", "name": "Ana", "birth_year": 1952, "caregiver_name": None}, ("med_05", "med_06")),
+    # nu „Ana”: așa o cheamă pe fiica Mariei din scenariu, iar lista medicului e proiectată pe ecran
+    ({"id": "pat_demo_ioana", "name": "Ioana", "birth_year": 1952, "caregiver_name": None}, ("med_05", "med_06")),
 )
+LEGACY_DEMO_IDS = ("pat_demo_ana",)  # din app.sqlite-urile create înainte de redenumire
 
 
 def reset_demo(live_scan: bool = False) -> None:
@@ -121,6 +123,8 @@ def reset_demo(live_scan: bool = False) -> None:
     doctor_id, doctor_name = DEMO_DOCTOR
     s.upsert_doctor(doctor_id, doctor_name, os.environ.get("PG_DOCTOR_CODE") or "medic-demo")
     s.link_patient(doctor_id, DEMO_ID)
+    for legacy in LEGACY_DEMO_IDS:
+        s.delete_patient(legacy)
     for extra, med_ids in DEMO_EXTRA:
         s.delete_patient(extra["id"])
         s.create_patient({**extra, "anchors": DEMO["patient"]["anchors"]})
@@ -155,6 +159,17 @@ def auth(pid: str, token: str | None) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------- sistem
+
+
+@app.get("/", response_class=PlainTextResponse)
+def root(request: Request) -> str:
+    # QR-ul din `make demo` deschis cu camera telefonului ajunge aici: spunem unde se pune adresa, nu „Not Found”
+    base = str(request.base_url).rstrip("/")
+    return (
+        "PolyGraph: serverul funcționează.\n\n"
+        f"Puneți această adresă în aplicație, la Setări → adresa serverului:\n{base}\n\n"
+        f"Portalul medicului de familie: {base}/portal\n"
+    )
 
 
 @app.get("/health")

@@ -27,13 +27,21 @@ Se face înainte de hackathon, doar cu telefonul și imprimanta: fără cod. Fi�
 **Fața cutiei:** cutia pe o masă plată, lumină de zi sau difuză, fără reflexii pe fața lucioasă, telefonul paralel cu cutia, tot textul citibil.
 **Codul DataMatrix:** o poză apropiată, focalizată, cu tot codul în cadru. Dacă lângă cod sunt tipărite `PC`, `SN`, `LOT`, `EXP`, fotografiază-le și pe ele și notează-le mai jos.
 
-Nume de fișier (în `demo/photos/` și `demo/datamatrix/`):
+Nume de fișier (în `demo/photos/` și `demo/datamatrix/`). Fața cutiei se numește după `id`-ul medicamentului din `contracts/fixtures/demo_patient.json`, pentru că aplicația și portalul caută exact `/media/med_0N.jpg`; cu alt nume, apare imaginea neutră:
 
 ```
-demo/photos/01_sintrom_fata.jpg        demo/datamatrix/01_sintrom_cod.jpg
-demo/photos/02_nurofen_fata.jpg        demo/datamatrix/02_nurofen_cod.jpg
-demo/photos/03_simvastatina_fata.jpg   ...
+demo/photos/med_01.jpg   Sintrom          demo/datamatrix/01_sintrom_cod.jpg
+demo/photos/med_02.jpg   Nurofen          demo/datamatrix/02_nurofen_cod.jpg
+demo/photos/med_03.jpg   Simvastatină     ...
+demo/photos/med_04.jpg   Amlodipină
+demo/photos/med_05.jpg   Euthyrox
+demo/photos/med_06.jpg   Calciu + D3
+demo/photos/med_07.jpg   Omeprazol
+demo/photos/med_08.jpg   Amitriptilină
+demo/photos/med_09.jpg   Fromilid (opțional)
 ```
+
+Doar JPEG, cu extensia `.jpg` (fixture-ul cere `/media/med_0N.jpg`; din iPhone: Export ca JPEG, nu HEIC), cel mult câțiva MB fiecare. După ce le pui, rulează o dată `make demo-warm` (cu internet) și verifică în `make demo` linia „fotografii demo: 8/8”.
 
 Datele de pe cutiile scanate live (completezi de pe cutie; GTIN/PC = șirul de cifre lângă „PC”):
 

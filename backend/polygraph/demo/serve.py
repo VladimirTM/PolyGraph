@@ -19,7 +19,7 @@ import zxingcpp
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[3]
-PHOTO = re.compile(r"med_0[1-9]\.(jpg|png)")
+PHOTO = re.compile(r"med_0[1-8]\.jpg")  # numele din demo_patient.json (photo_url = /media/med_0N.jpg)
 
 
 def local_ips() -> list[str]:
@@ -103,6 +103,12 @@ def main() -> None:
     print("\nPolyGraph · demo\n")
     for line in qr_lines(url):
         print("   " + line)
+    if ips == ["127.0.0.1"]:
+        print(
+            "\n  ⚠ Laptopul nu e în nicio rețea: telefoanele nu pot ajunge la 127.0.0.1.\n"
+            "    Porniți Wi-Fi-ul sau hotspot-ul (de exemplu Personal Hotspot de pe un iPhone, la care se conectează\n"
+            "    laptopul și celălalt telefon), apoi reporniți make demo ca să apară adresa bună."
+        )
     print(f"\n  Aplicația (Setări → adresa serverului): {url}")
     for ip in ips[1:]:
         print(f"                              sau: http://{ip}:{port}")
