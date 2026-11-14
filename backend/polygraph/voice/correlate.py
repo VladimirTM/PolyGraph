@@ -101,7 +101,10 @@ def dative(name: str | None) -> str:
 MAX_ADVICE = 2
 
 
-def reply_text(u: Understanding, correlations: list[Json], escalate: bool, caregiver: str | None) -> str:
+def reply_text(
+    u: Understanding, correlations: list[Json], escalate: bool, caregiver: str | None, can_take: str | None = None
+) -> str:
+    """`can_take`: răspunsul X1 (polygraph/voice/can_i_take.py) pentru un medicament din catalog, dacă există."""
     parts = ["Mulțumesc."]
     if escalate:
         parts.append(f"I-am trimis {dative(caregiver)} ce mi-ați spus.")
@@ -111,7 +114,9 @@ def reply_text(u: Understanding, correlations: list[Json], escalate: bool, careg
     parts += [s.advice for s in ordered[:MAX_ADVICE]]
     if u.intent == "can_i_take":
         dq = u.drug_query
-        if dq and dq["source"] == "patient":
+        if can_take:
+            parts.append(can_take)
+        elif dq and dq["source"] == "patient":
             parts.append(f"{dq['brand']} e pe lista dumneavoastră: uitați-vă pe ecranul „Acum” când îi vine ora.")
         else:
             what = f" {dq['brand']}" if dq else " un medicament nou"

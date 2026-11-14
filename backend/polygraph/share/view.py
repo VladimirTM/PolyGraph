@@ -151,8 +151,11 @@ def adherence(meds: list[Json], doses: list[Json], schedule_for, today: date, no
     return round(100 * taken / expected) if expected else None
 
 
-def recent_checkins(checkins: list[Json], today: date) -> list[Json]:
+def recent_checkins(checkins: list[Json], today: date, events: list[Json] | None = None) -> list[Json]:
+    """Check-in-urile din ultimele 7 zile, cele noi primele. La „Pot să iau…?” medicul vede și răspunsul dat, iar
+    marcajul „semnalat familiei” apare și la întrebările care au ajuns în Noutăți (escalate rămâne false la ele)."""
     cut = today - timedelta(days=6)
+    sent = {e["checkin_id"]: e for e in events or [] if e.get("checkin_id")}
     out = []
     for ci in checkins:
         try:
@@ -160,7 +163,17 @@ def recent_checkins(checkins: list[Json], today: date) -> list[Json]:
         except ValueError:
             continue
         if when.date() >= cut:
-            out.append({**ci, "when": when.strftime("%d.%m, %H:%M")})
+            event = sent.get(ci["id"])
+            answer = ci.get("reply_text", "").removeprefix("Mulțumesc.").strip() if ci.get("intent") == "can_i_take" else ""
+            out.append(
+                {
+                    **ci,
+                    "when": when.strftime("%d.%m, %H:%M"),
+                    "answer": answer or None,
+                    "to_family": ci.get("escalate") or event is not None,
+                    "grave": ci.get("escalate") or (event is not None and event["severity"] in ("critical", "major")),
+                }
+            )
     return list(reversed(out))
 
 
@@ -208,6 +221,7 @@ def page_context(
     schedule_for,
     today: date,
     now: datetime,
+    events: list[Json] | None = None,
 ) -> Json:
     active = [m for m in meds if is_active(m, today)]
     names = {m["id"]: med_name(m) for m in meds}
@@ -239,7 +253,7 @@ def page_context(
         "alerts": alerts,
         "acb": analysis["acb_total"],
         "graph": analysis["graph"],
-        "checkins": recent_checkins(checkins, today),
+        "checkins": recent_checkins(checkins, today, events),
         "schedule": schedule_view(schedule_for(today), names),
         "questions": questions(alerts, age, analysis["acb_total"]),
         "generated": now.astimezone(TZ).strftime("%d.%m.%Y, %H:%M"),

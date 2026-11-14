@@ -98,9 +98,10 @@
   <section aria-labelledby="h-checkins">
     <h2 id="h-checkins">Cum s-a simțit în ultimele 7 zile</h2>
     {% for ci in checkins %}
-    <div class="checkin{% if ci.escalate %} is-escalated{% endif %}">
-      <p class="checkin-when">{{ ci.when }}{% if ci.escalate %} · <strong>semnalat familiei</strong>{% endif %}</p>
+    <div class="checkin{% if ci.grave %} is-escalated{% endif %}">
+      <p class="checkin-when">{{ ci.when }}{% if ci.to_family %} · <strong>semnalat familiei</strong>{% endif %}</p>
       <p class="checkin-text">„{{ ci.transcript }}”</p>
+      {% if ci.answer %}<p class="small">Răspuns: {{ ci.answer }}</p>{% endif %}
       {% if ci.symptoms %}<p class="small">Simptome: {% for s in ci.symptoms %}{{ s.label }}{% if not loop.last %}, {% endif %}{% endfor %}</p>{% endif %}
     </div>
     {% else %}

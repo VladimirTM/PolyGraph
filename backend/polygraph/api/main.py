@@ -47,6 +47,7 @@ from polygraph.schedule import build_schedule  # noqa: E402
 from polygraph.share import STATIC_DIR, render  # noqa: E402
 from polygraph.share.view import page_context, patient_card, review_event  # noqa: E402
 from polygraph.store import Store  # noqa: E402
+from polygraph.voice import can_i_take  # noqa: E402
 from polygraph.voice.correlate import correlate, feed_event, reply_text  # noqa: E402
 from polygraph.voice.understand import understand  # noqa: E402
 
@@ -457,6 +458,16 @@ async def create_checkin(pid: str, request: Request, x_patient_token: str | None
     u = understand(text, meds, kb())
     alerts = run_analysis(pid, patient, meds)["alerts"]
     correlations, escalate = correlate(make_ctx(patient, meds, today(), kb()), alerts, u.symptoms)
+    x1 = None
+    if u.intent == "can_i_take" and u.drug_query and u.drug_query["source"] == "catalog":
+        x1 = can_i_take.answer(
+            u.drug_query,
+            meds,
+            kb(),
+            lambda regimen: run_analysis(pid, patient, regimen)["alerts"],
+            today().isoformat(),
+            patient.get("caregiver_name"),
+        )
     checkin = {
         "id": f"ci_{secrets.token_hex(4)}",
         "at": datetime.now(TZ).replace(microsecond=0).isoformat(),
@@ -465,9 +476,20 @@ async def create_checkin(pid: str, request: Request, x_patient_token: str | None
         "symptoms": [{"code": s.code, "label": s.label, "severity": s.severity} for s in u.symptoms],
         "correlations": correlations,
         "escalate": escalate,
-        "reply_text": reply_text(u, correlations, escalate, patient.get("caregiver_name")),
+        "reply_text": reply_text(u, correlations, escalate, patient.get("caregiver_name"), x1.text if x1 else None),
     }
     store().add_checkin(pid, checkin)
+    if x1:
+        # o întrebare nu e un simptom: escalate rămâne false, dar grav și „fără date” ajung în Noutăți
+        if x1.to_feed:
+            store().add_event(pid, can_i_take.feed_event(patient, checkin, x1))
+        LOG.info(
+            "POT SĂ IAU %-11s → %-10s severitate %-8s · %s",
+            x1.brand,
+            x1.case,
+            x1.severity or "–",
+            "trimis în Noutăți" if x1.to_feed else "fără Noutăți",
+        )
     labels = ", ".join(s.label for s in u.symptoms) or "fără simptome"
     via = "gemini" if u.used_llm else "sinonime"
     if escalate:
@@ -579,6 +601,7 @@ def patient_context(pid: str) -> dict[str, Any]:
         lambda day: build_schedule(patient, meds, day, catalog),
         today(),
         datetime.now(TZ),
+        s.list_events(pid),
     )
 
 

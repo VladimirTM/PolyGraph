@@ -179,6 +179,18 @@ class Scenario:
         need(event and "Sintrom + Nurofen" in event["body"], f"Noutățile pentru Ana: {event}")
         return "amețeală + vânătăi → Sintrom + Nurofen, escaladat; apare în Noutăți"
 
+    def can_i_take(self) -> str:
+        ci = valid("checkin", self.post(f"{P}/checkins", 201, headers=H, json={"text": "Pot să iau o aspirină?"}).json())
+        reply = ci["reply_text"]
+        need(ci["intent"] == "can_i_take", f"intent: {ci['intent']}")
+        need(ci["escalate"] is False, "o întrebare nu e un simptom: escalate rămâne false")
+        need("Sintrom împreună cresc riscul de sângerare" in reply and "până nu vă răspunde medicul" in reply, reply)
+        need(not any(w in reply.lower() for w in ("puteți lua", "farmacist")), f"răspuns nepermis: {reply}")
+        event = next((e for e in self.feed() if e["checkin_id"] == ci["id"]), None)
+        need(event and event["severity"] == "major" and "Aspirin" in event["title"], f"Noutățile pentru Ana: {event}")
+        valid("feed_event", event)
+        return "aspirină → grav (Sintrom, sângerare), „nu o luați până răspunde medicul”; apare în Noutăți"
+
     def new_doctor(self) -> str:
         fromilid = self.scan("fromilid_prescription")["candidates"]
         rx = next((c for c in fromilid if "J01FA09" in {s["atc"] for s in c["substances"]}), None)
@@ -235,6 +247,7 @@ STEPS: list[tuple[str, str, Callable[[Scenario], str]]] = [
     ("0:45", "Alertele și graful", Scenario.alerts_and_graph),
     ("1:15", "Programul și „Am luat”", Scenario.schedule),
     ("1:40", "Check-in-ul vocal", Scenario.checkin),
+    ("X1", "„Pot să iau o aspirină?”", Scenario.can_i_take),
     ("2:10", "Medic nou: rețeta ORL", Scenario.new_doctor),
     ("2:30", "Portalul medicului de familie", Scenario.portal),
     ("2:50", "Reconcilierea de tipărit", Scenario.print_sheet),
