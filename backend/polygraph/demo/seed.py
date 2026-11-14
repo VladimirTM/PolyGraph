@@ -121,7 +121,13 @@ def simulate_missed_dose(store: Store, pid: str, patient: Json, meds: list[Json]
     at = datetime.combine(day, time.fromisoformat(moment["time"]), TZ)
     taken = {d["med_id"] for d in store.list_doses(pid) if d["status"] == "taken" and _instant(d["scheduled_at"]) == at}
     med_ids = [d["med_id"] for d in moment["doses"] if d["med_id"] not in taken] or [d["med_id"] for d in moment["doses"]]
-    event = missed_event(patient, meds, moment, day, med_ids, now.strftime("%H%M%S") + "_sim")
+    suffix = f"{day:%m%d}_{moment['time'].replace(':', '')}_sim"
+    # Q3-20: butonul apăsat de mai multe ori pentru același moment nu adaugă alte evenimente
+    existing = next((e for e in store.list_events(pid) if e["id"] == f"ev_missed_{suffix}"), None)
+    if existing is not None:
+        LOG.info("DOZĂ      ratată (simulată) la %s: deja în Noutăți", moment["time"])
+        return existing
+    event = missed_event(patient, meds, moment, day, med_ids, suffix)
     event["at"] = now.replace(microsecond=0).isoformat()
     store.add_event(pid, event)
     LOG.info("DOZĂ      ratată (simulată) la %s: %s", moment["time"], _brands(meds, med_ids))

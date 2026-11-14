@@ -60,6 +60,14 @@ CREATE TABLE IF NOT EXISTS doctor_patients(
 """
 
 
+class MedIdTaken(Exception):
+    """Id-ul medicamentului e deja folosit la acest pacient; `saved` e medicamentul salvat."""
+
+    def __init__(self, saved: Json):
+        super().__init__(saved["id"])
+        self.saved = saved
+
+
 class Store:
     def __init__(self, path: str | Path | None = None):
         self.path = str(path or os.environ.get("PG_APP_DB") or DEFAULT_DB)
@@ -109,16 +117,6 @@ class Store:
         row = self._q("SELECT data FROM meds WHERE patient_id = ? AND id = ?", (pid, mid))
         return json.loads(row[0][0]) if row else None
 
-    def free_med_id(self, pid: str, wanted: str | None) -> str:
-        """Id-ul cerut dacă e liber și valid, altfel următorul med_NN liber."""
-        taken = {r[0] for r in self._q("SELECT id FROM meds WHERE patient_id = ?", (pid,))}
-        if wanted and wanted not in taken:
-            return wanted
-        n = len(taken) + 1
-        while f"med_{n:02d}" in taken:
-            n += 1
-        return f"med_{n:02d}"
-
     def clear_gtin_cache(self) -> None:
         self._x("DELETE FROM gtin_cache")
 
@@ -130,7 +128,11 @@ class Store:
         return int(product_id) if version == catalog_version and product_id.isdecimal() else None
 
     def add_med(self, pid: str, med: Json, catalog_product: tuple[str, int] | None = None) -> None:
+        """Verificarea id-ului și inserarea sub același lock: două cereri în paralel nu ajung la IntegrityError."""
         with self._lock, self._conn:
+            row = self._conn.execute("SELECT data FROM meds WHERE patient_id = ? AND id = ?", (pid, med["id"])).fetchone()
+            if row:
+                raise MedIdTaken(json.loads(row[0]))
             if catalog_product is not None:
                 version, product_id = catalog_product
                 prefix = f"{version}/"
